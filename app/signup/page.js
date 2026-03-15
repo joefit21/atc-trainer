@@ -26,8 +26,13 @@ export default function Signup() {
       body: JSON.stringify({ userId: data.user.id, email })
     })
 
-    const { url } = await res.json()
-    window.location.href = url
+    const result = await res.json()
+    if (result.error) {
+      setMessage('Checkout error: ' + result.error)
+      setLoading(false)
+      return
+    }
+    window.location.href = result.url
   }
 
   return (
