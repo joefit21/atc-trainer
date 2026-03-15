@@ -83,7 +83,7 @@ export default function Demo() {
         <div className="flex items-center gap-4">
           <span className="text-yellow-400 text-sm font-medium">🔓 Demo Mode</span>
           <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition">
-            Subscribe — $15/mo
+            Subscribe — $29/mo
           </a>
         </div>
       </nav>
@@ -197,7 +197,7 @@ export default function Demo() {
                   </p>
                   <a href="/signup"
                     className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">
-                    Subscribe for $15/mo →
+                    Subscribe for $29/mo →
                   </a>
                   <p className="text-gray-500 text-sm mt-3">Cancel anytime.</p>
                 </div>

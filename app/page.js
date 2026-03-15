@@ -27,7 +27,7 @@ export default function Home() {
             Try Free Demo
           </a>
           <a href="/signup" className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-lg text-lg transition">
-            Subscribe — $15/mo
+            Subscribe — $29/mo
           </a>
         </div>
       </section>
@@ -57,7 +57,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold mb-4">Simple Pricing</h2>
           <p className="text-gray-400 mb-10">One plan. Everything included.</p>
           <div className="bg-[#0a0f1e] border border-blue-500/30 rounded-2xl p-8">
-            <div className="text-5xl font-bold mb-2">$15<span className="text-xl text-gray-400">/mo</span></div>
+            <div className="text-5xl font-bold mb-2">$29<span className="text-xl text-gray-400">/mo</span></div>
             <p className="text-gray-400 mb-8">Cancel anytime</p>
             <ul className="text-left space-y-3 mb-8">
               {["Unlimited practice scenarios", "Ground & IFR clearances", "AI readback scoring", "Progress tracking", "New scenarios daily"].map((item, i) => (
