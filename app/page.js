@@ -8,7 +8,7 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-4">
           <a href="/login" className="text-gray-300 hover:text-white transition">Log In</a>
-          <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">Start Free Trial</a>
+          <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">Subscribe</a>
         </div>
       </nav>
 
