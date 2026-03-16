@@ -105,6 +105,7 @@ export default function Trainer() {
         <a href="/" className="text-xl font-bold">✈️ ATC Trainer</a>
         <div className="flex items-center gap-4">
           <span className="text-gray-400 text-sm">{user?.email}</span>
+          <a href="/reset-password" className="text-gray-400 hover:text-white text-sm transition">Change Password</a>
           <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
             className="text-gray-400 hover:text-white text-sm transition">Log Out</button>
         </div>
