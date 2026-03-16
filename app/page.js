@@ -38,7 +38,7 @@ export default function Home() {
           {[
             { icon: "🎙️", title: "Real Controller Audio", description: "Listen to authentic ATC clearances delivered in a realistic controller voice." },
             { icon: "🤖", title: "AI-Powered Scoring", description: "Get instant feedback on your readback accuracy, completeness, and phraseology." },
-            { icon: "📈", title: "Track Your Progress", description: "See your scores improve over time with detailed performance history." },
+            { icon: "✅", title: "Checkride Confidence", description: "Practice the exact clearance formats used on FAA checkrides and build confidence before your big day." },
             { icon: "🛫", title: "Ground & IFR Clearances", description: "Practice both taxi clearances and full IFR clearance delivery scenarios." },
             { icon: "🌍", title: "Built for All Pilots", description: "Ideal for student pilots and non-native English speakers preparing for ICAO proficiency." },
             { icon: "♾️", title: "Unlimited Scenarios", description: "Never repeat the same clearance twice — new scenarios generated continuously." }
@@ -60,7 +60,7 @@ export default function Home() {
             <div className="text-5xl font-bold mb-2">$29<span className="text-xl text-gray-400">/mo</span></div>
             <p className="text-gray-400 mb-8">Cancel anytime</p>
             <ul className="text-left space-y-3 mb-8">
-              {["Unlimited practice scenarios", "Ground & IFR clearances", "AI readback scoring", "Progress tracking", "New scenarios daily"].map((item, i) => (
+              {["Unlimited practice scenarios", "Ground & IFR clearances", "AI readback scoring", "Detailed feedback on every readback", "New scenarios every session"].map((item, i) => (
                 <li key={i} className="flex items-center gap-3 text-gray-300">
                   <span className="text-blue-400">✓</span> {item}
                 </li>
@@ -74,7 +74,11 @@ export default function Home() {
       </section>
 
       <footer className="px-8 py-8 border-t border-white/10 text-center text-gray-500 text-sm">
-        © 2025 ATC Trainer. Built for pilots, by a pilot.
+        <p>© 2026 ATC Trainer. Built for pilots, by a pilot.</p>
+        <div className="flex justify-center gap-6 mt-3">
+          <a href="/terms" className="hover:text-gray-300 transition">Terms of Service</a>
+          <a href="/privacy" className="hover:text-gray-300 transition">Privacy Policy</a>
+        </div>
       </footer>
     </main>
   )
