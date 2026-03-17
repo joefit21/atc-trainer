@@ -106,6 +106,15 @@ export default function Trainer() {
         <div className="flex items-center gap-4">
           <span className="text-gray-400 text-sm">{user?.email}</span>
           <a href="/reset-password" className="text-gray-400 hover:text-white text-sm transition">Change Password</a>
+          <button onClick={async () => {
+            const res = await fetch('/api/create-portal', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: user.id })
+            })
+            const { url } = await res.json()
+            window.location.href = url
+          }} className="text-gray-400 hover:text-white text-sm transition">Manage Subscription</button>
           <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
             className="text-gray-400 hover:text-white text-sm transition">Log Out</button>
         </div>
