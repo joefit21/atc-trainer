@@ -53,22 +53,60 @@ export default function Home() {
       </section>
 
       <section className="px-8 py-20 bg-white/5">
-        <div className="max-w-md mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-4">Simple Pricing</h2>
-          <p className="text-gray-400 mb-10">One plan. Everything included.</p>
-          <div className="bg-[#0a0f1e] border border-blue-500/30 rounded-2xl p-8">
-            <div className="text-5xl font-bold mb-2">$29<span className="text-xl text-gray-400">/mo</span></div>
-            <p className="text-gray-400 mb-8">Cancel anytime</p>
-            <ul className="text-left space-y-3 mb-8">
-              {["Unlimited practice scenarios", "Ground & IFR clearances", "AI readback scoring", "Detailed feedback on every readback", "New scenarios every session"].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-gray-300">
-                  <span className="text-blue-400">✓</span> {item}
-                </li>
-              ))}
-            </ul>
-            <a href="/signup" className="block bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition">
-              Get Started
-            </a>
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
+          <p className="text-gray-400 text-center mb-10">Unlimited sessions. Cancel anytime.</p>
+          <div className="grid md:grid-cols-2 gap-6">
+
+            {/* ATC Trainer only */}
+            <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
+              <div className="text-4xl font-bold mb-1">$29<span className="text-xl text-gray-400">/mo</span></div>
+              <p className="text-gray-400 text-sm mb-1">ATC Trainer only</p>
+              <p className="text-gray-500 text-xs mb-6">Less than one hour with a CFI</p>
+              <ul className="text-left space-y-2 mb-8 flex-1">
+                {[
+                  'Unlimited practice scenarios',
+                  'Ground & IFR clearances',
+                  'AI readback scoring',
+                  'Detailed feedback on every readback',
+                  'New scenarios every session',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-blue-400">✓</span> {item}
+                  </li>
+                ))}
+              </ul>
+              <a href="/signup" className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
+                Get ATC Trainer
+              </a>
+            </div>
+
+            {/* Bundle */}
+            <div className="bg-[#0a0f1e] border-2 border-purple-500/70 rounded-2xl p-8 text-center flex flex-col relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+                BEST VALUE
+              </div>
+              <div className="text-4xl font-bold mb-1">$49<span className="text-xl text-gray-400">/mo</span></div>
+              <p className="text-gray-300 text-sm mb-1 font-medium">Flight Levels Bundle</p>
+              <p className="text-gray-500 text-xs mb-6">Save $9/mo vs. buying separately</p>
+              <ul className="text-left space-y-2 mb-8 flex-1">
+                {[
+                  'Everything in ATC Trainer',
+                  'Full access to Checkride Prep AI',
+                  'Practice oral exams + radio comms',
+                  'One subscription, two tools',
+                  'Cancel anytime',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-purple-400">✓</span> {item}
+                  </li>
+                ))}
+              </ul>
+              <a href="https://checkride.flight-levels.com/signup?bundle=1" className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
+                Get the Bundle
+              </a>
+            </div>
+
           </div>
         </div>
       </section>
