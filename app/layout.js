@@ -13,8 +13,53 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ATC Trainer",
-  description: "Practice IFR clearances with AI-powered feedback. Built by a former air traffic controller.",
+  metadataBase: new URL("https://practice.flight-levels.com"),
+  title: {
+    default: "ATC Trainer — Practice IFR Clearances & Readbacks",
+    template: "%s | ATC Trainer",
+  },
+  description:
+    "Master ATC clearances before you fly. Practice IFR clearance readbacks and ground control with real-time AI scoring. Built by a former air traffic controller and CFI.",
+  keywords: [
+    "ATC trainer",
+    "IFR clearance practice",
+    "ATC readback",
+    "pilot radio communication",
+    "IFR clearance readback",
+    "ground control practice",
+    "aviation radio training",
+    "CRAFT clearance",
+    "pilot ATC practice",
+    "air traffic control training",
+  ],
+  authors: [{ name: "Joe Mattison" }],
+  creator: "Joe Mattison",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "ATC Trainer — Practice IFR Clearances & Readbacks",
+    description:
+      "Master ATC clearances before you fly. Practice IFR clearance readbacks with real-time AI scoring. Built by a former air traffic controller and CFI.",
+    url: "https://practice.flight-levels.com",
+    siteName: "ATC Trainer",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ATC Trainer — Practice IFR Clearances & Readbacks",
+    description:
+      "Master ATC clearances before you fly. Practice IFR clearance readbacks with real-time AI scoring. Built by a former air traffic controller.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -26,7 +71,7 @@ export default function RootLayout({ children }) {
           src="https://www.googletagmanager.com/gtag/js?id=AW-17833668075"
           strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-ads" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}

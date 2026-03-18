@@ -1,6 +1,44 @@
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: 'ATC Trainer',
+      applicationCategory: 'EducationalApplication',
+      operatingSystem: 'Web',
+      url: 'https://practice.flight-levels.com',
+      description: 'AI-powered ATC clearance practice for pilots. Practice IFR clearance readbacks and ground control with real-time AI scoring. Built by a former air traffic controller.',
+      author: { '@type': 'Person', name: 'Joe Mattison' },
+      offers: [
+        {
+          '@type': 'Offer',
+          name: 'ATC Trainer',
+          price: '29.00',
+          priceCurrency: 'USD',
+          priceSpecification: { '@type': 'RecurringChargeSpecification', billingDuration: 'P1M', billingIncrement: 1 },
+        },
+        {
+          '@type': 'Offer',
+          name: 'Flight Levels Bundle (ATC Trainer + Checkride Prep)',
+          price: '49.00',
+          priceCurrency: 'USD',
+          priceSpecification: { '@type': 'RecurringChargeSpecification', billingDuration: 'P1M', billingIncrement: 1 },
+        },
+      ],
+    },
+    {
+      '@type': 'WebSite',
+      url: 'https://practice.flight-levels.com',
+      name: 'ATC Trainer',
+      description: 'Practice IFR clearances and ATC readbacks with AI-powered feedback.',
+    },
+  ],
+}
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <nav className="flex items-center justify-between px-8 py-6 border-b border-white/10">
         <div className="flex items-center gap-2">
           <span className="text-2xl">✈️</span>
