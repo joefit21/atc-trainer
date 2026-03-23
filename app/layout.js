@@ -45,6 +45,7 @@ export const metadata = {
     siteName: "ATC Trainer",
     type: "website",
     locale: "en_US",
+    images: [{ url: "/Practice_OG.jpg", width: 1200, height: 630, alt: "ATC Trainer — Practice IFR Clearances Before You Fly" }],
   },
   twitter: {
     card: "summary_large_image",
