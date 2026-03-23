@@ -6,6 +6,15 @@ export default function PaymentSuccess() {
   const router = useRouter()
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        send_to: 'AW-17833668075/U8GpCN_jlY4cEOvb4LdC',
+        value: 29.0,
+        currency: 'USD',
+        transaction_id: '',
+      })
+    }
+
     const timer = setTimeout(() => {
       router.push('/login')
     }, 5000)
