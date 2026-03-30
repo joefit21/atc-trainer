@@ -52,15 +52,18 @@ export default function Home() {
 
       <section className="flex flex-col items-center text-center px-8 py-24">
         <div className="inline-block bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm px-4 py-1 rounded-full mb-6">
-          Built by a flight instructor & air traffic controller
+          Built by a CFI & former air traffic controller
         </div>
         <h1 className="text-5xl md:text-6xl font-bold max-w-3xl leading-tight mb-6">
-          Master ATC Clearances <span className="text-blue-400">Before You Fly</span>
+          Aviation English Practice <span className="text-blue-400">for Pilots Worldwide</span>
         </h1>
-        <p className="text-gray-400 text-xl max-w-2xl mb-10">
-          Practice reading back ground control and IFR clearances with real-time AI scoring. Build the confidence you need in the cockpit.
+        <p className="text-gray-400 text-xl max-w-2xl mb-4">
+          ICAO requires all pilots operating internationally to demonstrate English proficiency. Practice ATC clearances and radio readbacks with an AI controller — at your own pace, any time, anywhere.
         </p>
-        <div className="flex gap-4">
+        <p className="text-gray-500 text-base max-w-xl mb-10">
+          Used by student pilots in India, the UAE, and beyond preparing for ICAO Level 4 English proficiency and real-world cockpit communications.
+        </p>
+        <div className="flex flex-wrap gap-4 justify-center">
           <a href="/demo" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition">
             Try Free Demo
           </a>
@@ -70,16 +73,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Who this is for */}
+      <section className="px-8 py-12 bg-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-8">Who uses ATC Trainer?</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { flag: "🇮🇳", region: "India", description: "Student pilots preparing for DGCA exams and international operations requiring ICAO English proficiency." },
+              { flag: "🇦🇪", region: "UAE & Middle East", description: "Pilots building careers with Gulf carriers where precision English radio communication is essential." },
+              { flag: "🌏", region: "Asia & Beyond", description: "Any pilot who flies, trains, or communicates in English as a second language." },
+            ].map((item, i) => (
+              <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="text-4xl mb-3">{item.flag}</div>
+                <div className="font-semibold mb-2">{item.region}</div>
+                <p className="text-gray-400 text-sm">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="px-8 py-20 max-w-6xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-16">Everything you need to nail your readbacks</h2>
+        <h2 className="text-3xl font-bold text-center mb-16">Everything you need to communicate with confidence</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { icon: "🎙️", title: "Real Controller Audio", description: "Listen to authentic ATC clearances delivered in a realistic controller voice." },
-            { icon: "🤖", title: "AI-Powered Scoring", description: "Get instant feedback on your readback accuracy, completeness, and phraseology." },
-            { icon: "✅", title: "Checkride Confidence", description: "Practice the exact clearance formats used on FAA checkrides and build confidence before your big day." },
-            { icon: "🛫", title: "Ground & IFR Clearances", description: "Practice both taxi clearances and full IFR clearance delivery scenarios." },
-            { icon: "🌍", title: "Built for All Pilots", description: "Ideal for student pilots and non-native English speakers preparing for ICAO proficiency." },
-            { icon: "♾️", title: "Unlimited Scenarios", description: "Never repeat the same clearance twice — new scenarios generated continuously." }
+            { icon: "🌐", title: "ICAO English Proficiency", description: "Practice the standard aviation English phraseology required for ICAO Level 4 proficiency and international operations." },
+            { icon: "🎙️", title: "Real Controller Voice", description: "Listen to authentic ATC clearances delivered in a realistic controller voice — exactly what you will hear in the cockpit." },
+            { icon: "🤖", title: "AI-Powered Scoring", description: "Get instant feedback on your readback accuracy, completeness, and phraseology after every transmission." },
+            { icon: "🛫", title: "Ground & IFR Clearances", description: "Practice both taxi clearances and full IFR clearance delivery — the two most critical radio exchanges for any pilot." },
+            { icon: "🔁", title: "Unlimited Scenarios", description: "Never repeat the same clearance twice. New scenarios are generated continuously so every session is fresh." },
+            { icon: "📱", title: "Practice Anywhere", description: "No app to download. Train from your phone, tablet, or computer — wherever you have a few minutes to practice." },
           ].map((feature, i) => (
             <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-blue-500/30 transition">
               <div className="text-3xl mb-4">{feature.icon}</div>
@@ -93,7 +116,8 @@ export default function Home() {
       <section className="px-8 py-20 bg-white/5">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
-          <p className="text-gray-400 text-center mb-10">Unlimited sessions. Cancel anytime.</p>
+          <p className="text-gray-400 text-center mb-2">Unlimited sessions. Cancel anytime.</p>
+          <p className="text-gray-500 text-sm text-center mb-10">Regional pricing available — <a href="mailto:joe@flight-levels.com" className="text-blue-400 hover:text-blue-300 transition">contact us</a> if USD pricing is a barrier.</p>
           <div className="grid md:grid-cols-2 gap-6">
 
             {/* ATC Trainer only */}
@@ -150,7 +174,7 @@ export default function Home() {
       </section>
 
       <footer className="px-8 py-8 border-t border-white/10 text-center text-gray-500 text-sm">
-        <p>© 2026 ATC Trainer. Built for pilots, by a pilot.</p>
+        <p>© 2026 ATC Trainer. Built for pilots worldwide, by a CFI & former air traffic controller.</p>
         <div className="flex justify-center gap-6 mt-3">
           <a href="/terms" className="hover:text-gray-300 transition">Terms of Service</a>
           <a href="/privacy" className="hover:text-gray-300 transition">Privacy Policy</a>
