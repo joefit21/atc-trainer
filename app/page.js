@@ -47,16 +47,28 @@ const jsonLd = {
 
 function HomeContent() {
   const [price, setPrice] = useState('$29')
+  const [region, setRegion] = useState('default')
   const searchParams = useSearchParams()
 
   useEffect(() => {
     const override = searchParams.get('region')
-    if (override) { setPrice(REGIONAL_PRICE[override] || '$29'); return }
+    if (override) {
+      setRegion(override)
+      setPrice(REGIONAL_PRICE[override] || '$29')
+      return
+    }
     fetch('/api/get-location')
       .then(r => r.json())
-      .then(d => { if (d.region) setPrice(REGIONAL_PRICE[d.region] || '$29') })
+      .then(d => {
+        if (d.region) {
+          setRegion(d.region)
+          setPrice(REGIONAL_PRICE[d.region] || '$29')
+        }
+      })
       .catch(() => {})
   }, [])
+
+  const signupUrl = region && region !== 'default' ? `/signup?region=${region}` : '/signup'
 
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
@@ -68,7 +80,7 @@ function HomeContent() {
         </div>
         <div className="flex items-center gap-4">
           <a href="/login" className="text-gray-300 hover:text-white transition">Log In</a>
-          <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">Subscribe</a>
+          <a href={signupUrl} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">Subscribe</a>
         </div>
       </nav>
 
@@ -89,7 +101,7 @@ function HomeContent() {
           <a href="/demo" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition">
             Try Free Demo
           </a>
-          <a href="/signup" className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-lg text-lg transition">
+          <a href={signupUrl} className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-lg text-lg transition">
             Subscribe — {price}/mo
           </a>
         </div>
@@ -160,7 +172,7 @@ function HomeContent() {
                   </li>
                 ))}
               </ul>
-              <a href="/signup" className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
+              <a href={signupUrl} className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
                 Get ATC Trainer
               </a>
             </div>
