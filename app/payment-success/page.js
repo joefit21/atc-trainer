@@ -13,6 +13,10 @@ export default function PaymentSuccess() {
         currency: 'USD',
         transaction_id: '',
       })
+      window.gtag('event', 'conversion', {
+        send_to: 'AW-17833668075/rwnHCJ36xJIcEOvb4LdC',
+        transaction_id: '',
+      })
     }
 
     const timer = setTimeout(() => {
