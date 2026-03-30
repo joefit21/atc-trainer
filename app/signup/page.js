@@ -3,12 +3,19 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
+const REGIONAL_PRICE = {
+  india: '$9',
+  uae: '$19',
+  default: '$29',
+}
+
 function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [selectedPlan, setSelectedPlan] = useState('single') // 'single' | 'bundle'
+  const [region, setRegion] = useState('default')
   const searchParams = useSearchParams()
 
   useEffect(() => {
@@ -16,6 +23,17 @@ function SignupForm() {
       setSelectedPlan('bundle')
     }
   }, [searchParams])
+
+  useEffect(() => {
+    const override = searchParams.get('region')
+    if (override) { setRegion(override); return }
+    fetch('/api/get-location')
+      .then(r => r.json())
+      .then(d => { if (d.region) setRegion(d.region) })
+      .catch(() => {})
+  }, [])
+
+  const singlePrice = REGIONAL_PRICE[region] || '$29'
 
   const isBundleFlow = selectedPlan === 'bundle'
   const checkoutEndpoint = isBundleFlow ? '/api/create-bundle-checkout' : '/api/create-checkout'
@@ -49,7 +67,7 @@ function SignupForm() {
         const res = await fetch(checkoutEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: signInData.user.id, email }),
+          body: JSON.stringify({ userId: signInData.user.id, email, region }),
         })
         const result = await res.json()
         if (result.error) {
@@ -68,7 +86,7 @@ function SignupForm() {
     const res = await fetch(checkoutEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: data.user.id, email }),
+      body: JSON.stringify({ userId: data.user.id, email, region }),
     })
 
     const result = await res.json()
@@ -103,7 +121,7 @@ function SignupForm() {
           <div className="text-xl mb-2">✈️</div>
           <div className="font-semibold text-sm text-white">ATC Trainer</div>
           <div className="text-xs text-gray-400 mt-1">Ground · Clearance · Approach</div>
-          <div className="text-blue-400 font-bold mt-2">$29/mo</div>
+          <div className="text-blue-400 font-bold mt-2">{singlePrice}/mo</div>
         </button>
 
         {/* Bundle plan */}
@@ -168,7 +186,7 @@ function SignupForm() {
             ? 'Setting up your account...'
             : isBundleFlow
               ? 'Create Account & Subscribe — $49/mo'
-              : 'Create Account & Subscribe — $29/mo'}
+              : `Create Account & Subscribe — ${singlePrice}/mo`}
         </button>
       </form>
 

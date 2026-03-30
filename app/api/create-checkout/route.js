@@ -4,7 +4,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(request) {
   try {
-    const { userId, email } = await request.json()
+    const { userId, email, region } = await request.json()
+
+    const priceId = region === 'india'
+      ? process.env.INDIA_STRIPE_PRICE_ID
+      : region === 'uae'
+        ? process.env.UAE_STRIPE_PRICE_ID
+        : process.env.STRIPE_PRICE_ID
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -12,7 +18,7 @@ export async function POST(request) {
       customer_email: email,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID,
+          price: priceId,
           quantity: 1
         }
       ],

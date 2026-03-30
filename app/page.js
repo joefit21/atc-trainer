@@ -1,3 +1,13 @@
+'use client'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+
+const REGIONAL_PRICE = {
+  india: '$9',
+  uae: '$19',
+  default: '$29',
+}
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -35,7 +45,19 @@ const jsonLd = {
   ],
 }
 
-export default function Home() {
+function HomeContent() {
+  const [price, setPrice] = useState('$29')
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const override = searchParams.get('region')
+    if (override) { setPrice(REGIONAL_PRICE[override] || '$29'); return }
+    fetch('/api/get-location')
+      .then(r => r.json())
+      .then(d => { if (d.region) setPrice(REGIONAL_PRICE[d.region] || '$29') })
+      .catch(() => {})
+  }, [])
+
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -68,7 +90,7 @@ export default function Home() {
             Try Free Demo
           </a>
           <a href="/signup" className="border border-white/20 hover:border-white/40 px-8 py-4 rounded-lg text-lg transition">
-            Subscribe — $29/mo
+            Subscribe — {price}/mo
           </a>
         </div>
       </section>
@@ -117,12 +139,12 @@ export default function Home() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
           <p className="text-gray-400 text-center mb-2">Unlimited sessions. Cancel anytime.</p>
-          <p className="text-gray-500 text-sm text-center mb-10">Regional pricing available — <a href="mailto:joe@flight-levels.com" className="text-blue-400 hover:text-blue-300 transition">contact us</a> if USD pricing is a barrier.</p>
+          <p className="text-gray-500 text-sm text-center mb-10">Regional pricing applied automatically. Questions? <a href="mailto:joe@flight-levels.com" className="text-blue-400 hover:text-blue-300 transition">Contact us</a>.</p>
           <div className="grid md:grid-cols-2 gap-6">
 
             {/* ATC Trainer only */}
             <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
-              <div className="text-4xl font-bold mb-1">$29<span className="text-xl text-gray-400">/mo</span></div>
+              <div className="text-4xl font-bold mb-1">{price}<span className="text-xl text-gray-400">/mo</span></div>
               <p className="text-gray-400 text-sm mb-1">ATC Trainer only</p>
               <p className="text-gray-500 text-xs mb-6">Less than one hour with a CFI</p>
               <ul className="text-left space-y-2 mb-8 flex-1">
@@ -181,5 +203,13 @@ export default function Home() {
         </div>
       </footer>
     </main>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   )
 }
