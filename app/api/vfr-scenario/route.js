@@ -1,0 +1,107 @@
+const UNCONTROLLED_AIRPORTS = [
+  { id: 'KAUN', name: 'Auburn', state: 'CA', ctaf: '122.8', runways: ['7', '25'] },
+  { id: 'KUKI', name: 'Ukiah', state: 'CA', ctaf: '123.0', runways: ['15', '33'] },
+  { id: 'KFOT', name: 'Rohnerville', state: 'CA', ctaf: '122.8', runways: ['12', '30'] },
+  { id: 'KBKE', name: 'Baker City', state: 'OR', ctaf: '122.8', runways: ['13', '31'] },
+  { id: 'KORS', name: 'Orcas Island', state: 'WA', ctaf: '122.8', runways: ['16', '34'] },
+  { id: 'KFHR', name: 'Friday Harbor', state: 'WA', ctaf: '122.8', runways: ['16', '34'] },
+  { id: 'KTMK', name: 'Tillamook', state: 'OR', ctaf: '122.8', runways: ['13', '31'] },
+  { id: 'KSVH', name: 'Statesville', state: 'NC', ctaf: '122.8', runways: ['10', '28'] },
+  { id: 'KRUQ', name: 'Rowan County', state: 'NC', ctaf: '122.8', runways: ['2', '20'] },
+  { id: 'KDLZ', name: 'Delaware', state: 'OH', ctaf: '122.8', runways: ['10', '28'] },
+]
+
+const AIRCRAFT = [
+  { type: 'Cessna 172', spoken: 'Cessna one seven two' },
+  { type: 'Cessna 182', spoken: 'Cessna one eight two' },
+  { type: 'Piper Cherokee', spoken: 'Piper Cherokee' },
+  { type: 'Piper Archer', spoken: 'Piper Archer' },
+  { type: 'Beechcraft Bonanza', spoken: 'Beechcraft Bonanza' },
+  { type: 'Cirrus SR22', spoken: 'Cirrus S R twenty two' },
+]
+
+const PHONETIC = {
+  A:'alpha',B:'bravo',C:'charlie',D:'delta',E:'echo',F:'foxtrot',
+  G:'golf',H:'hotel',I:'india',J:'juliet',K:'kilo',L:'lima',M:'mike',
+  N:'november',O:'oscar',P:'papa',Q:'quebec',R:'romeo',S:'sierra',
+  T:'tango',U:'uniform',V:'victor',W:'whiskey',X:'xray',Y:'yankee',Z:'zulu'
+}
+
+const DIGIT_WORDS = ['zero','one','two','three','four','five','six','seven','eight','niner']
+
+const APPROACH_DIRECTIONS = ['north','south','east','west','northeast','northwest','southeast','southwest']
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function generateTailNumber() {
+  const digits = Array.from({ length: 3 }, () => randomInt(0, 9))
+  const letters = Array.from({ length: 2 }, () => String.fromCharCode(65 + randomInt(0, 25)))
+  return {
+    display: `N${digits.join('')}${letters.join('')}`,
+    spoken: `November ${digits.map(d => DIGIT_WORDS[d]).join(' ')} ${letters.map(l => PHONETIC[l]).join(' ')}`
+  }
+}
+
+export async function GET() {
+  const airport = pickRandom(UNCONTROLLED_AIRPORTS)
+  const runway = pickRandom(airport.runways)
+  const aircraft = pickRandom(AIRCRAFT)
+  const tail = generateTailNumber()
+  const pattern = Math.random() > 0.3 ? 'left' : 'right'
+  const approachDir = pickRandom(APPROACH_DIRECTIONS)
+  const approachAlt = randomInt(28, 42) * 100 + 3000
+
+  const steps = [
+    {
+      index: 0,
+      phase: 'inbound_10',
+      situation: `You are 10 miles ${approachDir} of ${airport.name} at ${approachAlt.toLocaleString()} ft MSL, inbound for landing. Runway in use is ${runway}, ${pattern} traffic. CTAF is ${airport.ctaf}.`,
+      hint: `Include: "${airport.name} traffic", aircraft type, callsign, position (distance & direction), intentions, and runway.`
+    },
+    {
+      index: 1,
+      phase: 'entering_45',
+      situation: `You are entering the 45° to the ${pattern} downwind for Runway ${runway} at ${airport.name}.`,
+      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "entering 45" or "45 for the ${pattern} downwind", runway, and "${airport.name}" at the end.`
+    },
+    {
+      index: 2,
+      phase: 'downwind',
+      situation: `You are turning ${pattern} downwind for Runway ${runway} at ${airport.name}.`,
+      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "${pattern} downwind, runway ${runway}", and "${airport.name}" at the end.`
+    },
+    {
+      index: 3,
+      phase: 'base',
+      situation: `You are turning ${pattern} base for Runway ${runway} at ${airport.name}.`,
+      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "${pattern} base, runway ${runway}", and "${airport.name}" at the end.`
+    },
+    {
+      index: 4,
+      phase: 'final',
+      situation: `You are turning final for Runway ${runway} at ${airport.name}, full stop.`,
+      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "final, runway ${runway}", full stop or touch and go, and "${airport.name}" at the end.`
+    },
+  ]
+
+  return Response.json({
+    scenario_type: 'ctaf',
+    airport_id: airport.id,
+    airport_name: airport.name,
+    airport_state: airport.state,
+    ctaf: airport.ctaf,
+    runway,
+    pattern,
+    aircraft_type: aircraft.type,
+    callsign_display: tail.display,
+    callsign_spoken: tail.spoken,
+    approach_direction: approachDir,
+    steps,
+  })
+}
