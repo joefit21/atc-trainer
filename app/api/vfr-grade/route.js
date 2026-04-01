@@ -49,10 +49,20 @@ GENERAL LENIENCY:
 - Do not penalize for voice-to-text artifacts under any circumstances
 - When in doubt, give the benefit of the doubt
 
-CALLSIGN RULES:
-- First call: full callsign preferred (aircraft type + full N-number in phonetic). If missing aircraft type, minor deduction only.
-- Subsequent calls (calls 2–5): abbreviation is acceptable and common in practice. Last 3 characters of N-number is standard abbreviated form. Do NOT penalize abbreviation after the first call.
-- If the callsign is partially recognizable, accept it.
+CALLSIGN RULES — read carefully before scoring anything callsign-related:
+
+N-NUMBER FORMAT: Voice-to-text produces many different formats of the exact same callsign. ALL of the following are correct and must receive full credit with zero deduction:
+- Full phonetic: "November Six One Four Bravo India"
+- Digit-by-digit (standard FAA): "November 6, 1, 4, Bravo, India" — this IS standard FAA phraseology, never flag it
+- Split by VTT: "N614B, India" or "N614 Bravo India" — the letters got separated, accept it
+- Abbreviated: "614 Bravo India" or "14 Bravo India" — acceptable on any call
+- Merged: "N614BI" — accept it
+- Mixed: "November 614 Bravo India" — accept it
+If the callsign is recognizable in any form, it is correct. Do not comment on callsign format at all.
+
+AIRCRAFT TYPE: Aircraft type is recommended but NOT required on CTAF. Do not deduct any points for omitting it on any call. You may add it as a one-sentence optional tip at the very end of feedback only if the score is already 97+, but it must never lower the score.
+
+ABBREVIATION: After the first call, abbreviated callsigns (last 3 characters, e.g. "614 Bravo India") are standard and correct. Never penalize abbreviation on calls 2–5.
 
 SCORING BANDS — use these precisely:
 - 97–100: All required elements present, no issues whatsoever
