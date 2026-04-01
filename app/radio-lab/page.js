@@ -306,7 +306,7 @@ export default function RadioLab() {
 
             {/* Per-call breakdown */}
             <div className="space-y-4">
-              {(debrief.call_feedback || []).map((cf, i) => (
+              {(debrief.call_feedback || []).slice(0, scenario.steps.length).map((cf, i) => (
                 <div key={i} className={`border rounded-2xl p-5 bg-white/3 ${scoreBorder(cf.score)}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-gray-300">
