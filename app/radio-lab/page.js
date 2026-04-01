@@ -36,6 +36,15 @@ export default function RadioLab() {
 
   useEffect(() => { loadScenario('ctaf') }, [])
 
+  // Auto-play controller audio as soon as it arrives
+  useEffect(() => {
+    if (!controllerAudioUrl) return
+    const audio = controllerAudioRef.current
+    if (!audio) return
+    audio.load()
+    audio.play().catch(() => {})
+  }, [controllerAudioUrl])
+
   // ── load scenario ─────────────────────────────────────────────────────────────
   const loadScenario = async (type) => {
     setPhase('loading')
@@ -185,10 +194,10 @@ export default function RadioLab() {
   const classDGetSituation = (step) => {
     if (!scenario) return ''
     switch (step) {
-      case 0: return `You are parked at ${scenario.position}. You have copied ATIS Information ${scenario.atis.letter}. You are ready to taxi.`
-      case 1: return `Ground has issued a taxi clearance. Read it back.`
-      case 2: return `You have taxied to the hold short line for Runway ${scenario.runway}. You are ready for departure.`
-      case 3: return `Tower has issued a takeoff clearance. Read it back.`
+      case 0: return `You are parked at ${scenario.position}. You have copied ATIS Information ${scenario.atis.letter}. You intend a ${scenario.departure_intention}. Request taxi from Ground.`
+      case 1: return `Ground has issued your taxi clearance. Write it down, then read it back.`
+      case 2: return `You have taxied to the hold short line for Runway ${scenario.runway}. Call Tower and request departure.`
+      case 3: return `Tower has issued your takeoff clearance. Write it down, then read it back.`
       default: return ''
     }
   }
@@ -196,10 +205,10 @@ export default function RadioLab() {
   const classDGetHint = (step) => {
     if (!scenario) return ''
     switch (step) {
-      case 0: return `Say: "${scenario.airport_name} Ground", aircraft type, callsign, your position, "with Information ${scenario.atis.letter}", request taxi to Runway ${scenario.runway}.`
-      case 1: return `Read back: callsign, runway, taxiway route, and any hold short instructions.`
-      case 2: return `Say: "${scenario.airport_name} Tower", aircraft type, callsign, "holding short Runway ${scenario.runway}", "with Information ${scenario.atis.letter}", ready for departure.`
-      case 3: return `Read back: callsign, "cleared for takeoff Runway ${scenario.runway}", departure frequency, and any heading instructions.`
+      case 0: return `Say: "${scenario.airport_name} Ground", aircraft type, callsign, your position (${scenario.position}), "with Information ${scenario.atis.letter}", and your intended departure (${scenario.departure_intention}). Ground will assign your runway.`
+      case 1: return `Write down what Ground said, then read it back: callsign, assigned runway, taxiway route, and any hold short instructions.`
+      case 2: return `Say: "${scenario.airport_name} Tower", aircraft type, callsign, "holding short Runway ${scenario.runway}", ready for departure, and your departure direction (${scenario.departure_intention}). Do not reference ATIS again.`
+      case 3: return `Write down what Tower said, then read it back: callsign, "cleared for takeoff Runway ${scenario.runway}", and any heading instructions issued.`
       default: return ''
     }
   }
@@ -379,8 +388,9 @@ export default function RadioLab() {
                 <div><p className="text-xs text-gray-500 mb-1">Your Aircraft</p><p className="text-xl font-bold text-blue-400">{scenario.callsign_display}</p><p className="text-sm text-gray-400">{scenario.aircraft_type}</p></div>
                 <div><p className="text-xs text-gray-500 mb-1">Ground</p><p className="text-xl font-bold text-blue-400">{scenario.ground_freq}</p></div>
                 <div><p className="text-xs text-gray-500 mb-1">Tower</p><p className="text-xl font-bold text-blue-400">{scenario.tower_freq}</p></div>
-                <div><p className="text-xs text-gray-500 mb-1">Departure Runway</p><p className="text-xl font-bold text-blue-400">{scenario.runway}</p><p className="text-sm text-gray-400">{scenario.pattern} traffic</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Active Runway</p><p className="text-xl font-bold text-blue-400">{scenario.runway}</p><p className="text-sm text-gray-400">{scenario.pattern} traffic</p></div>
                 <div><p className="text-xs text-gray-500 mb-1">Parked At</p><p className="text-lg font-bold text-blue-400">{scenario.position}</p></div>
+                <div className="col-span-2"><p className="text-xs text-gray-500 mb-1">Intended Departure</p><p className="text-lg font-bold text-yellow-400 capitalize">{scenario.departure_intention}</p></div>
               </div>
             </div>
 
@@ -435,15 +445,19 @@ export default function RadioLab() {
               <p className="text-gray-500 text-sm mt-4">💡 {classDGetHint(classDStep)}</p>
             </div>
 
-            {/* Controller's last transmission (for readbacks) */}
-            {classDIsReadback(classDStep) && controllerText && (
-              <div className="bg-white/5 border border-blue-400/20 rounded-2xl p-5">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs text-blue-400 uppercase tracking-wide">Controller said</p>
-                  <button onClick={() => controllerAudioRef.current?.play()} className="text-xs text-blue-400 hover:text-blue-300 transition">▶ Replay</button>
-                </div>
-                {controllerAudioUrl && <audio ref={controllerAudioRef} src={controllerAudioUrl} />}
-                <p className="text-gray-200 italic">&ldquo;{controllerText}&rdquo;</p>
+            {/* Controller audio — text hidden, audio-only with replay */}
+            {classDIsReadback(classDStep) && controllerAudioUrl && (
+              <div className="bg-white/5 border border-blue-400/20 rounded-2xl p-5 space-y-3">
+                <p className="text-xs text-blue-400 uppercase tracking-wide">
+                  {classDStep === 1 ? 'Ground Control' : 'Tower'} — write down the clearance, then read it back
+                </p>
+                <audio ref={controllerAudioRef} src={controllerAudioUrl} />
+                <button
+                  onClick={() => { controllerAudioRef.current?.load(); controllerAudioRef.current?.play() }}
+                  className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
+                >
+                  ▶ Play Clearance Again
+                </button>
               </div>
             )}
 

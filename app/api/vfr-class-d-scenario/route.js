@@ -64,6 +64,18 @@ const SKY_CONDITIONS = [
   'scattered at 4,500',
 ]
 
+const DEPARTURE_INTENTIONS = [
+  'northbound departure',
+  'southbound departure',
+  'eastbound departure',
+  'westbound departure',
+  'northwest departure',
+  'northeast departure',
+  'southwest departure',
+  'southeast departure',
+  'closed traffic',
+]
+
 const ATIS_LETTERS = [
   { letter: 'Alpha',   phonetic: 'alpha'   },
   { letter: 'Bravo',   phonetic: 'bravo'   },
@@ -107,15 +119,16 @@ function randomWind() {
 }
 
 export async function GET() {
-  const airport  = pickRandom(CLASS_D_AIRPORTS)
-  const rwyObj   = pickRandom(airport.runways)
-  const aircraft = pickRandom(AIRCRAFT)
-  const tail     = generateTailNumber()
-  const atis     = pickRandom(ATIS_LETTERS)
-  const wind     = randomWind()
-  const sky      = pickRandom(SKY_CONDITIONS)
-  const altimeter = randomAltimeter()
-  const position = pickRandom(POSITIONS)
+  const airport            = pickRandom(CLASS_D_AIRPORTS)
+  const rwyObj             = pickRandom(airport.runways)
+  const aircraft           = pickRandom(AIRCRAFT)
+  const tail               = generateTailNumber()
+  const atis               = pickRandom(ATIS_LETTERS)
+  const wind               = randomWind()
+  const sky                = pickRandom(SKY_CONDITIONS)
+  const altimeter          = randomAltimeter()
+  const position           = pickRandom(POSITIONS)
+  const departure_intention = pickRandom(DEPARTURE_INTENTIONS)
 
   return Response.json({
     scenario_type:    'classd_departure',
@@ -131,6 +144,7 @@ export async function GET() {
     callsign_display: tail.display,
     callsign_spoken:  tail.spoken,
     position,
+    departure_intention,
     atis: {
       letter:    atis.letter,
       phonetic:  atis.phonetic,

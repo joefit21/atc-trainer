@@ -42,15 +42,16 @@ Exchange 2 — Ground readback:
 Exchange 3 — Tower call at hold short:
 - "[Airport] Tower"
 - Aircraft type AND callsign
-- "Holding short of Runway [X]" or position at runway [X]
-- ATIS letter ("with information [letter]" or "have [letter]")
-- "Ready for departure" (direction optional)
+- "Holding short of Runway [X]" or equivalent position
+- Departure direction or intention (e.g., "northbound departure", "closed traffic") — required
+- "Ready for departure" or equivalent
+- Do NOT require or penalize for ATIS letter — it was already established with Ground
 
 Exchange 4 — Tower readback:
 - Callsign
 - Runway: "cleared for takeoff runway [X]" or equivalent
-- Departure frequency if one was issued
-- Any heading instructions if issued
+- Any heading instruction if one was issued
+- Do NOT require a departure frequency — none was issued in this exercise
 
 VOICE-TO-TEXT LENIENCY:
 - Apply maximum leniency to all phonetic alphabet attempts (Foxtrot/Foxdrop/Fox = same thing)
