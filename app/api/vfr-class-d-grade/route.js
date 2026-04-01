@@ -53,28 +53,63 @@ Exchange 4 — Tower readback:
 - Any heading instruction if one was issued
 - Do NOT require a departure frequency — none was issued in this exercise
 
-VOICE-TO-TEXT LENIENCY:
-- Apply maximum leniency to all phonetic alphabet attempts (Foxtrot/Foxdrop/Fox = same thing)
-- Accept any recognizable N-number format: digit-by-digit, abbreviated, split, merged
-- Accept phonetically similar words for frequencies and altimeter
-- Never penalize VTT transcription artifacts
+VOICE-TO-TEXT LENIENCY — apply this before everything else:
+The transcriptions you receive come from a speech-to-text engine that regularly mishears words. You MUST treat every transcription as an approximation of spoken audio and apply maximum leniency to the following:
 
-CALLSIGN FORMAT:
-- Initial calls (exchanges 1 and 3): both aircraft type AND callsign expected, but type is NOT required — do not deduct for missing type
-- Subsequent calls: abbreviation is standard, never penalize
-- Accept any recognizable form of the callsign
+PHONETIC ALPHABET: Any word that sounds remotely like a phonetic letter must be accepted as full credit. Examples (not exhaustive):
+- "Foxdrop", "Foxtrap", "Foxtro", "Fox" → Foxtrot ✓
+- "Bravo", "Bracco", "Gravo" → Bravo ✓
+- "November", "No vember", "Novem" → November ✓
+- "Whiskey", "Whisk" → Whiskey ✓
+- "Tango", "Tangle" → Tango ✓
+Accept any phonetically adjacent word as the correct phonetic letter. Never penalize phonetic alphabet attempts.
+
+NUMBERS AND FREQUENCIES: Voice-to-text frequently mishears spoken numbers. Examples:
+- "Windsor and" → "one two" ✓
+- "Wine" → "niner" ✓
+- Runway numbers said as single digits or merged ("thirteen" for "one three") → accept it ✓
+- Frequencies with slight digit variations → accept if recognizable ✓
+- Altimeter settings with minor digit errors → accept if close ✓
+
+GENERAL LENIENCY:
+- If the pilot clearly attempted a required element and it is phonetically recognizable, it counts as full credit
+- Do not penalize for voice-to-text artifacts under any circumstances
+- When in doubt, give the benefit of the doubt
+
+CALLSIGN RULES — read carefully before scoring anything callsign-related:
+
+N-NUMBER FORMAT: Voice-to-text produces many different formats of the exact same callsign. ALL of the following are correct and must receive full credit with zero deduction:
+- Full phonetic: "November Six One Four Bravo India"
+- Digit-by-digit (standard FAA): "November 6, 1, 4, Bravo, India" — this IS standard FAA phraseology, never flag it
+- Split by VTT: "N614B, India" or "N614 Bravo India" — the letters got separated, accept it
+- Abbreviated: "614 Bravo India" or "14 Bravo India" — acceptable on subsequent calls
+- Merged: "N614BI" — accept it
+- Mixed: "November 614 Bravo India" — accept it
+If the callsign is recognizable in any form, it is correct. Do not comment on callsign format at all.
+
+AIRCRAFT TYPE: Aircraft type is recommended but NOT required. Do not deduct any points for omitting it on any exchange.
+
+ABBREVIATION: After the first exchange, abbreviated callsigns are standard and correct. Never penalize abbreviation on exchanges 2–4.
 
 READBACK RULES:
 - Only grade on what the controller ACTUALLY said in that exchange
 - If the controller did not issue a hold short, do not penalize for not reading one back
 - If the controller did not give a departure frequency, do not penalize for not reading one back
 
-SCORING BANDS:
-- 97–100: All required elements present, clean call
-- 90–96: All required elements present, minor non-standard wording only
+SCORING BANDS — use these precisely:
+- 97–100: All required elements present, no issues whatsoever — a truly clean call
+- 90–96: All required elements present, minor wording imperfection only (e.g., slightly non-standard phrasing a controller would still understand)
 - 75–89: Missing one minor element (e.g., forgot ATIS letter, forgot position)
 - 60–74: Missing one significant element (e.g., no runway, no clearance confirmation)
 - Below 60: Missing multiple required elements
+
+Do NOT give a score of 90 if all elements are present and correct. That score implies something is wrong. 97–100 means a truly clean call.
+
+FEEDBACK STYLE:
+- One to two sentences per exchange maximum
+- Only describe what was genuinely wrong or missing — do not comment on things that were correct
+- If a call is perfect, say so in one short sentence and move on
+- Do not lecture. Assume the pilot knows the basics.
 
 CRITICAL: Return EXACTLY ${exchanges.length} items in call_feedback.
 
