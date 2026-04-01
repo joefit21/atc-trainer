@@ -21,11 +21,22 @@ PILOT'S CALLS (${calls.length} total):
 ${callsText}
 
 REQUIRED ELEMENTS by call type:
-- Inbound (10 miles): airport name + "traffic", aircraft type, callsign, distance and direction from airport, "inbound for landing", runway number
-- Entering 45°: airport name + "traffic", aircraft type, callsign, "entering 45" or "45 for the [pattern] downwind", runway
-- Base: airport name + "traffic", aircraft type, callsign, "[left/right] base", runway
-- Final: airport name + "traffic", aircraft type, callsign, "final", runway, full stop or touch and go
-- Clear of runway: airport name + "traffic", aircraft type, callsign, "clear of runway [number]"
+- Inbound (10 miles): airport name + "traffic", callsign, distance and direction from airport, "inbound for landing", runway number, airport name repeated at end
+- Entering 45°: airport name + "traffic", callsign, "entering 45" or "45 for the [pattern] downwind", runway, airport name repeated at end
+- Base: airport name + "traffic", callsign, "[left/right] base", runway, airport name repeated at end
+- Final: airport name + "traffic", callsign, "final", runway, full stop or touch and go, airport name repeated at end
+- Clear of runway: airport name + "traffic", callsign, "clear of runway [specific number]", airport name repeated at end
+
+AIRPORT NAME RULES — strictly enforced:
+- Every call must begin with "[Airport name] traffic" — if missing, deduct 10 points
+- Every call must end with the airport name repeated — if missing, deduct 5 points
+- Both missing = deduct 15 points total
+
+CLEAR OF RUNWAY — strictly enforced:
+- The pilot MUST say "clear of runway [number]" — e.g., "clear of runway 33"
+- "Clear of the active", "clear of the runway", "runway clear", or any other non-specific phrasing is NOT acceptable and scores 60 maximum
+- The specific runway number is required so other traffic knows exactly which runway is clear
+- If the pilot says "clear of the active" or similar, flag it clearly: they must state the runway number
 
 VOICE-TO-TEXT LENIENCY — apply this before everything else:
 The transcriptions you receive come from a speech-to-text engine that regularly mishears words. You MUST treat every transcription as an approximation of spoken audio and apply maximum leniency to the following:
