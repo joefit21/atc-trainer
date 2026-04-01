@@ -1,0 +1,115 @@
+import Anthropic from '@anthropic-ai/sdk'
+
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+
+export async function POST(request) {
+  try {
+    const { scenario, exchanges } = await request.json()
+
+    const exchangeText = exchanges.map((ex, i) => {
+      const base = `Exchange ${i + 1} — ${ex.phase.replace(/_/g, ' ')}\nSituation: ${ex.situation}\nPilot said: "${ex.pilot_said || '(nothing recorded)'}"`
+      if (ex.controller_said) return base + `\nController said: "${ex.controller_said}"`
+      return base
+    }).join('\n\n')
+
+    const prompt = `You are a CFI and former air traffic controller evaluating a student pilot's radio calls during a Class D airport departure. Be direct and practical, like a post-flight debrief.
+
+SCENARIO:
+Airport: ${scenario.airport_name} (${scenario.airport_id}) — Class D
+Aircraft: ${scenario.aircraft_type} ${scenario.callsign_display}
+ATIS: Information ${scenario.atis.letter}
+Departure runway: ${scenario.runway}
+Ground freq: ${scenario.ground_freq} / Tower freq: ${scenario.tower_freq}
+
+EXCHANGES (${exchanges.length} total):
+${exchangeText}
+
+REQUIRED ELEMENTS:
+
+Exchange 1 — Initial ground call:
+- "[Airport] Ground" (e.g., "${scenario.airport_name} Ground")
+- Aircraft type AND callsign
+- Current position on airport
+- "With Information [letter]" — must include current ATIS letter
+- Request to taxi (runway optional but encouraged)
+
+Exchange 2 — Ground readback:
+- Callsign (abbreviated OK after first call)
+- Runway number
+- Taxiway designator
+- Any hold short instruction if one was issued
+
+Exchange 3 — Tower call at hold short:
+- "[Airport] Tower"
+- Aircraft type AND callsign
+- "Holding short of Runway [X]" or position at runway [X]
+- ATIS letter ("with information [letter]" or "have [letter]")
+- "Ready for departure" (direction optional)
+
+Exchange 4 — Tower readback:
+- Callsign
+- Runway: "cleared for takeoff runway [X]" or equivalent
+- Departure frequency if one was issued
+- Any heading instructions if issued
+
+VOICE-TO-TEXT LENIENCY:
+- Apply maximum leniency to all phonetic alphabet attempts (Foxtrot/Foxdrop/Fox = same thing)
+- Accept any recognizable N-number format: digit-by-digit, abbreviated, split, merged
+- Accept phonetically similar words for frequencies and altimeter
+- Never penalize VTT transcription artifacts
+
+CALLSIGN FORMAT:
+- Initial calls (exchanges 1 and 3): both aircraft type AND callsign expected, but type is NOT required — do not deduct for missing type
+- Subsequent calls: abbreviation is standard, never penalize
+- Accept any recognizable form of the callsign
+
+READBACK RULES:
+- Only grade on what the controller ACTUALLY said in that exchange
+- If the controller did not issue a hold short, do not penalize for not reading one back
+- If the controller did not give a departure frequency, do not penalize for not reading one back
+
+SCORING BANDS:
+- 97–100: All required elements present, clean call
+- 90–96: All required elements present, minor non-standard wording only
+- 75–89: Missing one minor element (e.g., forgot ATIS letter, forgot position)
+- 60–74: Missing one significant element (e.g., no runway, no clearance confirmation)
+- Below 60: Missing multiple required elements
+
+CRITICAL: Return EXACTLY ${exchanges.length} items in call_feedback.
+
+Return raw JSON only, no markdown:
+{
+  "overall_score": 85,
+  "summary": "One to two sentence overall assessment.",
+  "call_feedback": [
+    {
+      "step": 0,
+      "phase": "ground_call",
+      "score": 90,
+      "what_you_said": "exact transcription",
+      "feedback": "Brief CFI-style feedback.",
+      "key_issue": "One-line issue summary or null."
+    }
+  ]
+}`
+
+    const message = await anthropic.messages.create({
+      model: 'claude-haiku-4-5',
+      max_tokens: 1200,
+      messages: [{ role: 'user', content: prompt }],
+    })
+
+    const rawText = message.content[0].text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+    const result  = JSON.parse(rawText)
+
+    if (Array.isArray(result.call_feedback)) {
+      result.call_feedback = result.call_feedback.slice(0, exchanges.length)
+    }
+
+    return Response.json(result)
+
+  } catch (error) {
+    console.error('Class D grade error:', error)
+    return Response.json({ error: error.message }, { status: 500 })
+  }
+}
