@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react'
 
 export default function RadioLab() {
-  const [phase, setPhase] = useState('loading') // loading | ready | practicing | grading | debrief
+  const [phase, setPhase] = useState('loading') // loading | ready | practicing | grading | debrief | error
   const [scenario, setScenario] = useState(null)
   const [currentStep, setCurrentStep] = useState(0)
   const [calls, setCalls] = useState([])
@@ -10,6 +10,7 @@ export default function RadioLab() {
   const [isRecording, setIsRecording] = useState(false)
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [debrief, setDebrief] = useState(null)
+  const [errorMessage, setErrorMessage] = useState('')
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
 
@@ -21,29 +22,44 @@ export default function RadioLab() {
     setCalls([])
     setCurrentTranscription('')
     setDebrief(null)
-    const res = await fetch('/api/vfr-scenario?type=ctaf')
-    const data = await res.json()
-    setScenario(data)
-    setPhase('ready')
+    setErrorMessage('')
+    try {
+      const res = await fetch('/api/vfr-scenario?type=ctaf')
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      setScenario(data)
+      setPhase('ready')
+    } catch (e) {
+      setErrorMessage(e.message || 'Failed to load scenario.')
+      setPhase('error')
+    }
   }
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-    mediaRecorderRef.current = new MediaRecorder(stream)
-    audioChunksRef.current = []
-    mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data)
-    mediaRecorderRef.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
-      setIsTranscribing(true)
-      const formData = new FormData()
-      formData.append('audio', audioBlob, 'call.webm')
-      const res = await fetch('/api/transcribe', { method: 'POST', body: formData })
-      const { text } = await res.json()
-      setCurrentTranscription(text)
-      setIsTranscribing(false)
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      mediaRecorderRef.current = new MediaRecorder(stream)
+      audioChunksRef.current = []
+      mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data)
+      mediaRecorderRef.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        setIsTranscribing(true)
+        try {
+          const formData = new FormData()
+          formData.append('audio', audioBlob, 'call.webm')
+          const res = await fetch('/api/transcribe', { method: 'POST', body: formData })
+          const { text } = await res.json()
+          setCurrentTranscription(text || '')
+        } catch {
+          setCurrentTranscription('[transcription failed — type your call below or re-record]')
+        }
+        setIsTranscribing(false)
+      }
+      mediaRecorderRef.current.start()
+      setIsRecording(true)
+    } catch {
+      alert('Microphone access is required. Please allow microphone permissions and try again.')
     }
-    mediaRecorderRef.current.start()
-    setIsRecording(true)
   }
 
   const stopRecording = () => {
@@ -67,18 +83,25 @@ export default function RadioLab() {
       setCurrentStep(currentStep + 1)
     } else {
       setPhase('grading')
-      const res = await fetch('/api/vfr-grade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario, calls: updatedCalls }),
-      })
-      const result = await res.json()
-      setDebrief(result)
-      setPhase('debrief')
+      try {
+        const res = await fetch('/api/vfr-grade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ scenario, calls: updatedCalls }),
+        })
+        const result = await res.json()
+        if (result.error) throw new Error(result.error)
+        if (!result.call_feedback) throw new Error('Debrief response was missing call feedback.')
+        setDebrief(result)
+        setPhase('debrief')
+      } catch (e) {
+        setErrorMessage(e.message || 'Debrief failed. Please try again.')
+        setPhase('error')
+      }
     }
   }
 
-  const scoreColor = (s) => s >= 90 ? 'text-green-400' : s >= 70 ? 'text-yellow-400' : 'text-red-400'
+  const scoreColor  = (s) => s >= 90 ? 'text-green-400'  : s >= 70 ? 'text-yellow-400'  : 'text-red-400'
   const scoreBorder = (s) => s >= 90 ? 'border-green-400/20' : s >= 70 ? 'border-yellow-400/20' : 'border-red-400/20'
 
   return (
@@ -97,6 +120,21 @@ export default function RadioLab() {
           <div className="text-center py-24 text-gray-400">
             <div className="text-4xl mb-4">📻</div>
             <p>Loading scenario...</p>
+          </div>
+        )}
+
+        {/* Error */}
+        {phase === 'error' && (
+          <div className="text-center py-24 space-y-4">
+            <div className="text-4xl">⚠️</div>
+            <p className="text-red-400 font-semibold">Something went wrong</p>
+            <p className="text-gray-400 text-sm">{errorMessage}</p>
+            <button
+              onClick={loadScenario}
+              className="mt-4 bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg font-semibold transition"
+            >
+              Try Again
+            </button>
           </div>
         )}
 
@@ -268,11 +306,11 @@ export default function RadioLab() {
 
             {/* Per-call breakdown */}
             <div className="space-y-4">
-              {debrief.call_feedback.map((cf, i) => (
+              {(debrief.call_feedback || []).map((cf, i) => (
                 <div key={i} className={`border rounded-2xl p-5 bg-white/3 ${scoreBorder(cf.score)}`}>
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-gray-300">
-                      Call {i + 1} — {scenario.steps[i]?.phase.replace(/_/g, ' ')}
+                      Call {i + 1} — {(scenario.steps[i]?.phase || '').replace(/_/g, ' ')}
                     </span>
                     <span className={`text-2xl font-bold ${scoreColor(cf.score)}`}>{cf.score}</span>
                   </div>

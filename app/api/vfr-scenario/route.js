@@ -1,23 +1,23 @@
 const UNCONTROLLED_AIRPORTS = [
-  { id: 'KAUN', name: 'Auburn', state: 'CA', ctaf: '122.8', runways: ['7', '25'] },
-  { id: 'KUKI', name: 'Ukiah', state: 'CA', ctaf: '123.0', runways: ['15', '33'] },
-  { id: 'KFOT', name: 'Rohnerville', state: 'CA', ctaf: '122.8', runways: ['12', '30'] },
-  { id: 'KBKE', name: 'Baker City', state: 'OR', ctaf: '122.8', runways: ['13', '31'] },
+  { id: 'KAUN', name: 'Auburn',       state: 'CA', ctaf: '122.8', runways: ['7',  '25'] },
+  { id: 'KUKI', name: 'Ukiah',        state: 'CA', ctaf: '123.0', runways: ['15', '33'] },
+  { id: 'KFOT', name: 'Rohnerville',  state: 'CA', ctaf: '122.8', runways: ['11', '29'] },
+  { id: 'KBKE', name: 'Baker City',   state: 'OR', ctaf: '122.8', runways: ['13', '31', '17', '35'] },
   { id: 'KORS', name: 'Orcas Island', state: 'WA', ctaf: '122.8', runways: ['16', '34'] },
-  { id: 'KFHR', name: 'Friday Harbor', state: 'WA', ctaf: '122.8', runways: ['16', '34'] },
-  { id: 'KTMK', name: 'Tillamook', state: 'OR', ctaf: '122.8', runways: ['13', '31'] },
-  { id: 'KSVH', name: 'Statesville', state: 'NC', ctaf: '122.8', runways: ['10', '28'] },
-  { id: 'KRUQ', name: 'Rowan County', state: 'NC', ctaf: '122.8', runways: ['2', '20'] },
-  { id: 'KDLZ', name: 'Delaware', state: 'OH', ctaf: '122.8', runways: ['10', '28'] },
+  { id: 'KFHR', name: 'Friday Harbor',state: 'WA', ctaf: '122.8', runways: ['16', '34'] },
+  { id: 'KTMK', name: 'Tillamook',    state: 'OR', ctaf: '122.8', runways: ['13', '31', '1',  '19'] },
+  { id: 'KSVH', name: 'Statesville',  state: 'NC', ctaf: '122.8', runways: ['10', '28'] },
+  { id: 'KRUQ', name: 'Rowan County', state: 'NC', ctaf: '122.8', runways: ['2',  '20'] },
+  { id: 'KDLZ', name: 'Delaware',     state: 'OH', ctaf: '122.8', runways: ['10', '28'] },
 ]
 
 const AIRCRAFT = [
-  { type: 'Cessna 172', spoken: 'Cessna one seven two' },
-  { type: 'Cessna 182', spoken: 'Cessna one eight two' },
-  { type: 'Piper Cherokee', spoken: 'Piper Cherokee' },
-  { type: 'Piper Archer', spoken: 'Piper Archer' },
+  { type: 'Cessna 172',         spoken: 'Cessna one seven two' },
+  { type: 'Cessna 182',         spoken: 'Cessna one eight two' },
+  { type: 'Piper Cherokee',     spoken: 'Piper Cherokee' },
+  { type: 'Piper Archer',       spoken: 'Piper Archer' },
   { type: 'Beechcraft Bonanza', spoken: 'Beechcraft Bonanza' },
-  { type: 'Cirrus SR22', spoken: 'Cirrus S R twenty two' },
+  { type: 'Cirrus SR22',        spoken: 'Cirrus S R twenty two' },
 ]
 
 const PHONETIC = {
@@ -49,11 +49,11 @@ function generateTailNumber() {
 }
 
 export async function GET() {
-  const airport = pickRandom(UNCONTROLLED_AIRPORTS)
-  const runway = pickRandom(airport.runways)
-  const aircraft = pickRandom(AIRCRAFT)
-  const tail = generateTailNumber()
-  const pattern = Math.random() > 0.3 ? 'left' : 'right'
+  const airport     = pickRandom(UNCONTROLLED_AIRPORTS)
+  const runway      = pickRandom(airport.runways)
+  const aircraft    = pickRandom(AIRCRAFT)
+  const tail        = generateTailNumber()
+  const pattern     = Math.random() > 0.3 ? 'left' : 'right'
   const approachDir = pickRandom(APPROACH_DIRECTIONS)
   const approachAlt = randomInt(28, 42) * 100 + 3000
 
@@ -62,45 +62,45 @@ export async function GET() {
       index: 0,
       phase: 'inbound_10',
       situation: `You are 10 miles ${approachDir} of ${airport.name} at ${approachAlt.toLocaleString()} ft MSL, inbound for landing. Runway in use is ${runway}, ${pattern} traffic. CTAF is ${airport.ctaf}.`,
-      hint: `Include: "${airport.name} traffic", aircraft type, callsign, position (distance & direction), intentions, and runway.`
+      hint: `Say: "${airport.name} traffic", aircraft type, callsign, distance and direction from field, intentions, and runway number.`,
     },
     {
       index: 1,
       phase: 'entering_45',
       situation: `You are entering the 45° to the ${pattern} downwind for Runway ${runway} at ${airport.name}.`,
-      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "entering 45" or "45 for the ${pattern} downwind", runway, and "${airport.name}" at the end.`
+      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "entering 45" or "45 for the ${pattern} downwind", runway, and "${airport.name}".`,
     },
     {
       index: 2,
-      phase: 'downwind',
-      situation: `You are turning ${pattern} downwind for Runway ${runway} at ${airport.name}.`,
-      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "${pattern} downwind, runway ${runway}", and "${airport.name}" at the end.`
+      phase: 'base',
+      situation: `You are turning ${pattern} base for Runway ${runway} at ${airport.name}.`,
+      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "${pattern} base, runway ${runway}", and "${airport.name}".`,
     },
     {
       index: 3,
-      phase: 'base',
-      situation: `You are turning ${pattern} base for Runway ${runway} at ${airport.name}.`,
-      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "${pattern} base, runway ${runway}", and "${airport.name}" at the end.`
+      phase: 'final',
+      situation: `You are turning final for Runway ${runway} at ${airport.name}, full stop.`,
+      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "final, runway ${runway}", full stop, and "${airport.name}".`,
     },
     {
       index: 4,
-      phase: 'final',
-      situation: `You are turning final for Runway ${runway} at ${airport.name}, full stop.`,
-      hint: `Include: "${airport.name} traffic", aircraft type, callsign, "final, runway ${runway}", full stop or touch and go, and "${airport.name}" at the end.`
+      phase: 'clear_runway',
+      situation: `You have landed and are clear of Runway ${runway} at ${airport.name}.`,
+      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "clear of runway ${runway}", and "${airport.name}".`,
     },
   ]
 
   return Response.json({
-    scenario_type: 'ctaf',
-    airport_id: airport.id,
-    airport_name: airport.name,
-    airport_state: airport.state,
-    ctaf: airport.ctaf,
+    scenario_type:    'ctaf',
+    airport_id:       airport.id,
+    airport_name:     airport.name,
+    airport_state:    airport.state,
+    ctaf:             airport.ctaf,
     runway,
     pattern,
-    aircraft_type: aircraft.type,
+    aircraft_type:    aircraft.type,
     callsign_display: tail.display,
-    callsign_spoken: tail.spoken,
+    callsign_spoken:  tail.spoken,
     approach_direction: approachDir,
     steps,
   })
