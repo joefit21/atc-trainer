@@ -36,7 +36,7 @@ const DEMO_SCENARIOS = {
     aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
     callsign_spoken: 'November four five two one Hotel',
     atis: { letter: 'Alpha', wind: '130/8', ceiling: 'clear', visibility: 10, altimeter: '29.98' },
-    approach_direction: 'southeast', approach_distance: 10, parking_destination: 'GA ramp',
+    approach_direction: 'southeast', approach_distance: 10, approach_altitude: 3200, parking_destination: 'GA ramp',
   },
   flightfollowing: {
     scenario_type: 'flight_following', facility_name: 'NorCal Approach', facility_freq: '132.45',
