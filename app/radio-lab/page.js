@@ -519,7 +519,7 @@ export default function RadioLab() {
     <main className="min-h-screen bg-[#0a0f1e] text-white">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-white/10">
         <a href="/" className="text-xl font-bold">✈️ ATC Trainer</a>
-        <span className="text-xs text-yellow-400 border border-yellow-400/30 px-3 py-1 rounded-full">🔬 Radio Lab — Dev Preview</span>
+        <span className="text-xs text-blue-400 border border-blue-400/30 px-3 py-1 rounded-full">ICAO Radio Lab</span>
       </nav>
 
       <div className="max-w-2xl mx-auto px-6 py-10">
@@ -565,7 +565,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'ctaf' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">VFR Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
               <p className="text-gray-400">CTAF — Uncontrolled Airport Arrival</p>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
@@ -623,7 +623,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'classd' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">VFR Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
               <p className="text-gray-400">Class D — Departure from a Towered Airport</p>
             </div>
 
@@ -736,7 +736,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'classdarrival' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">VFR Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
               <p className="text-gray-400">Class D — Arrival at a Towered Airport</p>
             </div>
 
@@ -849,7 +849,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'flightfollowing' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">VFR Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
               <p className="text-gray-400">VFR Flight Following Request</p>
             </div>
 
