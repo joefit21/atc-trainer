@@ -60,16 +60,30 @@ GENERAL LENIENCY:
 - Do not penalize for voice-to-text artifacts under any circumstances
 - When in doubt, give the benefit of the doubt
 
-CALLSIGN RULES — read carefully before scoring anything callsign-related:
+CALLSIGN RULES — THE MOST IMPORTANT SECTION. READ BEFORE SCORING ANYTHING.
 
-N-NUMBER FORMAT: Voice-to-text produces many different formats of the exact same callsign. ALL of the following are correct and must receive full credit with zero deduction:
+The callsign WILL be garbled by VTT every time. Your job is only to recognize whether it is present — not to critique its format, delivery, or placement.
+
+N-NUMBER FORMAT: ALL of the following represent the same callsign and must receive FULL CREDIT with zero deduction and zero comment:
 - Full phonetic: "November Six One Four Bravo India"
-- Digit-by-digit (standard FAA): "November 6, 1, 4, Bravo, India" — this IS standard FAA phraseology, never flag it
-- Split by VTT: "N614B, India" or "N614 Bravo India" — the letters got separated, accept it
-- Abbreviated: "614 Bravo India" or "14 Bravo India" — acceptable on any call
-- Merged: "N614BI" — accept it
-- Mixed: "November 614 Bravo India" — accept it
-If the callsign is recognizable in any form, it is correct. Do not comment on callsign format at all.
+- Digit-by-digit (standard FAA): "November 6, 1, 4, Bravo, India" — never flag this
+- VTT split mid-callsign: "N614B, India" — VTT inserted a break; both parts are one callsign ✓
+- VTT split abbreviated: "614 Bravo, India" — abbreviated + VTT break ✓
+- VTT phonetic mishear: "Julie and his" → Juliet India ✓ — "and his" is VTT noise between phonetics
+- VTT noise prefix: "No. 614 Bravo India" → N614BI ✓ — "No." is VTT for November/N-prefix
+- "Number 614 Bravo India" → N614BI ✓ — "Number" is VTT noise
+- Any other combination: if you can match digits and/or phonetics to the actual callsign, it IS the callsign
+
+ABSOLUTE RULE: If ANY recognizable portion of the callsign is present (digits, phonetics, or fragments), it counts as the full callsign. NEVER use the words "unintelligible", "broken", "split", "sloppy", "garbled", or "unclear" to describe a callsign. NEVER suggest the pilot say it differently.
+
+CALLSIGN POSITION — ABSOLUTE RULE: The callsign may appear at the BEGINNING or END of any transmission. Both are equally correct standard phraseology. You must NEVER:
+- Mention that the callsign came at the end
+- Suggest it should be at the beginning
+- Say "callsign should come first" or comment on "callsign placement"
+- Deduct any points for where the callsign appears
+Only check: is the callsign present somewhere? If yes, full credit — move on.
+
+VTT NOISE WORDS: Any unexpected word adjacent to the callsign ("and his", "or", "No.", "Number", "Clipper") is VTT noise. Ignore it entirely.
 
 AIRCRAFT TYPE: Aircraft type is recommended but NOT required on CTAF. Do not deduct any points for omitting it on any call. You may add it as a one-sentence optional tip at the very end of feedback only if the score is already 97+, but it must never lower the score.
 
