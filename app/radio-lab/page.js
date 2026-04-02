@@ -865,6 +865,12 @@ export default function RadioLab() {
               </div>
             </div>
 
+            <div className="bg-blue-500/10 border border-blue-400/20 rounded-2xl p-5">
+              <p className="text-sm text-blue-300 leading-relaxed">
+                <span className="font-semibold text-blue-200">About this method:</span> This exercise teaches the short-initial-contact approach preferred at busy facilities. Your first call is just the facility name, your callsign, and position — nothing more. The controller finds you on radar, issues a squawk to confirm your target, then invites your full request. If you learned the all-in-one method, set it aside for now — this flow is what controllers at busy approach facilities expect.
+              </p>
+            </div>
+
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
               <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-3">You Will Make 4 Transmissions</h2>
               <div className="space-y-2">
