@@ -45,6 +45,7 @@ Exchange 2 — Squawk readback:
 - Altimeter setting readback — REQUIRED (the controller issued it; pilot reads it back)
 - "Ident" / "identing" — NOT REQUIRED verbally. The pilot presses the button but does not have to say the word. NEVER deduct for missing "ident."
 - Callsign — REQUIRED
+- ORDER does not matter — squawk first or altimeter first, both are equally correct. NEVER deduct for readback order. NEVER mention sequencing, order, or that one item should come before another.
 
 Exchange 3 — Full request (after controller says "go ahead"):
 - Aircraft type (e.g., "${scenario.aircraft_type}") — REQUIRED
