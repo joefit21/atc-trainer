@@ -48,9 +48,10 @@ Exchange 3 — Tower call at hold short:
 - Do NOT require or penalize for ATIS letter — it was already established with Ground
 
 Exchange 4 — Tower readback:
-- Callsign
-- Runway: "cleared for takeoff runway [X]" or equivalent
-- Any heading instruction if one was issued
+- Callsign (may be at beginning OR end — both are standard)
+- "Cleared for takeoff runway [X]" or equivalent
+- Departure direction if one was stated in the clearance (e.g., "northbound departure approved")
+- Do NOT require a heading — none is issued in this exercise
 - Do NOT require a departure frequency — none was issued in this exercise
 
 VOICE-TO-TEXT LENIENCY — apply this before everything else:
@@ -91,6 +92,8 @@ If the callsign is recognizable in any form, it is correct. Do not comment on ca
 CALLSIGN POSITION IN READBACKS: The callsign may appear at the BEGINNING or END of a readback — both are standard. Never penalize for callsign position. Only check that it is present somewhere in the transmission.
 
 READBACK VTT ARTIFACTS: When a readback contains a string of garbled numbers and/or phonetics (e.g. "11-541-GINKY-WHISKEY", "1-9-884-WhiskeyZulu", "Clifford takeoff to Niner flight"), treat the entire garbled string as a VTT artifact of the callsign and/or other clearance elements — NOT as "made-up content." Extract all recognizable elements from the readback and grade only on those. The presence of garbled VTT noise never lowers the score; only genuine omissions of required elements lower the score.
+
+VTT OPENER WORDS: Words like "Clipper", "Clifford", "November", "Navajo", or any similar word at the start of a readback are VTT renderings of the callsign opener — treat them as the callsign and move on. Never flag an unrecognized opener word as "non-standard" — it is a transcription artifact.
 
 AIRCRAFT TYPE: Aircraft type is recommended but NOT required. Do not deduct any points for omitting it on any exchange.
 

@@ -56,15 +56,14 @@ Pilot's intended departure: ${scenario.departure_intention}
 
 The pilot just called: "${pilot_said}"
 
-Respond with a realistic takeoff clearance. Rules:
-- Start with the aircraft callsign: ${scenario.callsign_spoken}
-- Assign runway ${scenario.runway} — write it as: "runway ${rwySpoken}"
-- Say "cleared for takeoff"
-- Include wind (${windStr}) only if 5 knots or greater
-- Include a departure instruction: "fly runway heading" OR a specific heading (e.g., "turn left heading two seven zero")
-- Do NOT include any frequency change or departure control contact instruction
-- Keep response under 30 words
-- Professional tower controller cadence
+Respond with a realistic takeoff clearance using EXACTLY this format (elements after callsign may be in any order):
+1. Callsign FIRST: ${scenario.callsign_spoken}
+2. Wind (${windStr}) — include ONLY if wind speed is 5 knots or greater
+3. "Cleared for takeoff runway ${rwySpoken}"
+4. Departure approval: state the departure direction from the pilot's intended departure — e.g., "northbound departure approved", "westbound departure approved", "closed traffic approved"
+
+DO NOT include any heading instruction. DO NOT include any frequency change. DO NOT include "fly runway heading."
+Keep response under 25 words. Professional tower controller cadence.
 
 CRITICAL: Write ALL runway numbers as individual spoken digits:
 - Runway 13 → "runway one three"
