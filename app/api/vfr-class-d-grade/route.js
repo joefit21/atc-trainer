@@ -67,7 +67,8 @@ Accept any phonetically adjacent word as the correct phonetic letter. Never pena
 NUMBERS AND FREQUENCIES: Voice-to-text frequently mishears spoken numbers. Examples:
 - "Windsor and" → "one two" ✓
 - "Wine" → "niner" ✓
-- Runway numbers said as single digits or merged ("thirteen" for "one three") → accept it ✓
+- Runway numbers said as merged words ("thirteen" for "one three"), hyphenated ("3-1" for "three one"), or with "er" suffix ("29er" for "two niner") → ALL acceptable ✓
+- "2-9", "two-niner", "29er" → runway two niner ✓ — never penalize runway number format
 - Frequencies with slight digit variations → accept if recognizable ✓
 - Altimeter settings with minor digit errors → accept if close ✓
 
@@ -86,6 +87,10 @@ N-NUMBER FORMAT: Voice-to-text produces many different formats of the exact same
 - Merged: "N614BI" — accept it
 - Mixed: "November 614 Bravo India" — accept it
 If the callsign is recognizable in any form, it is correct. Do not comment on callsign format at all.
+
+CALLSIGN POSITION IN READBACKS: The callsign may appear at the BEGINNING or END of a readback — both are standard. Never penalize for callsign position. Only check that it is present somewhere in the transmission.
+
+READBACK VTT ARTIFACTS: When a readback contains a string of garbled numbers and/or phonetics (e.g. "11-541-GINKY-WHISKEY", "1-9-884-WhiskeyZulu", "Clifford takeoff to Niner flight"), treat the entire garbled string as a VTT artifact of the callsign and/or other clearance elements — NOT as "made-up content." Extract all recognizable elements from the readback and grade only on those. The presence of garbled VTT noise never lowers the score; only genuine omissions of required elements lower the score.
 
 AIRCRAFT TYPE: Aircraft type is recommended but NOT required. Do not deduct any points for omitting it on any exchange.
 
