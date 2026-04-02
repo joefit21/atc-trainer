@@ -57,6 +57,10 @@ Exchange 4 — Tower readback:
 VOICE-TO-TEXT LENIENCY — apply this before everything else:
 The transcriptions you receive come from a speech-to-text engine that regularly mishears words. You MUST treat every transcription as an approximation of spoken audio and apply maximum leniency to the following:
 
+GOLDEN RULE — NO EXCEPTIONS: If you recognize something as a VTT artifact, transcription error, or voice-to-text issue, you MUST give full credit for that element and score it as if the pilot said it perfectly. Identifying it as VTT means the pilot said the correct thing and the machine transcribed it wrong. Never say "likely a VTT artifact" and then deduct points. Never say "this is a VTT issue" and then deduct points. VTT artifact = full credit, period.
+
+AIRPORT NAME VTT LENIENCY: Any phonetically adjacent word for the airport name must be accepted as full credit — e.g., "Sail" → Salem ✓, "Redmon" → Redmond ✓, "Palo" → Palo Alto ✓.
+
 PHONETIC ALPHABET: Any word that sounds remotely like a phonetic letter must be accepted as full credit. Examples (not exhaustive):
 - "Foxdrop", "Foxtrap", "Foxtro", "Fox" → Foxtrot ✓
 - "Bravo", "Bracco", "Gravo" → Bravo ✓
