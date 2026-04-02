@@ -1,36 +1,96 @@
-const FACILITIES = [
-  { name: 'NorCal Approach',      freq: '132.45' },
-  { name: 'Seattle Approach',     freq: '120.1'  },
-  { name: 'Denver Center',        freq: '133.4'  },
-  { name: 'SoCal Approach',       freq: '124.5'  },
-  { name: 'Salt Lake Approach',   freq: '124.3'  },
-  { name: 'Portland Approach',    freq: '124.0'  },
-  { name: 'Albuquerque Center',   freq: '135.3'  },
-  { name: 'Houston Approach',     freq: '119.0'  },
+// Geographic regions — facility, position references, and destinations are
+// all within ~200 nm of each other so scenarios make geographic sense.
+const REGIONS = [
+  {
+    facility: { name: 'NorCal Approach', freq: '132.45' },
+    references: ['Auburn', 'Stockton', 'Modesto', 'Fresno', 'Chico', 'Redding', 'Marysville'],
+    destinations: [
+      { name: 'Sacramento Executive',        id: 'KSAC' },
+      { name: 'Fresno Yosemite International', id: 'KFAT' },
+      { name: 'Redding Municipal',           id: 'KRDD' },
+      { name: 'Chico Municipal',             id: 'KCIC' },
+      { name: 'Stockton Metropolitan',       id: 'KSCK' },
+      { name: 'Beale Air Force Base',        id: 'KBAB' },
+    ],
+  },
+  {
+    facility: { name: 'Seattle Approach', freq: '120.1' },
+    references: ['Olympia', 'Tacoma', 'Everett', 'Bellingham', 'Bremerton', 'Monroe'],
+    destinations: [
+      { name: 'Seattle Boeing Field',        id: 'KBFI' },
+      { name: 'Paine Field',                 id: 'KPAE' },
+      { name: 'Olympia Regional',            id: 'KOLM' },
+      { name: 'Bellingham International',    id: 'KBLI' },
+      { name: 'Harvey Field',                id: 'S43'  },
+    ],
+  },
+  {
+    facility: { name: 'Portland Approach', freq: '124.0' },
+    references: ['Salem', 'Eugene', 'Pendleton', 'Astoria', 'McMinnville', 'The Dalles'],
+    destinations: [
+      { name: 'Salem Airport',               id: 'KSLE' },
+      { name: 'Eugene Airport',              id: 'KEUG' },
+      { name: 'Medford Airport',             id: 'KMFR' },
+      { name: 'Pendleton Regional',          id: 'KPDT' },
+      { name: 'McMinnville Municipal',       id: 'KMMV' },
+    ],
+  },
+  {
+    facility: { name: 'Salt Lake Approach', freq: '124.3' },
+    references: ['Provo', 'Logan', 'Ogden', 'Price', 'Vernal', 'Heber City'],
+    destinations: [
+      { name: 'Provo Municipal',             id: 'KPVU' },
+      { name: 'Logan-Cache Airport',         id: 'KLGU' },
+      { name: 'Ogden Hinckley',              id: 'KOGD' },
+      { name: 'Vernal Regional',             id: 'KVEL' },
+      { name: 'Spanish Fork Municipal',      id: 'U77'  },
+    ],
+  },
+  {
+    facility: { name: 'Denver Center', freq: '133.4' },
+    references: ['Grand Junction', 'Glenwood Springs', 'Steamboat Springs', 'Fort Collins', 'Pueblo'],
+    destinations: [
+      { name: 'Grand Junction Regional',     id: 'KGJT' },
+      { name: 'Colorado Springs Airport',    id: 'KCOS' },
+      { name: 'Fort Collins-Loveland',       id: 'KFNL' },
+      { name: 'Pueblo Memorial',             id: 'KPUB' },
+      { name: 'Leadville Lake County',       id: 'KLXV' },
+    ],
+  },
+  {
+    facility: { name: 'Albuquerque Center', freq: '135.3' },
+    references: ['Santa Fe', 'Taos', 'Roswell', 'Gallup', 'Farmington', 'Ruidoso'],
+    destinations: [
+      { name: 'Albuquerque International Sunport', id: 'KABQ' },
+      { name: 'Santa Fe Regional',           id: 'KSAF' },
+      { name: 'Roswell International Air Center', id: 'KROW' },
+      { name: 'Farmington Four Corners',     id: 'KFMN' },
+    ],
+  },
+  {
+    facility: { name: 'SoCal Approach', freq: '124.5' },
+    references: ['Oceanside', 'Riverside', 'Palm Springs', 'Victorville', 'El Cajon', 'Hemet'],
+    destinations: [
+      { name: 'Long Beach Airport',          id: 'KLGB' },
+      { name: 'John Wayne Airport',          id: 'KSNA' },
+      { name: 'Palm Springs International',  id: 'KPSP' },
+      { name: 'Ramona Airport',              id: 'KRNM' },
+      { name: 'Hemet-Ryan Airport',          id: 'KHMT' },
+    ],
+  },
+  {
+    facility: { name: 'Houston Approach', freq: '119.0' },
+    references: ['Galveston', 'Conroe', 'Beaumont', 'Victoria', 'Huntsville', 'Wharton'],
+    destinations: [
+      { name: 'Sugar Land Regional',         id: 'KSGR' },
+      { name: 'Galveston Scholes',           id: 'KGLS' },
+      { name: 'Beaumont Municipal',          id: 'KBMT' },
+      { name: 'Victoria Regional',           id: 'KVCT' },
+      { name: 'Conroe-North Houston Regional', id: 'KCXO' },
+    ],
+  },
 ]
 
-const POSITION_REFERENCES = [
-  'Auburn', 'Redding', 'Medford', 'Eugene', 'Yakima',
-  'Provo', 'Logan', 'Elko', 'Grand Junction', 'Flagstaff',
-  'Bend', 'Twin Falls', 'Pendleton', 'Chico', 'Fresno',
-]
-
-const DESTINATIONS = [
-  { name: 'Sacramento Executive',      id: 'KSAC' },
-  { name: 'Portland International',    id: 'KPDX' },
-  { name: 'Seattle Boeing Field',      id: 'KBFI' },
-  { name: 'Salt Lake City International', id: 'KSLC' },
-  { name: 'Reno-Tahoe International',  id: 'KRNO' },
-  { name: 'Eugene Airport',            id: 'KEUG' },
-  { name: 'Boise Airport',             id: 'KBOI' },
-  { name: 'Spokane International',     id: 'KGEG' },
-  { name: 'Colorado Springs Airport',  id: 'KCOS' },
-  { name: 'Albuquerque International', id: 'KABQ' },
-  { name: 'Medford Airport',           id: 'KMFR' },
-  { name: 'Yakima Air Terminal',       id: 'KYKM' },
-]
-
-// VFR hemispheric cruising altitudes
 const VFR_ALTITUDES = [3500, 4500, 5500, 6500, 7500, 8500, 9500]
 
 const APPROACH_DIRECTIONS = [
@@ -73,20 +133,20 @@ function randomAltimeter() {
 }
 
 export async function GET() {
-  const facility   = pickRandom(FACILITIES)
-  const aircraft   = pickRandom(AIRCRAFT)
-  const tail       = generateTailNumber()
-  const destination = pickRandom(DESTINATIONS)
-  const posRef     = pickRandom(POSITION_REFERENCES)
-  const posDir     = pickRandom(APPROACH_DIRECTIONS)
-  const posDist    = randomInt(8, 18)
-  const altitude   = pickRandom(VFR_ALTITUDES)
-  const altimeter  = randomAltimeter()
+  const region      = pickRandom(REGIONS)
+  const aircraft    = pickRandom(AIRCRAFT)
+  const tail        = generateTailNumber()
+  const destination = pickRandom(region.destinations)
+  const posRef      = pickRandom(region.references)
+  const posDir      = pickRandom(APPROACH_DIRECTIONS)
+  const posDist     = randomInt(8, 18)
+  const altitude    = pickRandom(VFR_ALTITUDES)
+  const altimeter   = randomAltimeter()
 
   return Response.json({
     scenario_type:      'flight_following',
-    facility_name:      facility.name,
-    facility_freq:      facility.freq,
+    facility_name:      region.facility.name,
+    facility_freq:      region.facility.freq,
     aircraft_type:      aircraft.type,
     callsign_display:   tail.display,
     callsign_spoken:    tail.spoken,

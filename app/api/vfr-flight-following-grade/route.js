@@ -40,14 +40,21 @@ Exchange 1 — Initial contact (short opener):
 - DO NOT require "request flight following" here — that comes in Exchange 3
 
 Exchange 2 — Squawk readback:
-- "Squawking [code]" — must match the 4-digit code the controller issued (${squawk_code})
-- "Ident" or "identing" — REQUIRED (confirms pilot pressed ident button)
+- Squawk code — must match the 4-digit code the controller issued (${squawk_code}) — REQUIRED
+- Altimeter setting readback — REQUIRED (the controller issued it; pilot reads it back)
+- "Ident" / "identing" — NOT REQUIRED verbally. The pilot presses the button but does not have to say the word. NEVER deduct for missing "ident."
 - Callsign — REQUIRED
 
 Exchange 3 — Full request (after controller says "go ahead"):
 - Aircraft type (e.g., "${scenario.aircraft_type}") — REQUIRED
 - Destination (e.g., "${scenario.destination_name}" or "${scenario.destination_id}") — REQUIRED
-- "Request flight following", "VFR advisories", or equivalent — REQUIRED
+- Flight following request — REQUIRED. Accept ANY of these phrasings:
+  - "request flight following"
+  - "flight following to [destination]" ← this IS a valid request phrasing
+  - "VFR flight following"
+  - "VFR advisories"
+  - Any sentence that contains "flight following" anywhere — full credit
+  CRITICAL: If the word "flight following" appears anywhere in the transmission, the request requirement is MET. Do NOT penalize for phrasing style.
 - Callsign — required
 
 Exchange 4 — State altitude (after controller asks "say altitude"):
@@ -89,6 +96,13 @@ NUMBERS AND POSITION:
 - Merged or misheared distance + direction words → accept if recognizable
 - Altitude stated as combined ("five thousand five hundred" = 5,500) ✓
 - Aircraft type phonetic variants → accept ("Cessna" alone, "one seven two" etc.) ✓
+
+DESTINATION VTT: Destinations may be spoken as ICAO identifier phonetics — full credit:
+- "Charlie Oscar Sierra" → COS → Colorado Springs ✓
+- "Kilo Foxtrot Alpha Tango" → KFAT → Fresno ✓
+- "Kilo Bravo Foxtrot India" → KBFI → Boeing Field ✓
+- Airport name partial match (e.g., "Colorado Springs" or "Springs") → accept ✓
+If the destination is identifiable by name fragment or ICAO phonetics, full credit.
 
 CALLSIGN RULES — MOST IMPORTANT:
 

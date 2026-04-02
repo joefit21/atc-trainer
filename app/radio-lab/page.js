@@ -299,7 +299,7 @@ export default function RadioLab() {
     if (!scenario) return ''
     switch (step) {
       case 0: return `Say: "${scenario.facility_name}, ${scenario.callsign_display}, [X] miles [direction] of [reference]."`
-      case 1: return `Say: "Squawking [code], ident, ${scenario.callsign_display}." Write down the code — you'll need to set it on your transponder.`
+      case 1: return `Say: "Squawking [code], altimeter [setting], ${scenario.callsign_display}." Write down the squawk code — you'll need to set it on your transponder.`
       case 2: return `Say: "${scenario.aircraft_type}, VFR to ${scenario.destination_name}, request flight following, ${scenario.callsign_display}."`
       case 3: return `Say: "${scenario.altitude.toLocaleString()}, ${scenario.callsign_display}."`
       default: return ''
@@ -857,10 +857,11 @@ export default function RadioLab() {
               <h2 className="text-sm text-gray-400 uppercase tracking-wide">Your Scenario</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div><p className="text-xs text-gray-500 mb-1">Facility</p><p className="text-xl font-bold text-blue-400">{scenario.facility_name}</p><p className="text-sm text-gray-400">{scenario.facility_freq}</p></div>
-                <div><p className="text-xs text-gray-500 mb-1">Your Aircraft</p><p className="text-xl font-bold text-blue-400">{scenario.callsign_display}</p><p className="text-sm text-gray-400">{scenario.aircraft_type}</p></div>
-                <div><p className="text-xs text-gray-500 mb-1">Your Position</p><p className="text-lg font-bold text-yellow-400">{scenario.position_distance} miles {scenario.position_direction}</p><p className="text-sm text-gray-400">of {scenario.position_reference}</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Callsign</p><p className="text-xl font-bold text-blue-400">{scenario.callsign_display}</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Aircraft Type</p><p className="text-xl font-bold text-yellow-400">{scenario.aircraft_type}</p></div>
                 <div><p className="text-xs text-gray-500 mb-1">Altitude</p><p className="text-xl font-bold text-yellow-400">{scenario.altitude.toLocaleString()} ft MSL</p></div>
-                <div className="col-span-2"><p className="text-xs text-gray-500 mb-1">Destination</p><p className="text-lg font-bold text-blue-400">{scenario.destination_name} ({scenario.destination_id})</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Your Position</p><p className="text-lg font-bold text-white">{scenario.position_distance} miles {scenario.position_direction}</p><p className="text-sm text-gray-400">of {scenario.position_reference}</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Destination</p><p className="text-lg font-bold text-blue-400">{scenario.destination_name}</p><p className="text-sm text-gray-400">{scenario.destination_id}</p></div>
               </div>
             </div>
 
@@ -869,7 +870,7 @@ export default function RadioLab() {
               <div className="space-y-2">
                 {[
                   'Initial contact — ' + scenario.facility_name + ', callsign, position',
-                  'Read back squawk code + ident',
+                  'Read back squawk code + altimeter setting',
                   'State aircraft type, destination, request flight following',
                   'Report your altitude',
                 ].map((s, i) => (
@@ -935,6 +936,7 @@ export default function RadioLab() {
             {/* Quick reference */}
             <div className="flex flex-wrap gap-4 text-sm bg-white/3 border border-white/5 rounded-xl px-4 py-3">
               <span className="text-gray-500">Freq <span className="text-white font-medium">{scenario.facility_freq}</span></span>
+              <span className="text-gray-500">Type <span className="text-yellow-300 font-medium">{scenario.aircraft_type}</span></span>
               <span className="text-gray-500">Alt <span className="text-white font-medium">{scenario.altitude.toLocaleString()} ft</span></span>
               <span className="text-gray-500">Dest <span className="text-white font-medium">{scenario.destination_id}</span></span>
               <span className="text-gray-500">Callsign <span className="text-white font-medium">{scenario.callsign_display}</span></span>
