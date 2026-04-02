@@ -236,10 +236,11 @@ export default function RadioLab() {
       case 1: return `Tower has given you a pattern entry instruction. Write it down, then read it back.`
       case 2: {
         const patternInstruction = classDArrivalExchanges[1]?.controller_said
-        return `Make your required position report to Tower.${patternInstruction ? ` You were told: "${patternInstruction}"` : ''}`
+        return `Make your required position report to Tower.${patternInstruction ? ` Tower said: "${patternInstruction}"` : ''}`
       }
       case 3: return `Tower has issued your landing clearance. Write it down, then read it back.`
-      case 4: return `You have landed and are clear of Runway ${scenario.runway} at ${scenario.airport_name}. Call Tower.`
+      case 4: return `You have landed and cleared Runway ${scenario.runway}. Switch to Ground (${scenario.ground_freq}) and report clear. You are taxiing to ${scenario.parking_destination}.`
+      case 5: return `Ground has issued your taxi-to-parking clearance. Write it down, then read it back.`
       default: return ''
     }
   }
@@ -249,9 +250,10 @@ export default function RadioLab() {
     switch (step) {
       case 0: return `Say: "${scenario.airport_name} Tower", aircraft type, callsign, distance and direction (${scenario.approach_distance} miles ${scenario.approach_direction}), altitude (${scenario.approach_altitude.toLocaleString()} ft), "with Information ${scenario.atis.letter}", inbound for landing.`
       case 1: return `Read back: callsign, the runway, pattern entry type (e.g., "left downwind"), and the reporting point Tower specified.`
-      case 2: return `Say: "${scenario.airport_name} Tower", callsign, then your position exactly as Tower instructed — include the runway number.`
+      case 2: return `Callsign only — no need to say "${scenario.airport_name} Tower" on a position report. State your position exactly as Tower instructed, and include the runway number.`
       case 3: return `Read back: callsign, "cleared to land runway ${scenario.runway}", and wind if Tower stated it.`
-      case 4: return `Say: "${scenario.airport_name} Tower", callsign, "clear of runway ${scenario.runway}". You must state the specific runway number.`
+      case 4: return `Say: "${scenario.airport_name} Ground", callsign, "clear of runway ${scenario.runway}", and request taxi to ${scenario.parking_destination}. You must state the specific runway number.`
+      case 5: return `Read back: callsign, taxiway, and destination (${scenario.parking_destination}).`
       default: return ''
     }
   }
@@ -261,25 +263,31 @@ export default function RadioLab() {
     'Read Back Pattern Entry',
     'Make Your Position Report',
     'Read Back Landing Clearance',
-    'Clear of Runway',
+    'Clear of Runway — Call Ground',
+    'Read Back Taxi to Parking',
   ][step] || ''
 
-  const classDArrivalIsReadback = (step) => step === 1 || step === 3
+  const classDArrivalIsReadback = (step) => step === 1 || step === 3 || step === 5
 
   // ── Class D arrival submit ────────────────────────────────────────────────────
   const classDArrivalSubmitCall = async () => {
     const pilotSaid = currentTranscription
     setCurrentTranscription('')
 
-    if (classDArrivalStep === 0 || classDArrivalStep === 2) {
+    if (classDArrivalStep === 0 || classDArrivalStep === 2 || classDArrivalStep === 4) {
       // Initiating call — fetch controller response
-      const apiPhase = classDArrivalStep === 0 ? 'initial_call' : 'position_report'
+      const apiPhase = classDArrivalStep === 0 ? 'initial_call'
+        : classDArrivalStep === 2 ? 'position_report'
+        : 'taxi_to_parking'
+      const phaseLabel = classDArrivalStep === 0 ? 'initial_call'
+        : classDArrivalStep === 2 ? 'position_report'
+        : 'clear_runway_to_ground'
       setControllerLoading(true)
       setControllerText('')
       setControllerAudioUrl(null)
       setClassDArrivalExchanges(prev => [...prev, {
         step: classDArrivalStep,
-        phase: classDArrivalStep === 0 ? 'initial_call' : 'position_report',
+        phase: phaseLabel,
         situation: classDArrivalGetSituation(classDArrivalStep),
         pilot_said: pilotSaid,
       }])
@@ -294,7 +302,7 @@ export default function RadioLab() {
       setControllerLoading(false)
 
     } else if (classDArrivalStep === 1 || classDArrivalStep === 3) {
-      // Readback — save controller_said and advance
+      // Readback of Tower instruction — save and advance
       const ctrlSaid = controllerText
       setClassDArrivalExchanges(prev => [...prev, {
         step: classDArrivalStep,
@@ -308,11 +316,13 @@ export default function RadioLab() {
       setClassDArrivalStep(classDArrivalStep + 1)
 
     } else {
-      // Step 4: clear_runway — one-way call, grade immediately
+      // Step 5: ground taxi readback — grade all 6 exchanges
+      const ctrlSaid = controllerText
       const finalExchanges = [...classDArrivalExchanges, {
         step: classDArrivalStep,
-        phase: 'clear_runway',
+        phase: 'ground_taxi_readback',
         situation: classDArrivalGetSituation(classDArrivalStep),
+        controller_said: ctrlSaid,
         pilot_said: pilotSaid,
       }]
       setClassDArrivalExchanges(finalExchanges)
@@ -639,9 +649,9 @@ export default function RadioLab() {
 
             {/* Steps preview */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-3">You Will Make 5 Transmissions</h2>
+              <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-3">You Will Make 6 Transmissions</h2>
               <div className="space-y-2">
-                {['Initial call to Tower (inbound)', 'Read back pattern entry instruction', 'Position report as directed', 'Read back landing clearance', 'Clear of runway call'].map((s, i) => (
+                {['Initial call to Tower (inbound)', 'Read back pattern entry instruction', 'Position report as directed', 'Read back landing clearance', 'Call Ground — clear of runway, request taxi to parking', 'Read back taxi-to-parking clearance'].map((s, i) => (
                   <div key={i} className="flex items-start gap-3 text-sm text-gray-400">
                     <span className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center text-xs text-gray-500 flex-shrink-0 mt-0.5">{i + 1}</span>
                     <span>{s}</span>
@@ -663,11 +673,11 @@ export default function RadioLab() {
           <div className="space-y-6">
             {/* Progress */}
             <div className="flex items-center gap-2">
-              {[0,1,2,3,4].map(i => (
+              {[0,1,2,3,4,5].map(i => (
                 <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${i < classDArrivalStep ? 'bg-green-400' : i === classDArrivalStep ? 'bg-blue-400' : 'bg-white/10'}`} />
               ))}
             </div>
-            <p className="text-sm text-gray-400">Transmission {classDArrivalStep + 1} of 5</p>
+            <p className="text-sm text-gray-400">Transmission {classDArrivalStep + 1} of 6</p>
 
             {/* Title + situation */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -680,7 +690,7 @@ export default function RadioLab() {
             {classDArrivalIsReadback(classDArrivalStep) && controllerAudioUrl && (
               <div className="bg-white/5 border border-blue-400/20 rounded-2xl p-5 space-y-3">
                 <p className="text-xs text-blue-400 uppercase tracking-wide">
-                  Tower — write down the clearance, then read it back
+                  {classDArrivalStep === 5 ? 'Ground Control' : 'Tower'} — write down the clearance, then read it back
                 </p>
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
                 <button
@@ -701,16 +711,18 @@ export default function RadioLab() {
 
             {/* Quick reference */}
             <div className="flex flex-wrap gap-4 text-sm bg-white/3 border border-white/5 rounded-xl px-4 py-3">
-              <span className="text-gray-500">Tower <span className="text-white font-medium">{scenario.tower_freq}</span></span>
+              {classDArrivalStep <= 3
+                ? <><span className="text-gray-500">Tower <span className="text-white font-medium">{scenario.tower_freq}</span></span><span className="text-gray-500">ATIS <span className="text-white font-medium">Info {scenario.atis.letter}</span></span></>
+                : <><span className="text-gray-500">Ground <span className="text-white font-medium">{scenario.ground_freq}</span></span><span className="text-gray-500">Parking <span className="text-white font-medium">{scenario.parking_destination}</span></span></>
+              }
               <span className="text-gray-500">Runway <span className="text-white font-medium">{scenario.runway}</span></span>
-              <span className="text-gray-500">ATIS <span className="text-white font-medium">Info {scenario.atis.letter}</span></span>
               <span className="text-gray-500">Callsign <span className="text-white font-medium">{scenario.callsign_display}</span></span>
             </div>
 
             {!controllerLoading && (
               <RecordingPanel
                 onSubmit={classDArrivalSubmitCall}
-                submitLabel={classDArrivalStep < 4 ? 'Submit →' : 'Finish & Get Debrief →'}
+                submitLabel={classDArrivalStep < 5 ? 'Submit →' : 'Finish & Get Debrief →'}
               />
             )}
           </div>

@@ -44,6 +44,24 @@ CRITICAL: Write ALL runway numbers as individual spoken digits:
 Return raw JSON only, no markdown:
 {"controller_text": "the full instruction exactly as spoken"}`
 
+    } else if (phase === 'taxi_to_parking') {
+      // Pilot called Ground clear of runway and requested taxi to parking
+      prompt = `You are ${scenario.airport_name} Ground Control (${scenario.airport_id}).
+Aircraft: ${scenario.callsign_spoken} (${scenario.aircraft_type})
+Aircraft just cleared runway ${scenario.runway} and is requesting taxi to ${scenario.parking_destination}.
+
+The pilot just called: "${pilot_said}"
+
+Respond with a taxi-to-parking clearance:
+- Start with callsign: ${scenario.callsign_spoken}
+- Assign a single taxiway letter (Alpha, Bravo, or Charlie)
+- Direct them to ${scenario.parking_destination}
+- Keep response under 20 words
+- Professional ground controller cadence — no pleasantries
+
+Return raw JSON only, no markdown:
+{"controller_text": "the full clearance exactly as spoken"}`
+
     } else {
       // position_report — issue landing clearance
       const windStr = parseInt(scenario.atis.wind_speed) >= 5

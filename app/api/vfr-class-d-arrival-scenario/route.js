@@ -58,6 +58,15 @@ const DIGIT_WORDS = ['zero','one','two','three','four','five','six','seven','eig
 
 const APPROACH_DIRECTIONS = ['north','south','east','west','northeast','northwest','southeast','southwest']
 
+const PARKING_DESTINATIONS = [
+  'the GA ramp',
+  'the transient ramp',
+  'the FBO ramp',
+  'the general aviation ramp',
+  'the south ramp',
+  'the west ramp',
+]
+
 const SKY_CONDITIONS = [
   'clear',
   'few clouds at 2,500',
@@ -100,33 +109,35 @@ function randomWind() {
 }
 
 export async function GET() {
-  const airport       = pickRandom(CLASS_D_AIRPORTS)
-  const rwyObj        = pickRandom(airport.runways)
-  const aircraft      = pickRandom(AIRCRAFT)
-  const tail          = generateTailNumber()
-  const atis          = pickRandom(ATIS_LETTERS)
-  const wind          = randomWind()
-  const sky           = pickRandom(SKY_CONDITIONS)
-  const altimeter     = randomAltimeter()
-  const approachDir   = pickRandom(APPROACH_DIRECTIONS)
-  const approachDist  = randomInt(8, 12)
-  const approachAlt   = (randomInt(28, 45) * 100) + 3000
+  const airport            = pickRandom(CLASS_D_AIRPORTS)
+  const rwyObj             = pickRandom(airport.runways)
+  const aircraft           = pickRandom(AIRCRAFT)
+  const tail               = generateTailNumber()
+  const atis               = pickRandom(ATIS_LETTERS)
+  const wind               = randomWind()
+  const sky                = pickRandom(SKY_CONDITIONS)
+  const altimeter          = randomAltimeter()
+  const approachDir        = pickRandom(APPROACH_DIRECTIONS)
+  const approachDist       = randomInt(8, 12)
+  const approachAlt        = (randomInt(28, 45) * 100) + 3000
+  const parkingDestination = pickRandom(PARKING_DESTINATIONS)
 
   return Response.json({
-    scenario_type:      'classd_arrival',
-    airport_id:         airport.id,
-    airport_name:       airport.name,
-    state:              airport.state,
-    tower_freq:         airport.tower,
-    ground_freq:        airport.ground,
-    runway:             rwyObj.rwy,
-    pattern:            rwyObj.pattern,
-    aircraft_type:      aircraft.type,
-    callsign_display:   tail.display,
-    callsign_spoken:    tail.spoken,
-    approach_direction: approachDir,
-    approach_distance:  approachDist,
-    approach_altitude:  approachAlt,
+    scenario_type:       'classd_arrival',
+    airport_id:          airport.id,
+    airport_name:        airport.name,
+    state:               airport.state,
+    tower_freq:          airport.tower,
+    ground_freq:         airport.ground,
+    runway:              rwyObj.rwy,
+    pattern:             rwyObj.pattern,
+    aircraft_type:       aircraft.type,
+    callsign_display:    tail.display,
+    callsign_spoken:     tail.spoken,
+    approach_direction:  approachDir,
+    approach_distance:   approachDist,
+    approach_altitude:   approachAlt,
+    parking_destination: parkingDestination,
     atis: {
       letter:        atis.letter,
       phonetic:      atis.phonetic,

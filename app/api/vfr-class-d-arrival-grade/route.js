@@ -19,8 +19,9 @@ Airport: ${scenario.airport_name} (${scenario.airport_id}) — Class D
 Aircraft: ${scenario.aircraft_type} ${scenario.callsign_display}
 ATIS: Information ${scenario.atis.letter}
 Active runway: ${scenario.runway}, ${scenario.pattern} traffic
-Tower freq: ${scenario.tower_freq}
+Tower freq: ${scenario.tower_freq} / Ground freq: ${scenario.ground_freq}
 Pilot was inbound from the ${scenario.approach_direction}, ${scenario.approach_distance} miles, at ${scenario.approach_altitude} ft MSL
+Parking destination: ${scenario.parking_destination}
 
 EXCHANGES (${exchanges.length} total):
 ${exchangeText}
@@ -41,22 +42,28 @@ Exchange 2 — Pattern entry readback:
 - Reporting point if one was specified by controller
 
 Exchange 3 — Position report:
-- "[Airport] Tower"
-- Callsign
+- Callsign — this is the ONLY identifier required; do NOT require or penalize for missing "[Airport] Tower"
 - Position matching what controller instructed (e.g., "turning final runway [X]", "[X]-mile final")
 - Must include runway number
+- NOTE: On a position report, calling the facility name ("[Airport] Tower") is not required and must never be penalized
 
 Exchange 4 — Landing clearance readback:
 - Callsign (may be at beginning OR end — both are standard)
 - "Cleared to land runway [X]" or equivalent
 - Wind readback if wind was included in clearance
 
-Exchange 5 — Clear of runway:
-- "[Airport] Tower"
+Exchange 5 — Clear of runway / call Ground:
+- "[Airport] Ground" — this call goes to Ground Control, NOT Tower
 - Callsign
 - "Clear of runway [specific number]" — the exact runway number is required
 - "Clear of the active", "clear of the runway", or any non-specific phrasing scores 60 maximum
+- Request taxi to parking (e.g., "request taxi to the GA ramp", "taxi to the FBO") — required
 - The specific runway number must be stated so other traffic knows which runway is clear
+
+Exchange 6 — Ground taxi readback:
+- Callsign (may be at beginning OR end)
+- Taxiway designator issued by Ground
+- Destination (e.g., "GA ramp", "FBO", "transient ramp")
 
 VOICE-TO-TEXT LENIENCY — apply this before everything else:
 The transcriptions you receive come from a speech-to-text engine that regularly mishears words. You MUST treat every transcription as an approximation of spoken audio and apply maximum leniency to the following:
@@ -100,7 +107,7 @@ READBACK VTT ARTIFACTS: Garbled strings of numbers and phonetics (e.g., "11-541-
 
 AIRCRAFT TYPE: Not required on any exchange. Never deduct points for omitting it.
 
-ABBREVIATION: After the first exchange, abbreviated callsigns are standard. Never penalize abbreviation on exchanges 2–5.
+ABBREVIATION: After the first exchange, abbreviated callsigns are standard. Never penalize abbreviation on exchanges 2–6.
 
 READBACK RULES:
 - Only grade on what the controller ACTUALLY said in that exchange
