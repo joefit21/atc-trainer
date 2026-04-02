@@ -32,7 +32,7 @@ Exchange 1 — Initial tower call (inbound):
 - "[Airport] Tower" (e.g., "${scenario.airport_name} Tower")
 - Aircraft type AND callsign
 - Distance and direction from airport (e.g., "10 miles northwest")
-- Altitude (MSL)
+- Altitude — OPTIONAL. Do NOT deduct any points for omitting altitude. Never comment on missing altitude.
 - "With Information [letter]" — must include current ATIS letter
 - "Inbound for landing" or equivalent request
 
@@ -50,7 +50,7 @@ Exchange 3 — Position report:
 Exchange 4 — Landing clearance readback:
 - Callsign (may be at beginning OR end — both are standard)
 - "Cleared to land runway [X]" or equivalent
-- Wind readback if wind was included in clearance
+- Wind: OPTIONAL — do NOT deduct points for omitting wind, even if the controller stated it. Never comment on missing wind readback.
 
 Exchange 5 — Clear of runway / call Ground:
 - "[Airport] Ground" — this call goes to Ground Control, NOT Tower
@@ -95,15 +95,16 @@ N-NUMBER FORMAT: ALL of the following are correct and must receive full credit:
 - Full phonetic: "November Six One Four Bravo India"
 - Digit-by-digit (standard FAA): "November 6, 1, 4, Bravo, India" — this IS standard FAA phraseology, never flag it
 - Split by VTT: "N614B, India" or "N614 Bravo India" — accept it
-- Abbreviated: "614 Bravo India" — acceptable on exchanges 2–5
+- Abbreviated: "614 Bravo India" — acceptable on exchanges 2–6
 - Merged or mixed formats — accept if recognizable
-If the callsign is recognizable in any form, it is correct. Do not comment on callsign format at all.
+- Numbers mixed with noise words: "Number 9 or 5, 0, Yankee, India" → N950YI ✓ — "Number" and "or" are VTT noise; extract the digits and phonetics
+If the callsign contains recognizable digits and/or phonetic letters from the actual callsign, it is correct. NEVER call a callsign "unintelligible" if it contains any recognizable portion of the actual callsign. Do not comment on callsign format at all.
 
-CALLSIGN POSITION: The callsign may appear at the BEGINNING or END of a readback — both are standard. Never penalize for callsign position. Only check that it is present.
+CALLSIGN POSITION: The callsign may appear at the BEGINNING or END of any transmission — both are standard. Never penalize for callsign position. Only check that it is present somewhere.
 
-VTT OPENER WORDS: Words like "Clipper", "Clifford", or any similar word at the start of a transmission are VTT renderings of the callsign opener — treat them as the callsign and move on.
+VTT OPENER WORDS: Words like "Clipper", "Clifford", "Number", or any similar word at the start of a transmission are VTT renderings of the callsign opener — treat them as the callsign and move on.
 
-READBACK VTT ARTIFACTS: Garbled strings of numbers and phonetics (e.g., "11-541-GINKY-WHISKEY") are VTT artifacts — NOT made-up content. Extract all recognizable elements and grade only on those. VTT noise never lowers the score; only genuine omissions do.
+READBACK VTT ARTIFACTS: Garbled strings of numbers and phonetics (e.g., "11-541-GINKY-WHISKEY", "Number 9 or 5, 0, Yankee, India") are VTT artifacts — NOT made-up content. Extract all recognizable elements and grade only on those. VTT noise never lowers the score; only genuine omissions of required elements lower the score.
 
 AIRCRAFT TYPE: Not required on any exchange. Never deduct points for omitting it.
 

@@ -239,7 +239,7 @@ export default function RadioLab() {
         return `Make your required position report to Tower.${patternInstruction ? ` Tower said: "${patternInstruction}"` : ''}`
       }
       case 3: return `Tower has issued your landing clearance. Write it down, then read it back.`
-      case 4: return `You have landed and cleared Runway ${scenario.runway}. Switch to Ground (${scenario.ground_freq}) and report clear. You are taxiing to ${scenario.parking_destination}.`
+      case 4: return `You have landed and cleared Runway ${scenario.runway}. Switch to Ground on ${scenario.ground_freq}. You are requesting taxi to ${scenario.parking_destination}.`
       case 5: return `Ground has issued your taxi-to-parking clearance. Write it down, then read it back.`
       default: return ''
     }
@@ -252,7 +252,7 @@ export default function RadioLab() {
       case 1: return `Read back: callsign, the runway, pattern entry type (e.g., "left downwind"), and the reporting point Tower specified.`
       case 2: return `Callsign only — no need to say "${scenario.airport_name} Tower" on a position report. State your position exactly as Tower instructed, and include the runway number.`
       case 3: return `Read back: callsign, "cleared to land runway ${scenario.runway}", and wind if Tower stated it.`
-      case 4: return `Say: "${scenario.airport_name} Ground", callsign, "clear of runway ${scenario.runway}", and request taxi to ${scenario.parking_destination}. You must state the specific runway number.`
+      case 4: return `Say: "${scenario.airport_name} Ground", callsign, "clear of runway ${scenario.runway}", request taxi to ${scenario.parking_destination}. Must say the specific runway number. Do NOT say "Tower."`
       case 5: return `Read back: callsign, taxiway, and destination (${scenario.parking_destination}).`
       default: return ''
     }
