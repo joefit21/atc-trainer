@@ -7,6 +7,12 @@ export default function sitemap() {
       priority: 1,
     },
     {
+      url: 'https://practice.flight-levels.com/radio-lab',
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: 'https://practice.flight-levels.com/demo',
       lastModified: new Date(),
       changeFrequency: 'monthly',

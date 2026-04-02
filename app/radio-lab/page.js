@@ -1,13 +1,62 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 // ─── shared helpers ────────────────────────────────────────────────────────────
 const scoreColor  = (s) => s >= 90 ? 'text-green-400'      : s >= 70 ? 'text-yellow-400'      : 'text-red-400'
 const scoreBorder = (s) => s >= 90 ? 'border-green-400/20' : s >= 70 ? 'border-yellow-400/20' : 'border-red-400/20'
 
+// ─── fixed demo scenarios (same every time — non-paying users can't reload for new ones) ──
+const DEMO_SCENARIOS = {
+  ctaf: {
+    scenario_type: 'ctaf', airport_id: 'KAUN', airport_name: 'Auburn', airport_state: 'CA',
+    ctaf: '122.8', runway: '7', pattern: 'left',
+    aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
+    callsign_spoken: 'November four five two one Hotel', approach_direction: 'south',
+    steps: [
+      { index: 0, phase: 'inbound_10',  situation: 'You are 10 miles south of Auburn at 3,400 ft MSL, inbound for landing. Runway in use is 7, left traffic. CTAF is 122.8.', hint: 'Say: "Auburn traffic", aircraft type, callsign, distance and direction, intentions, runway.' },
+      { index: 1, phase: 'entering_45', situation: 'You are entering the 45° to the left downwind for Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", type, callsign, "entering 45 left downwind", runway, "Auburn".' },
+      { index: 2, phase: 'base',        situation: 'You are turning left base for Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", type, callsign, "left base runway 7", "Auburn".' },
+      { index: 3, phase: 'final',       situation: 'You are turning final for Runway 7 at Auburn, full stop.', hint: 'Say: "Auburn traffic", type, callsign, "final runway 7", full stop, "Auburn".' },
+      { index: 4, phase: 'clear_runway',situation: 'You have landed and are clear of Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", type, callsign, "clear of runway 7", "Auburn".' },
+    ],
+  },
+  classd: {
+    scenario_type: 'classd', airport_id: 'KRDM', airport_name: 'Redmond', airport_state: 'OR',
+    tower_freq: '124.5', ground_freq: '121.8', runway: '5', pattern: 'left',
+    aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
+    callsign_spoken: 'November four five two one Hotel',
+    atis: { letter: 'Bravo', wind: '050/10', ceiling: 'clear', visibility: 10, altimeter: '30.02' },
+    departure_direction: 'north',
+  },
+  classdarrival: {
+    scenario_type: 'classdarrival', airport_id: 'KPAO', airport_name: 'Palo Alto', airport_state: 'CA',
+    tower_freq: '118.6', ground_freq: '125.0', runway: '13', pattern: 'left',
+    aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
+    callsign_spoken: 'November four five two one Hotel',
+    atis: { letter: 'Alpha', wind: '130/8', ceiling: 'clear', visibility: 10, altimeter: '29.98' },
+    approach_direction: 'southeast', approach_distance: 10, parking_destination: 'GA ramp',
+  },
+  flightfollowing: {
+    scenario_type: 'flight_following', facility_name: 'NorCal Approach', facility_freq: '132.45',
+    altimeter_station: 'Sacramento', aircraft_type: 'Cessna 172',
+    callsign_display: 'N4521H', callsign_spoken: 'November four five two one Hotel',
+    destination_name: 'Sacramento Executive', destination_id: 'KSAC',
+    position_reference: 'Auburn', position_direction: 'south', position_distance: 12,
+    altitude: 5500, altimeter: '30.04',
+  },
+}
+
 export default function RadioLab() {
+  const router = useRouter()
+
+  // ── auth / demo ──────────────────────────────────────────────────────────────
+  const [user, setUser]     = useState(null)
+  const [isDemo, setIsDemo] = useState(false)
+
   // ── scenario type ────────────────────────────────────────────────────────────
-  const [scenarioType, setScenarioType] = useState('ctaf') // 'ctaf' | 'classd' | 'classdarrival' | 'flightfollowing'
+  const [scenarioType, setScenarioType] = useState('ctaf')
 
   // ── shared state ─────────────────────────────────────────────────────────────
   const [phase, setPhase]               = useState('loading')
@@ -28,25 +77,53 @@ export default function RadioLab() {
   const [ctafCalls, setCtafCalls] = useState([])
 
   // ── Class D departure state ───────────────────────────────────────────────────
-  const [classDStep, setClassDStep]                       = useState(0) // 0=ground call, 1=ground readback, 2=tower call, 3=tower readback
-  const [classDExchanges, setClassDExchanges]             = useState([])
+  const [classDStep, setClassDStep]           = useState(0)
+  const [classDExchanges, setClassDExchanges] = useState([])
 
   // ── Class D arrival state ─────────────────────────────────────────────────────
-  const [classDArrivalStep, setClassDArrivalStep]         = useState(0)
+  const [classDArrivalStep, setClassDArrivalStep]           = useState(0)
   const [classDArrivalExchanges, setClassDArrivalExchanges] = useState([])
 
   // ── Flight following state ────────────────────────────────────────────────────
-  const [ffStep, setFFStep]           = useState(0) // 0=initial contact, 1=squawk readback, 2=full request, 3=state altitude
-  const [ffExchanges, setFFExchanges] = useState([])
+  const [ffStep, setFFStep]             = useState(0)
+  const [ffExchanges, setFFExchanges]   = useState([])
   const [ffSquawkCode, setFFSquawkCode] = useState(null)
 
+  // ── IFR Clearance state ───────────────────────────────────────────────────────
+  const [ifrScenario, setIFRScenario]       = useState(null)
+  const [ifrAudioUrl, setIFRAudioUrl]       = useState(null)
+  const [ifrIsLoading, setIFRIsLoading]     = useState(false)
+  const [ifrIsGrading, setIFRIsGrading]     = useState(false)
+  const [ifrReadbackText, setIFRReadbackText] = useState('')
+  const [ifrScore, setIFRScore]             = useState(null)
+  const [ifrFeedback, setIFRFeedback]       = useState('')
+  const [ifrShowResults, setIFRShowResults] = useState(false)
+  const ifrAudioRef = useRef(null)
+
   // ── shared controller audio (one scenario runs at a time) ─────────────────────
-  const [controllerText, setControllerText]               = useState('')
-  const [controllerAudioUrl, setControllerAudioUrl]       = useState(null)
-  const [controllerLoading, setControllerLoading]         = useState(false)
+  const [controllerText, setControllerText]     = useState('')
+  const [controllerAudioUrl, setControllerAudioUrl] = useState(null)
+  const [controllerLoading, setControllerLoading]   = useState(false)
   const controllerAudioRef = useRef(null)
 
-  useEffect(() => { loadScenario('ctaf') }, [])
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const demo   = params.get('demo') === 'true'
+    setIsDemo(demo)
+    if (demo) {
+      loadScenario('ctaf', true)
+    } else {
+      const checkAuth = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { router.push('/login'); return }
+        const { data: profile } = await supabase.from('profiles').select('is_subscribed').eq('id', user.id).single()
+        if (!profile?.is_subscribed) { router.push('/signup'); return }
+        setUser(user)
+        loadScenario('ctaf', false)
+      }
+      checkAuth()
+    }
+  }, [])
 
   // Auto-play controller audio as soon as it arrives
   useEffect(() => {
@@ -58,7 +135,7 @@ export default function RadioLab() {
   }, [controllerAudioUrl])
 
   // ── load scenario ─────────────────────────────────────────────────────────────
-  const loadScenario = async (type) => {
+  const loadScenario = async (type, demoMode = false) => {
     setPhase('loading')
     setScenario(null)
     setDebrief(null)
@@ -76,6 +153,12 @@ export default function RadioLab() {
     setControllerText('')
     setControllerAudioUrl(null)
     try {
+      if (demoMode) {
+        const key = type === 'classd' ? 'classd' : type === 'classdarrival' ? 'classdarrival' : type === 'flightfollowing' ? 'flightfollowing' : 'ctaf'
+        setScenario(DEMO_SCENARIOS[key])
+        setPhase('ready')
+        return
+      }
       const endpoint = type === 'classd'
         ? '/api/vfr-class-d-scenario'
         : type === 'classdarrival'
@@ -94,9 +177,49 @@ export default function RadioLab() {
     }
   }
 
+  const loadIFRScenario = async (demoMode = false) => {
+    setIFRIsLoading(true)
+    setIFRShowResults(false)
+    setIFRReadbackText('')
+    setIFRScore(null)
+    setIFRFeedback('')
+    setIFRAudioUrl(null)
+    setIFRScenario(null)
+    try {
+      const endpoint = demoMode ? '/api/demo-scenario?type=ifr' : '/api/scenario?type=ifr'
+      const res  = await fetch(endpoint)
+      const data = await res.json()
+      setIFRScenario(data)
+      setIFRAudioUrl(data.audio_url)
+    } catch (e) { /* silent — audio just won't play */ }
+    setIFRIsLoading(false)
+  }
+
+  const ifrSubmitCall = async (text) => {
+    if (!ifrScenario) return
+    setIFRIsGrading(true)
+    setIFRReadbackText(text)
+    try {
+      const res = await fetch('/api/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clearance_text: ifrScenario.clearance_text, readback_text: text, scenario_type: 'ifr' }),
+      })
+      const result = await res.json()
+      setIFRScore(result.score)
+      setIFRFeedback(result.feedback)
+      setIFRShowResults(true)
+    } catch (e) { /* silent */ }
+    setIFRIsGrading(false)
+  }
+
   const handleTypeChange = (type) => {
     setScenarioType(type)
-    loadScenario(type)
+    if (type === 'ifr') {
+      loadIFRScenario(isDemo)
+    } else {
+      loadScenario(type, isDemo)
+    }
   }
 
   // ── recording helpers ─────────────────────────────────────────────────────────
@@ -518,20 +641,45 @@ export default function RadioLab() {
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
       <nav className="flex items-center justify-between px-8 py-4 border-b border-white/10">
-        <a href="/" className="text-xl font-bold">✈️ ATC Trainer</a>
-        <span className="text-xs text-blue-400 border border-blue-400/30 px-3 py-1 rounded-full">ICAO Radio Lab</span>
+        <a href="/" className="text-xl font-bold">✈️ Flight Levels</a>
+        {isDemo ? (
+          <div className="flex items-center gap-4">
+            <span className="text-yellow-400 text-sm font-medium">🔓 Demo Mode</span>
+            <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition">Subscribe →</a>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            <span className="text-gray-400 text-sm hidden sm:block">{user?.email}</span>
+            <button onClick={async () => {
+              const res = await fetch('/api/create-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user?.id }) })
+              const { url } = await res.json()
+              window.location.href = url
+            }} className="text-gray-400 hover:text-white text-sm transition">Manage Subscription</button>
+            <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
+              className="text-gray-400 hover:text-white text-sm transition">Log Out</button>
+          </div>
+        )}
       </nav>
+      {isDemo && (
+        <div className="bg-blue-500/10 border-b border-blue-500/20 px-8 py-3 text-center">
+          <p className="text-blue-300 text-sm">
+            🎯 <strong>Demo Mode</strong> — Fixed scenarios, unlimited attempts.
+            <a href="/signup" className="underline ml-2 hover:text-blue-200">Subscribe for unlimited random scenarios →</a>
+          </p>
+        </div>
+      )}
 
       <div className="max-w-2xl mx-auto px-6 py-10">
 
         {/* ── Scenario type selector ── */}
-        {(phase === 'ready' || phase === 'practicing' || phase === 'classd_pilot' || phase === 'classdarrival_pilot' || phase === 'ff_pilot') && (
+        {(phase === 'ready' || phase === 'practicing' || phase === 'classd_pilot' || phase === 'classdarrival_pilot' || phase === 'ff_pilot' || scenarioType === 'ifr') && (
           <div className="flex gap-1 mb-6 bg-white/5 border border-white/10 rounded-xl p-1">
             {[
-              { key: 'ctaf',           label: '📻 CTAF'       },
-              { key: 'classd',         label: '🛫 Departure'  },
-              { key: 'classdarrival',  label: '🛬 Arrival'    },
-              { key: 'flightfollowing', label: '✈️ Flight Following' },
+              { key: 'ctaf',            label: '📻 CTAF'            },
+              { key: 'classd',          label: '🛫 Departure'       },
+              { key: 'classdarrival',   label: '🛬 Arrival'         },
+              { key: 'flightfollowing', label: '✈️ Following'       },
+              { key: 'ifr',             label: '📋 IFR Clearance'   },
             ].map(opt => (
               <button key={opt.key} onClick={() => handleTypeChange(opt.key)}
                 className={`flex-1 py-2 rounded-lg text-xs font-medium transition ${scenarioType === opt.key ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'}`}>
@@ -1000,9 +1148,113 @@ export default function RadioLab() {
               ))}
             </div>
 
-            <button onClick={() => loadScenario(scenarioType)} className="w-full bg-blue-500 hover:bg-blue-600 py-4 rounded-xl font-bold text-lg transition">
-              Try Another Scenario →
-            </button>
+            {isDemo ? (
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
+                <div className="text-3xl mb-3">🚀</div>
+                <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
+                <p className="text-gray-400 mb-6">The demo uses fixed scenarios. Subscribe for unlimited random scenarios across all exercise types — new airports, callsigns, and routes every time.</p>
+                <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe →</a>
+                <p className="text-gray-500 text-sm mt-3">Cancel anytime.</p>
+              </div>
+            ) : (
+              <button onClick={() => loadScenario(scenarioType, false)} className="w-full bg-blue-500 hover:bg-blue-600 py-4 rounded-xl font-bold text-lg transition">
+                Try Another Scenario →
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════════
+            IFR CLEARANCE — full flow (listen → record readback → results)
+        ════════════════════════════════════════════════════════════════════════ */}
+        {scenarioType === 'ifr' && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
+              <p className="text-gray-400">IFR Clearance Readback</p>
+            </div>
+
+            {ifrIsLoading ? (
+              <div className="text-center py-20 text-gray-400">
+                <div className="text-4xl mb-4">📋</div>
+                <p>Loading your clearance...</p>
+              </div>
+            ) : ifrScenario ? (
+              <div className="space-y-6">
+                {/* Scenario info */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Your Scenario</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div><p className="text-xs text-gray-500 mb-1">Callsign</p><p className="text-xl font-bold text-blue-400">{ifrScenario.callsign}</p></div>
+                    <div><p className="text-xs text-gray-500 mb-1">{ifrScenario.destination ? 'Departure Airport' : 'Airport'}</p><p className="text-xl font-bold text-blue-400">{ifrScenario.airport}</p></div>
+                    {ifrScenario.destination && (
+                      <div className="col-span-2"><p className="text-xs text-gray-500 mb-1">Destination</p><p className="text-xl font-bold text-blue-400">{ifrScenario.destination}</p></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Step 1 — Listen */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                  <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Step 1 — Listen to the Clearance</h2>
+                  {ifrAudioUrl && <audio ref={ifrAudioRef} src={ifrAudioUrl} />}
+                  <button onClick={() => ifrAudioRef.current?.play()}
+                    className="flex items-center gap-3 bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg font-semibold transition">
+                    ▶ Play Clearance
+                  </button>
+                  <p className="text-gray-500 text-sm mt-3">Write it down as you listen — CRAFT format. Then read it back.</p>
+                </div>
+
+                {/* Step 2 — Record */}
+                {!ifrShowResults && (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Step 2 — Record Your Readback</h2>
+                    <RecordingPanel onStart={ifrSubmitCall} />
+                    {ifrIsGrading && <p className="text-gray-400 mt-3 text-sm animate-pulse">Grading your readback...</p>}
+                  </div>
+                )}
+
+                {/* Results */}
+                {ifrShowResults && (
+                  <div className="space-y-6">
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-5">
+                      <h2 className="text-sm text-gray-400 uppercase tracking-wide">Results</h2>
+                      <div className="text-center">
+                        <div className={`text-7xl font-bold ${scoreColor(ifrScore)}`}>{ifrScore}</div>
+                        <div className="text-gray-400 text-sm mt-1">out of 100</div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-4">
+                        <p className="text-xs text-gray-500 mb-1">Feedback</p>
+                        <p className="text-gray-200">{ifrFeedback}</p>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="bg-white/5 rounded-xl p-4">
+                          <p className="text-xs text-gray-500 mb-2">Original Clearance</p>
+                          <p className="text-gray-200 text-sm">{ifrScenario.clearance_text}</p>
+                        </div>
+                        <div className="bg-white/5 rounded-xl p-4">
+                          <p className="text-xs text-gray-500 mb-2">Your Readback</p>
+                          <p className="text-gray-200 text-sm">{ifrReadbackText}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {isDemo ? (
+                      <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
+                        <div className="text-3xl mb-3">🚀</div>
+                        <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
+                        <p className="text-gray-400 mb-6">Subscribe for unlimited random clearances — new airports, callsigns, and routes every time.</p>
+                        <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe →</a>
+                        <p className="text-gray-500 text-sm mt-3">Cancel anytime.</p>
+                      </div>
+                    ) : (
+                      <button onClick={() => loadIFRScenario(false)} className="w-full bg-blue-500 hover:bg-blue-600 py-4 rounded-xl font-bold text-lg transition">
+                        Next Scenario →
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : null}
           </div>
         )}
 
