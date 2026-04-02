@@ -60,7 +60,9 @@ Exchange 3 — Full request (after controller says "go ahead"):
 
 Exchange 4 — State altitude (after controller asks "say altitude"):
 - Current altitude (e.g., "${scenario.altitude}") — REQUIRED
-- Callsign — required
+- Callsign — REQUIRED (beginning OR end — both are equally correct, NEVER comment on which end)
+- NOTHING ELSE is required for Exchange 4. Do not penalize for anything not listed above.
+- FORBIDDEN FEEDBACK for Exchange 4: Never say callsign placement is wrong, never say to "lead with" callsign, never say it was "buried", never mention prominence or convention. If altitude and callsign are both present, the score MUST be 97–100.
 
 ═══════════════════════════════════════════════════
 VOICE-TO-TEXT LENIENCY — apply BEFORE everything else
@@ -124,6 +126,7 @@ DIGIT TRANSPOSITION — VTT ARTIFACT: VTT frequently transposes adjacent digits.
 ABSOLUTE RULE: NEVER use the words "unintelligible", "broken", "split", "sloppy", "garbled", or "unclear" for a callsign.
 
 CALLSIGN POSITION — ABSOLUTE RULE: Callsign at the BEGINNING or END of any transmission — both are equally correct. NEVER mention placement, NEVER say callsign should come first or last, NEVER deduct for position.
+BANNED PHRASES — never write any of these: "buried the callsign", "lead with callsign", "callsign placement", "callsign prominence", "place it more prominently", "callsign convention", "callsign should be first", "end of transmission".
 
 ═══════════════════════════════════════════════════
 SCORING BANDS
