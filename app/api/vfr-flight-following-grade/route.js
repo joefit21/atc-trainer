@@ -93,6 +93,7 @@ ALTIMETER VTT: Altimeter digits may merge or be heard differently:
 - Do not penalize for any reasonable phonetic rendering of the altimeter digits.
 - The station name (e.g. "Denver", "Salt Lake", "Sacramento") may be omitted in the pilot's readback — do NOT require the pilot to repeat the station name. Accept any correct altimeter digits.
 - If the pilot says the station name, accept any phonetically similar rendering.
+- DECIMAL POINT — CRITICAL: The decimal point is never spoken on the radio and VTT cannot hear it. "3004" = 30.04 ✓. "2992" = 29.92 ✓. "3017" = 30.17 ✓. If the 4 digits match the altimeter setting (ignoring the decimal), it is FULL CREDIT. Never penalize for missing or misplaced decimal — it does not exist in spoken aviation radio communication.
 
 FACILITY NAME VTT: Any phonetically adjacent word for the facility name must be accepted:
 - "NorCal" → NorCal Approach ✓
