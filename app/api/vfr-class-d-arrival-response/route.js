@@ -17,22 +17,27 @@ export async function POST(request) {
     let prompt
 
     if (phase === 'initial_call') {
+      // Randomly pick one of the two approved pattern entry formats
+      const useDownwind = Math.random() < 0.5
+
       prompt = `You are ${scenario.airport_name} Tower (${scenario.airport_id}).
 Aircraft: ${scenario.callsign_spoken} (${scenario.aircraft_type})
 Active runway: ${scenario.runway} (spoken: "${rwySpoken}"), ${scenario.pattern} traffic pattern
-Pilot is inbound from the ${scenario.approach_direction}.
 
 The pilot just called inbound: "${pilot_said}"
 
-Respond with a realistic pattern entry instruction. Choose the most realistic option given the approach direction:
-- "[Callsign], enter [left/right] downwind runway ${rwySpoken}, report turning final"
-- "[Callsign], enter [left/right] base runway ${rwySpoken}, report final"
-- "[Callsign], report [2 or 3]-mile final runway ${rwySpoken}"
+${useDownwind
+  ? `Respond with a downwind entry instruction in EXACTLY this format:
+"[Callsign], enter ${scenario.pattern} downwind runway ${rwySpoken}, report midfield."
+Use exactly those words — no variations.`
+  : `Respond with a straight-in instruction in EXACTLY this format:
+"[Callsign], enter straight in runway ${rwySpoken}, report three-mile final."
+Use exactly those words — no variations.`
+}
 
 Rules:
 - Start with callsign: ${scenario.callsign_spoken}
-- Use the correct pattern direction: ${scenario.pattern}
-- Keep response under 20 words
+- Keep it to that one instruction only — no additional instructions
 - Professional tower cadence — no pleasantries
 
 CRITICAL: Write ALL runway numbers as individual spoken digits:

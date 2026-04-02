@@ -38,12 +38,15 @@ Exchange 1 — Initial tower call (inbound):
 
 Exchange 2 — Pattern entry readback:
 - Callsign
-- Pattern entry matching what controller said (e.g., runway number, entry type)
-- Reporting point if one was specified by controller
+- Entry type: either "[left/right] downwind runway [X]" OR "straight in runway [X]" — must match what controller said
+- Runway number
+- Reporting point: either "midfield" (for downwind entry) or "three-mile final" / "3-mile final" (for straight-in)
 
 Exchange 3 — Position report:
 - Callsign — this is the ONLY identifier required; do NOT require or penalize for missing "[Airport] Tower"
-- Position matching what controller instructed (e.g., "turning final runway [X]", "[X]-mile final")
+- Position matching the reporting point controller specified:
+  - If downwind entry: "midfield [left/right] downwind runway [X]" or equivalent
+  - If straight-in: "[X]-mile final runway [X]" or equivalent
 - Must include runway number
 - NOTE: On a position report, calling the facility name ("[Airport] Tower") is not required and must never be penalized
 

@@ -249,8 +249,8 @@ export default function RadioLab() {
     if (!scenario) return ''
     switch (step) {
       case 0: return `Say: "${scenario.airport_name} Tower", aircraft type, callsign, distance and direction (${scenario.approach_distance} miles ${scenario.approach_direction}), altitude (${scenario.approach_altitude.toLocaleString()} ft), "with Information ${scenario.atis.letter}", inbound for landing.`
-      case 1: return `Read back: callsign, the runway, pattern entry type (e.g., "left downwind"), and the reporting point Tower specified.`
-      case 2: return `Callsign only — no need to say "${scenario.airport_name} Tower" on a position report. State your position exactly as Tower instructed, and include the runway number.`
+      case 1: return `Read back: callsign, entry type and runway (e.g., "left downwind runway ${scenario.runway}"), and the reporting point — either "midfield" or "three-mile final."`
+      case 2: return `Callsign only — no need to say "${scenario.airport_name} Tower." Report the position Tower asked for (midfield downwind or three-mile final) and include the runway number.`
       case 3: return `Read back: callsign, "cleared to land runway ${scenario.runway}", and wind if Tower stated it.`
       case 4: return `Say: "${scenario.airport_name} Ground", callsign, "clear of runway ${scenario.runway}", request taxi to ${scenario.parking_destination}. Must say the specific runway number. Do NOT say "Tower."`
       case 5: return `Read back: callsign, taxiway, and destination (${scenario.parking_destination}).`
