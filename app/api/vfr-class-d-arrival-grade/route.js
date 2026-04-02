@@ -34,7 +34,7 @@ Exchange 1 — Initial tower call (inbound):
 - Distance and direction from airport (e.g., "10 miles northwest")
 - Altitude — OPTIONAL. Do NOT deduct any points for omitting altitude. Never comment on missing altitude.
 - "With Information [letter]" — must include current ATIS letter
-- "Inbound for landing" or equivalent request
+- Intention to land: "inbound for landing", "inbound for the full stop", "inbound for landing full stop", or any equivalent phrasing indicating they want to land — REQUIRED. Deduct points if omitted entirely.
 
 Exchange 2 — Pattern entry readback:
 - Callsign
@@ -48,7 +48,7 @@ Exchange 3 — Position report:
   - If downwind entry: "midfield [left/right] downwind runway [X]" or equivalent
   - If straight-in: "[X]-mile final runway [X]" or equivalent
 - Must include runway number
-- NOTE: On a position report, calling the facility name ("[Airport] Tower") is not required and must never be penalized
+- CRITICAL: Do NOT comment on or suggest that calling "[Airport] Tower" would be good practice. It is not required and mentioning it at all is wrong. Never reference the omission of the facility name on a position report.
 
 Exchange 4 — Landing clearance readback:
 - Callsign (may be at beginning OR end — both are standard)
@@ -79,13 +79,23 @@ PHONETIC ALPHABET: Any word that sounds remotely like a phonetic letter must be 
 - "Tango", "Tangle" → Tango ✓
 Accept any phonetically adjacent word as the correct phonetic letter. Never penalize phonetic alphabet attempts.
 
-NUMBERS AND DISTANCES: Voice-to-text frequently mishears spoken numbers. Examples:
+NUMBERS AND DISTANCES: Voice-to-text frequently mishears spoken numbers and distances. Examples:
 - "Windsor and Miles" → "ten miles" ✓
 - "Wine miles" → "nine miles" ✓
 - "Wine" → "niner" ✓
 - Runway numbers said as merged words ("thirteen" for "one three"), hyphenated ("3-1"), or with "er" suffix ("29er") → ALL acceptable ✓
+- "Threemaw", "Three-maw", "Three Ma", "Thre mile" → "three-mile" ✓ — never penalize VTT mishearing of "three-mile final"
 - Altitude with minor digit variation → accept if recognizable ✓
 - Frequencies with slight digit variations → accept if recognizable ✓
+
+DESTINATION AND PLACE NAMES: Voice-to-text frequently merges multi-word destinations. Examples:
+- "Westramp", "West-ramp" → "west ramp" ✓
+- "GAramp", "G A ramp" → "GA ramp" ✓
+- "Transientramp" → "transient ramp" ✓
+- "FBOramp" → "FBO ramp" ✓
+Any merged or split version of a destination name must be accepted as full credit. Never penalize for destination word spacing or merging.
+
+FEEDBACK STYLE RULE: Never comment on "sloppy diction", "delivery", or suggest the pilot "say it more clearly" for any element — these are VTT artifacts, not pilot delivery issues. Only comment on missing or incorrect required elements.
 
 GENERAL LENIENCY:
 - If the pilot clearly attempted a required element and it is phonetically recognizable, it counts as full credit

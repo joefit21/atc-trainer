@@ -16,11 +16,12 @@ export default function RadioLab() {
   const [errorMessage, setErrorMessage] = useState('')
 
   // ── recording ────────────────────────────────────────────────────────────────
-  const [isRecording, setIsRecording]             = useState(false)
-  const [isTranscribing, setIsTranscribing]       = useState(false)
-  const [currentTranscription, setCurrentTranscription] = useState('')
-  const mediaRecorderRef = useRef(null)
-  const audioChunksRef   = useRef([])
+  const [isRecording, setIsRecording]       = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
+  const [transcriptionFailed, setTranscriptionFailed] = useState(false)
+  const mediaRecorderRef  = useRef(null)
+  const audioChunksRef    = useRef([])
+  const submitFnRef       = useRef(null)
 
   // ── CTAF state ───────────────────────────────────────────────────────────────
   const [ctafStep, setCtafStep]   = useState(0)
@@ -57,7 +58,7 @@ export default function RadioLab() {
     setScenario(null)
     setDebrief(null)
     setErrorMessage('')
-    setCurrentTranscription('')
+    setTranscriptionFailed(false)
     setCtafStep(0)
     setCtafCalls([])
     setClassDStep(0)
@@ -89,11 +90,13 @@ export default function RadioLab() {
   }
 
   // ── recording helpers ─────────────────────────────────────────────────────────
-  const startRecording = async () => {
+  const startRecording = async (onComplete) => {
+    setTranscriptionFailed(false)
+    submitFnRef.current = onComplete
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      mediaRecorderRef.current  = new MediaRecorder(stream)
-      audioChunksRef.current    = []
+      mediaRecorderRef.current = new MediaRecorder(stream)
+      audioChunksRef.current   = []
       mediaRecorderRef.current.ondataavailable = (e) => audioChunksRef.current.push(e.data)
       mediaRecorderRef.current.onstop = async () => {
         const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
@@ -103,9 +106,12 @@ export default function RadioLab() {
           fd.append('audio', blob, 'call.webm')
           const res     = await fetch('/api/transcribe', { method: 'POST', body: fd })
           const { text } = await res.json()
-          setCurrentTranscription(text || '')
-        } catch { setCurrentTranscription('[transcription failed — re-record]') }
-        setIsTranscribing(false)
+          setIsTranscribing(false)
+          if (submitFnRef.current) submitFnRef.current(text || '')
+        } catch {
+          setIsTranscribing(false)
+          setTranscriptionFailed(true)
+        }
       }
       mediaRecorderRef.current.start()
       setIsRecording(true)
@@ -119,11 +125,10 @@ export default function RadioLab() {
   }
 
   // ── CTAF flow ─────────────────────────────────────────────────────────────────
-  const ctafSaveAndAdvance = async () => {
+  const ctafSaveAndAdvance = async (text) => {
     const step        = scenario.steps[ctafStep]
-    const updatedCalls = [...ctafCalls, { step: ctafStep, phase: step.phase, situation: step.situation, transcription: currentTranscription }]
+    const updatedCalls = [...ctafCalls, { step: ctafStep, phase: step.phase, situation: step.situation, transcription: text }]
     setCtafCalls(updatedCalls)
-    setCurrentTranscription('')
     if (ctafStep < scenario.steps.length - 1) {
       setCtafStep(ctafStep + 1)
     } else {
@@ -140,9 +145,8 @@ export default function RadioLab() {
   }
 
   // ── Class D flow ──────────────────────────────────────────────────────────────
-  const classDSubmitCall = async () => {
-    const pilotSaid = currentTranscription
-    setCurrentTranscription('')
+  const classDSubmitCall = async (text) => {
+    const pilotSaid = text
 
     if (classDStep === 0 || classDStep === 2) {
       // Pilot just made an initiating call — fetch controller response
@@ -270,9 +274,8 @@ export default function RadioLab() {
   const classDArrivalIsReadback = (step) => step === 1 || step === 3 || step === 5
 
   // ── Class D arrival submit ────────────────────────────────────────────────────
-  const classDArrivalSubmitCall = async () => {
-    const pilotSaid = currentTranscription
-    setCurrentTranscription('')
+  const classDArrivalSubmitCall = async (text) => {
+    const pilotSaid = text
 
     if (classDArrivalStep === 0 || classDArrivalStep === 2 || classDArrivalStep === 4) {
       // Initiating call — fetch controller response
@@ -339,37 +342,28 @@ export default function RadioLab() {
   }
 
   // ── recording UI ──────────────────────────────────────────────────────────────
-  const RecordingPanel = ({ onSubmit, submitLabel }) => (
+  const RecordingPanel = ({ onStart }) => (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
-      {!currentTranscription && !isTranscribing && (
+      {!isRecording && !isTranscribing && !transcriptionFailed && (
+        <button onClick={() => startRecording(onStart)} className="flex items-center gap-3 bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
+          🎙️ Record Your Call
+        </button>
+      )}
+      {isRecording && (
         <div className="space-y-3">
-          {!isRecording ? (
-            <button onClick={startRecording} className="flex items-center gap-3 bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
-              🎙️ Record Your Call
-            </button>
-          ) : (
-            <button onClick={stopRecording} className="flex items-center gap-3 bg-red-700 px-6 py-3 rounded-lg font-semibold animate-pulse">
-              ⏹ Stop Recording
-            </button>
-          )}
-          {isRecording && <p className="text-red-400 text-sm">Recording... make your call now.</p>}
+          <button onClick={stopRecording} className="flex items-center gap-3 bg-red-700 px-6 py-3 rounded-lg font-semibold animate-pulse">
+            ⏹ Stop Recording
+          </button>
+          <p className="text-red-400 text-sm">Recording... make your call now.</p>
         </div>
       )}
-      {isTranscribing && <p className="text-gray-400 text-sm">Transcribing...</p>}
-      {currentTranscription && !isTranscribing && (
-        <div className="space-y-4">
-          <div className="bg-white/5 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-1">You said</p>
-            <p className="text-gray-200 italic">&ldquo;{currentTranscription}&rdquo;</p>
-          </div>
-          <div className="flex gap-3">
-            <button onClick={() => setCurrentTranscription('')} className="flex-1 border border-white/20 hover:border-white/40 py-3 rounded-lg font-semibold transition text-sm">
-              Re-record
-            </button>
-            <button onClick={onSubmit} className="flex-1 bg-blue-500 hover:bg-blue-600 py-3 rounded-lg font-semibold transition">
-              {submitLabel}
-            </button>
-          </div>
+      {isTranscribing && <p className="text-gray-400 text-sm animate-pulse">Processing...</p>}
+      {transcriptionFailed && (
+        <div className="space-y-3">
+          <p className="text-red-400 text-sm">Transcription failed — please try again.</p>
+          <button onClick={() => setTranscriptionFailed(false)} className="flex items-center gap-3 bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
+            🎙️ Try Again
+          </button>
         </div>
       )}
     </div>
@@ -492,7 +486,7 @@ export default function RadioLab() {
               <span className="text-gray-500">Runway <span className="text-white font-medium">{scenario.runway} {scenario.pattern}</span></span>
               <span className="text-gray-500">Callsign <span className="text-white font-medium">{scenario.callsign_display}</span></span>
             </div>
-            <RecordingPanel onSubmit={ctafSaveAndAdvance} submitLabel={ctafStep < scenario.steps.length - 1 ? 'Next Call →' : 'Finish & Get Debrief →'} />
+            <RecordingPanel onStart={ctafSaveAndAdvance} />
           </div>
         )}
 
@@ -604,10 +598,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <RecordingPanel
-                onSubmit={classDSubmitCall}
-                submitLabel={classDStep < 3 ? 'Submit →' : 'Finish & Get Debrief →'}
-              />
+              <RecordingPanel onStart={classDSubmitCall} />
             )}
           </div>
         )}
@@ -720,10 +711,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <RecordingPanel
-                onSubmit={classDArrivalSubmitCall}
-                submitLabel={classDArrivalStep < 5 ? 'Submit →' : 'Finish & Get Debrief →'}
-              />
+              <RecordingPanel onStart={classDArrivalSubmitCall} />
             )}
           </div>
         )}
