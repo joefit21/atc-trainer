@@ -31,7 +31,7 @@ Exchange 1 — Initial ground call:
 - Aircraft type AND callsign
 - Current position on airport
 - "With Information [letter]" — must include current ATIS letter
-- Request to taxi (runway optional but encouraged)
+- Request to taxi — runway number is NOT required and must NOT be penalized. Ground assigns the runway; the pilot does not need to request a specific one.
 
 Exchange 2 — Ground readback:
 - Callsign (abbreviated OK after first call)

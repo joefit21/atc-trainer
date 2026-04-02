@@ -30,7 +30,7 @@ Respond with a realistic ground taxi clearance. Rules:
 - Start with the aircraft callsign in spoken form: ${scenario.callsign_spoken}
 - Assign runway ${scenario.runway} — write it as spoken digits: "runway ${rwySpoken}"
 - Include a taxiway route using a single letter (Alpha, Bravo, or Charlie)
-- About 50% of the time add a hold short instruction for a runway crossing (use a different runway number, also as spoken digits)
+- About 1 out of 3 times (roughly 33%) add a hold short instruction for a runway crossing (use a different runway number, also as spoken digits). The other 2 out of 3 times issue a simple taxi clearance with no hold short or crossing instruction.
 - Keep response under 25 words
 - Professional controller cadence — no pleasantries
 
