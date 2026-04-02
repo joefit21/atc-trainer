@@ -7,7 +7,7 @@ const scoreBorder = (s) => s >= 90 ? 'border-green-400/20' : s >= 70 ? 'border-y
 
 export default function RadioLab() {
   // ── scenario type ────────────────────────────────────────────────────────────
-  const [scenarioType, setScenarioType] = useState('ctaf') // 'ctaf' | 'classd' | 'classdarrival'
+  const [scenarioType, setScenarioType] = useState('ctaf') // 'ctaf' | 'classd' | 'classdarrival' | 'flightfollowing'
 
   // ── shared state ─────────────────────────────────────────────────────────────
   const [phase, setPhase]               = useState('loading')
@@ -32,8 +32,12 @@ export default function RadioLab() {
   const [classDExchanges, setClassDExchanges]             = useState([])
 
   // ── Class D arrival state ─────────────────────────────────────────────────────
-  const [classDArrivalStep, setClassDArrivalStep]         = useState(0) // 0-4
+  const [classDArrivalStep, setClassDArrivalStep]         = useState(0)
   const [classDArrivalExchanges, setClassDArrivalExchanges] = useState([])
+
+  // ── Flight following state ────────────────────────────────────────────────────
+  const [ffStep, setFFStep]           = useState(0) // 0=initial call, 1=squawk readback, 2=radar contact ack
+  const [ffExchanges, setFFExchanges] = useState([])
 
   // ── shared controller audio (one scenario runs at a time) ─────────────────────
   const [controllerText, setControllerText]               = useState('')
@@ -65,6 +69,8 @@ export default function RadioLab() {
     setClassDExchanges([])
     setClassDArrivalStep(0)
     setClassDArrivalExchanges([])
+    setFFStep(0)
+    setFFExchanges([])
     setControllerText('')
     setControllerAudioUrl(null)
     try {
@@ -72,7 +78,9 @@ export default function RadioLab() {
         ? '/api/vfr-class-d-scenario'
         : type === 'classdarrival'
           ? '/api/vfr-class-d-arrival-scenario'
-          : '/api/vfr-scenario?type=ctaf'
+          : type === 'flightfollowing'
+            ? '/api/vfr-flight-following-scenario'
+            : '/api/vfr-scenario?type=ctaf'
       const res  = await fetch(endpoint)
       const data = await res.json()
       if (data.error) throw new Error(data.error)
@@ -273,6 +281,97 @@ export default function RadioLab() {
 
   const classDArrivalIsReadback = (step) => step === 1 || step === 3 || step === 5
 
+  // ── Flight following helpers ──────────────────────────────────────────────────
+  const ffGetSituation = (step) => {
+    if (!scenario) return ''
+    switch (step) {
+      case 0: return `You are ${scenario.position_distance} miles ${scenario.position_direction} of ${scenario.position_reference} at ${scenario.altitude.toLocaleString()} ft MSL, VFR en route to ${scenario.destination_name}. Contact ${scenario.facility_name} on ${scenario.facility_freq} and request flight following.`
+      case 1: return `${scenario.facility_name} has assigned you a squawk code. Write it down, then read it back.`
+      case 2: return `${scenario.facility_name} has confirmed radar contact and given your altimeter. Acknowledge.`
+      default: return ''
+    }
+  }
+
+  const ffGetHint = (step) => {
+    if (!scenario) return ''
+    switch (step) {
+      case 0: return `Say: "${scenario.facility_name}", aircraft type, callsign, position (${scenario.position_distance} miles ${scenario.position_direction} of ${scenario.position_reference}), altitude (${scenario.altitude.toLocaleString()} ft), VFR to ${scenario.destination_name}, request flight following.`
+      case 1: return `Read back: callsign, "squawking [code]", "ident." Write down the code — you'll need it for your transponder.`
+      case 2: return `Acknowledge: callsign, "roger." You may also read back the altimeter (${scenario.altimeter}).`
+      default: return ''
+    }
+  }
+
+  const ffGetTitle = (step) => [
+    'Request Flight Following',
+    'Read Back Squawk Code',
+    'Acknowledge Radar Contact',
+  ][step] || ''
+
+  const ffIsReadback = (step) => step === 1 || step === 2
+
+  // ── Flight following submit ───────────────────────────────────────────────────
+  const ffSubmitCall = async (text) => {
+    const pilotSaid = text
+
+    if (ffStep === 0) {
+      // Initial call — fetch squawk assignment
+      setControllerLoading(true)
+      setControllerText('')
+      setControllerAudioUrl(null)
+      setFFExchanges(prev => [...prev, {
+        step: 0, phase: 'initial_call', situation: ffGetSituation(0), pilot_said: pilotSaid,
+      }])
+      try {
+        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'squawk_assignment', pilot_said: pilotSaid }) })
+        const result = await res.json()
+        if (result.error) throw new Error(result.error)
+        setControllerText(result.controller_text)
+        setControllerAudioUrl(result.audio_url)
+        setFFStep(1)
+      } catch (e) { setErrorMessage(e.message); setPhase('error') }
+      setControllerLoading(false)
+
+    } else if (ffStep === 1) {
+      // Squawk readback — save with controller_said (squawk assignment), then fetch radar contact
+      const squawkText = controllerText
+      setFFExchanges(prev => [...prev, {
+        step: 1, phase: 'squawk_readback', situation: ffGetSituation(1),
+        controller_said: squawkText, pilot_said: pilotSaid,
+      }])
+      setControllerLoading(true)
+      setControllerText('')
+      setControllerAudioUrl(null)
+      try {
+        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'radar_contact', pilot_said: pilotSaid }) })
+        const result = await res.json()
+        if (result.error) throw new Error(result.error)
+        setControllerText(result.controller_text)
+        setControllerAudioUrl(result.audio_url)
+        setFFStep(2)
+      } catch (e) { setErrorMessage(e.message); setPhase('error') }
+      setControllerLoading(false)
+
+    } else {
+      // Step 2: radar contact ack — save and grade
+      const radarText = controllerText
+      const finalExchanges = [...ffExchanges, {
+        step: 2, phase: 'radar_contact_ack', situation: ffGetSituation(2),
+        controller_said: radarText, pilot_said: pilotSaid,
+      }]
+      setFFExchanges(finalExchanges)
+      setPhase('grading')
+      try {
+        const res    = await fetch('/api/vfr-flight-following-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges }) })
+        const result = await res.json()
+        if (result.error) throw new Error(result.error)
+        if (!result.call_feedback) throw new Error('Missing call feedback in response.')
+        setDebrief(result)
+        setPhase('debrief')
+      } catch (e) { setErrorMessage(e.message); setPhase('error') }
+    }
+  }
+
   // ── Class D arrival submit ────────────────────────────────────────────────────
   const classDArrivalSubmitCall = async (text) => {
     const pilotSaid = text
@@ -399,15 +498,16 @@ export default function RadioLab() {
       <div className="max-w-2xl mx-auto px-6 py-10">
 
         {/* ── Scenario type selector ── */}
-        {(phase === 'ready' || phase === 'practicing' || phase === 'classd_pilot' || phase === 'classdarrival_pilot') && (
+        {(phase === 'ready' || phase === 'practicing' || phase === 'classd_pilot' || phase === 'classdarrival_pilot' || phase === 'ff_pilot') && (
           <div className="flex gap-1 mb-6 bg-white/5 border border-white/10 rounded-xl p-1">
             {[
-              { key: 'ctaf',         label: '📻 CTAF Arrival' },
-              { key: 'classd',       label: '🛫 Class D Departure' },
-              { key: 'classdarrival', label: '🛬 Class D Arrival' },
+              { key: 'ctaf',           label: '📻 CTAF'       },
+              { key: 'classd',         label: '🛫 Departure'  },
+              { key: 'classdarrival',  label: '🛬 Arrival'    },
+              { key: 'flightfollowing', label: '✈️ Flight Following' },
             ].map(opt => (
               <button key={opt.key} onClick={() => handleTypeChange(opt.key)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${scenarioType === opt.key ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'}`}>
+                className={`flex-1 py-2 rounded-lg text-xs font-medium transition ${scenarioType === opt.key ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'}`}>
                 {opt.label}
               </button>
             ))}
@@ -417,7 +517,7 @@ export default function RadioLab() {
         {/* ── Loading ── */}
         {phase === 'loading' && (
           <div className="text-center py-24 text-gray-400">
-            <div className="text-4xl mb-4">{scenarioType === 'classd' ? '🛫' : scenarioType === 'classdarrival' ? '🛬' : '📻'}</div>
+            <div className="text-4xl mb-4">{scenarioType === 'classd' ? '🛫' : scenarioType === 'classdarrival' ? '🛬' : scenarioType === 'flightfollowing' ? '✈️' : '📻'}</div>
             <p>Loading scenario...</p>
           </div>
         )}
@@ -716,6 +816,102 @@ export default function RadioLab() {
           </div>
         )}
 
+        {/* ═══════════════════════════════════════════════════════════════════════
+            FLIGHT FOLLOWING — Ready
+        ════════════════════════════════════════════════════════════════════════ */}
+        {phase === 'ready' && scenarioType === 'flightfollowing' && scenario && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">VFR Radio Lab</h1>
+              <p className="text-gray-400">VFR Flight Following Request</p>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+              <h2 className="text-sm text-gray-400 uppercase tracking-wide">Your Scenario</h2>
+              <div className="grid grid-cols-2 gap-4">
+                <div><p className="text-xs text-gray-500 mb-1">Facility</p><p className="text-xl font-bold text-blue-400">{scenario.facility_name}</p><p className="text-sm text-gray-400">{scenario.facility_freq}</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Your Aircraft</p><p className="text-xl font-bold text-blue-400">{scenario.callsign_display}</p><p className="text-sm text-gray-400">{scenario.aircraft_type}</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Your Position</p><p className="text-lg font-bold text-yellow-400">{scenario.position_distance} miles {scenario.position_direction}</p><p className="text-sm text-gray-400">of {scenario.position_reference}</p></div>
+                <div><p className="text-xs text-gray-500 mb-1">Altitude</p><p className="text-xl font-bold text-yellow-400">{scenario.altitude.toLocaleString()} ft MSL</p></div>
+                <div className="col-span-2"><p className="text-xs text-gray-500 mb-1">Destination</p><p className="text-lg font-bold text-blue-400">{scenario.destination_name} ({scenario.destination_id})</p></div>
+              </div>
+            </div>
+
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-3">You Will Make 3 Transmissions</h2>
+              <div className="space-y-2">
+                {['Request flight following from ' + scenario.facility_name, 'Read back squawk code + ident', 'Acknowledge radar contact'].map((s, i) => (
+                  <div key={i} className="flex items-start gap-3 text-sm text-gray-400">
+                    <span className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center text-xs text-gray-500 flex-shrink-0 mt-0.5">{i + 1}</span>
+                    <span>{s}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={() => setPhase('ff_pilot')} className="w-full bg-blue-500 hover:bg-blue-600 py-4 rounded-xl font-bold text-lg transition">
+              Start — Call {scenario.facility_name} →
+            </button>
+          </div>
+        )}
+
+        {/* ═══════════════════════════════════════════════════════════════════════
+            FLIGHT FOLLOWING — Pilot Turn
+        ════════════════════════════════════════════════════════════════════════ */}
+        {phase === 'ff_pilot' && scenarioType === 'flightfollowing' && scenario && (
+          <div className="space-y-6">
+            {/* Progress */}
+            <div className="flex items-center gap-2">
+              {[0,1,2].map(i => (
+                <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${i < ffStep ? 'bg-green-400' : i === ffStep ? 'bg-blue-400' : 'bg-white/10'}`} />
+              ))}
+            </div>
+            <p className="text-sm text-gray-400">Transmission {ffStep + 1} of 3</p>
+
+            {/* Title + situation */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <h2 className="text-lg font-semibold mb-2">{ffGetTitle(ffStep)}</h2>
+              <p className="text-white leading-relaxed">{ffGetSituation(ffStep)}</p>
+              <p className="text-gray-500 text-sm mt-4">💡 {ffGetHint(ffStep)}</p>
+            </div>
+
+            {/* Controller audio */}
+            {ffIsReadback(ffStep) && controllerAudioUrl && (
+              <div className="bg-white/5 border border-blue-400/20 rounded-2xl p-5 space-y-3">
+                <p className="text-xs text-blue-400 uppercase tracking-wide">
+                  {ffStep === 1 ? 'Squawk assignment — write it down, then read it back' : 'Radar contact confirmed — acknowledge'}
+                </p>
+                <audio ref={controllerAudioRef} src={controllerAudioUrl} />
+                <button
+                  onClick={() => { controllerAudioRef.current?.load(); controllerAudioRef.current?.play() }}
+                  className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
+                >
+                  ▶ Play Again
+                </button>
+              </div>
+            )}
+
+            {/* Controller loading */}
+            {controllerLoading && (
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-center text-gray-400">
+                <p>📡 {scenario.facility_name} is responding...</p>
+              </div>
+            )}
+
+            {/* Quick reference */}
+            <div className="flex flex-wrap gap-4 text-sm bg-white/3 border border-white/5 rounded-xl px-4 py-3">
+              <span className="text-gray-500">Freq <span className="text-white font-medium">{scenario.facility_freq}</span></span>
+              <span className="text-gray-500">Alt <span className="text-white font-medium">{scenario.altitude.toLocaleString()} ft</span></span>
+              <span className="text-gray-500">Dest <span className="text-white font-medium">{scenario.destination_id}</span></span>
+              <span className="text-gray-500">Callsign <span className="text-white font-medium">{scenario.callsign_display}</span></span>
+            </div>
+
+            {!controllerLoading && (
+              <RecordingPanel onStart={ffSubmitCall} />
+            )}
+          </div>
+        )}
+
         {/* ── Grading ── */}
         {phase === 'grading' && (
           <div className="text-center py-24 text-gray-400">
@@ -736,7 +932,9 @@ export default function RadioLab() {
                   ? `CTAF — ${scenario.airport_name} (${scenario.airport_id})`
                   : scenarioType === 'classdarrival'
                     ? `Class D Arrival — ${scenario.airport_name} (${scenario.airport_id})`
-                    : `Class D Departure — ${scenario.airport_name} (${scenario.airport_id})`}
+                    : scenarioType === 'flightfollowing'
+                      ? `Flight Following — ${scenario.facility_name}`
+                      : `Class D Departure — ${scenario.airport_name} (${scenario.airport_id})`}
               </p>
             </div>
 
@@ -750,11 +948,12 @@ export default function RadioLab() {
               {(debrief.call_feedback || []).slice(0,
                 scenarioType === 'ctaf' ? scenario.steps?.length
                 : scenarioType === 'classdarrival' ? classDArrivalExchanges.length
+                : scenarioType === 'flightfollowing' ? ffExchanges.length
                 : classDExchanges.length + 1
               ).map((cf, i) => (
                 <DebriefCard key={i} cf={cf} index={i}
                   steps={scenarioType === 'ctaf' ? scenario.steps : null}
-                  calls={scenarioType === 'ctaf' ? ctafCalls : scenarioType === 'classdarrival' ? classDArrivalExchanges : classDExchanges}
+                  calls={scenarioType === 'ctaf' ? ctafCalls : scenarioType === 'classdarrival' ? classDArrivalExchanges : scenarioType === 'flightfollowing' ? ffExchanges : classDExchanges}
                 />
               ))}
             </div>
