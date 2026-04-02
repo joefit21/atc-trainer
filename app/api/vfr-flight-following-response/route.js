@@ -40,11 +40,12 @@ export async function POST(request) {
     let squawkCode = null
 
     if (phase === 'initial_contact') {
-      // Issue squawk code + altimeter
+      // Issue squawk code + altimeter (with station ID)
       squawkCode = randomSquawk()
       const codeSpoken = squawkSpoken(squawkCode)
       const altSpoken  = altimeterSpoken(scenario.altimeter)
-      controllerText = `${abbrev}, ${scenario.facility_name}, squawk ${codeSpoken}, altimeter ${altSpoken}.`
+      const station    = scenario.altimeter_station || scenario.facility_name
+      controllerText = `${abbrev}, ${scenario.facility_name}, squawk ${codeSpoken}, ${station} altimeter ${altSpoken}.`
 
     } else if (phase === 'go_ahead') {
       // After pilot reads back squawk

@@ -1,8 +1,11 @@
 // Geographic regions — facility, position references, and destinations are
 // all within ~200 nm of each other so scenarios make geographic sense.
+// altimeter_station: the city/airport name the controller identifies when issuing the altimeter
+//   e.g. "Sacramento altimeter, two niner niner five"
 const REGIONS = [
   {
     facility: { name: 'NorCal Approach', freq: '132.45' },
+    altimeter_station: 'Sacramento',
     references: ['Auburn', 'Stockton', 'Modesto', 'Fresno', 'Chico', 'Redding', 'Marysville'],
     destinations: [
       { name: 'Sacramento Executive',        id: 'KSAC' },
@@ -15,6 +18,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'Seattle Approach', freq: '120.1' },
+    altimeter_station: 'Seattle',
     references: ['Olympia', 'Tacoma', 'Everett', 'Bellingham', 'Bremerton', 'Monroe'],
     destinations: [
       { name: 'Seattle Boeing Field',        id: 'KBFI' },
@@ -26,6 +30,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'Portland Approach', freq: '124.0' },
+    altimeter_station: 'Portland',
     references: ['Salem', 'Eugene', 'Pendleton', 'Astoria', 'McMinnville', 'The Dalles'],
     destinations: [
       { name: 'Salem Airport',               id: 'KSLE' },
@@ -37,6 +42,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'Salt Lake Approach', freq: '124.3' },
+    altimeter_station: 'Salt Lake',
     references: ['Provo', 'Logan', 'Ogden', 'Price', 'Vernal', 'Heber City'],
     destinations: [
       { name: 'Provo Municipal',             id: 'KPVU' },
@@ -48,6 +54,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'Denver Center', freq: '133.4' },
+    altimeter_station: 'Denver',
     references: ['Grand Junction', 'Glenwood Springs', 'Steamboat Springs', 'Fort Collins', 'Pueblo'],
     destinations: [
       { name: 'Grand Junction Regional',     id: 'KGJT' },
@@ -59,6 +66,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'Albuquerque Center', freq: '135.3' },
+    altimeter_station: 'Albuquerque',
     references: ['Santa Fe', 'Taos', 'Roswell', 'Gallup', 'Farmington', 'Ruidoso'],
     destinations: [
       { name: 'Albuquerque International Sunport', id: 'KABQ' },
@@ -69,6 +77,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'SoCal Approach', freq: '124.5' },
+    altimeter_station: 'Los Angeles',
     references: ['Oceanside', 'Riverside', 'Palm Springs', 'Victorville', 'El Cajon', 'Hemet'],
     destinations: [
       { name: 'Long Beach Airport',          id: 'KLGB' },
@@ -80,6 +89,7 @@ const REGIONS = [
   },
   {
     facility: { name: 'Houston Approach', freq: '119.0' },
+    altimeter_station: 'Houston',
     references: ['Galveston', 'Conroe', 'Beaumont', 'Victoria', 'Huntsville', 'Wharton'],
     destinations: [
       { name: 'Sugar Land Regional',         id: 'KSGR' },
@@ -144,17 +154,18 @@ export async function GET() {
   const altimeter   = randomAltimeter()
 
   return Response.json({
-    scenario_type:      'flight_following',
-    facility_name:      region.facility.name,
-    facility_freq:      region.facility.freq,
-    aircraft_type:      aircraft.type,
-    callsign_display:   tail.display,
-    callsign_spoken:    tail.spoken,
-    destination_name:   destination.name,
-    destination_id:     destination.id,
-    position_reference: posRef,
-    position_direction: posDir,
-    position_distance:  posDist,
+    scenario_type:       'flight_following',
+    facility_name:       region.facility.name,
+    facility_freq:       region.facility.freq,
+    altimeter_station:   region.altimeter_station,
+    aircraft_type:       aircraft.type,
+    callsign_display:    tail.display,
+    callsign_spoken:     tail.spoken,
+    destination_name:    destination.name,
+    destination_id:      destination.id,
+    position_reference:  posRef,
+    position_direction:  posDir,
+    position_distance:   posDist,
     altitude,
     altimeter,
   })

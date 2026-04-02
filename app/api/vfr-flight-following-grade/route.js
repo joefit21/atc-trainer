@@ -22,6 +22,7 @@ Altitude: ${scenario.altitude} ft MSL
 Destination: ${scenario.destination_name} (${scenario.destination_id})
 Altimeter: ${scenario.altimeter}
 Squawk code issued: ${squawk_code || '(see exchange 1 controller_said)'}
+Altimeter station: ${scenario.altimeter_station || scenario.facility_name} (e.g. "Denver altimeter, three zero zero three")
 
 EXCHANGES (${exchanges.length} total):
 ${exchangeText}
@@ -85,6 +86,8 @@ ALTIMETER VTT: Altimeter digits may merge or be heard differently:
 - "Two niner niner two" = 29.92 ✓
 - "Three zero one seven" = 30.17 ✓
 - Do not penalize for any reasonable phonetic rendering of the altimeter digits.
+- The station name (e.g. "Denver", "Salt Lake", "Sacramento") may be omitted in the pilot's readback — do NOT require the pilot to repeat the station name. Accept any correct altimeter digits.
+- If the pilot says the station name, accept any phonetically similar rendering.
 
 FACILITY NAME VTT: Any phonetically adjacent word for the facility name must be accepted:
 - "NorCal" → NorCal Approach ✓
