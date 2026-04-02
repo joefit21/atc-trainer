@@ -36,8 +36,9 @@ export default function RadioLab() {
   const [classDArrivalExchanges, setClassDArrivalExchanges] = useState([])
 
   // ── Flight following state ────────────────────────────────────────────────────
-  const [ffStep, setFFStep]           = useState(0) // 0=initial call, 1=squawk readback, 2=radar contact ack
+  const [ffStep, setFFStep]           = useState(0) // 0=initial contact, 1=squawk readback, 2=full request, 3=state altitude
   const [ffExchanges, setFFExchanges] = useState([])
+  const [ffSquawkCode, setFFSquawkCode] = useState(null)
 
   // ── shared controller audio (one scenario runs at a time) ─────────────────────
   const [controllerText, setControllerText]               = useState('')
@@ -71,6 +72,7 @@ export default function RadioLab() {
     setClassDArrivalExchanges([])
     setFFStep(0)
     setFFExchanges([])
+    setFFSquawkCode(null)
     setControllerText('')
     setControllerAudioUrl(null)
     try {
@@ -285,9 +287,10 @@ export default function RadioLab() {
   const ffGetSituation = (step) => {
     if (!scenario) return ''
     switch (step) {
-      case 0: return `You are ${scenario.position_distance} miles ${scenario.position_direction} of ${scenario.position_reference} at ${scenario.altitude.toLocaleString()} ft MSL, VFR en route to ${scenario.destination_name}. Contact ${scenario.facility_name} on ${scenario.facility_freq} and request flight following.`
-      case 1: return `${scenario.facility_name} has assigned you a squawk code. Write it down, then read it back.`
-      case 2: return `${scenario.facility_name} has confirmed radar contact and given your altimeter. Acknowledge.`
+      case 0: return `You are ${scenario.position_distance} miles ${scenario.position_direction} of ${scenario.position_reference}. Contact ${scenario.facility_name} on ${scenario.facility_freq} with your callsign and position.`
+      case 1: return `${scenario.facility_name} has issued a squawk code and altimeter setting. Write the code down, then read it back and confirm ident.`
+      case 2: return `${scenario.facility_name} said "go ahead with your request." Give them your aircraft type, destination, and request flight following.`
+      case 3: return `${scenario.facility_name} has radar contact and is asking for your altitude. Report it.`
       default: return ''
     }
   }
@@ -295,49 +298,73 @@ export default function RadioLab() {
   const ffGetHint = (step) => {
     if (!scenario) return ''
     switch (step) {
-      case 0: return `Say: "${scenario.facility_name}", aircraft type, callsign, position (${scenario.position_distance} miles ${scenario.position_direction} of ${scenario.position_reference}), altitude (${scenario.altitude.toLocaleString()} ft), VFR to ${scenario.destination_name}, request flight following.`
-      case 1: return `Read back: callsign, "squawking [code]", "ident." Write down the code — you'll need it for your transponder.`
-      case 2: return `Acknowledge: callsign, "roger." You may also read back the altimeter (${scenario.altimeter}).`
+      case 0: return `Say: "${scenario.facility_name}, ${scenario.callsign_display}, [X] miles [direction] of [reference]."`
+      case 1: return `Say: "Squawking [code], ident, ${scenario.callsign_display}." Write down the code — you'll need to set it on your transponder.`
+      case 2: return `Say: "${scenario.aircraft_type}, VFR to ${scenario.destination_name}, request flight following, ${scenario.callsign_display}."`
+      case 3: return `Say: "${scenario.altitude.toLocaleString()}, ${scenario.callsign_display}."`
       default: return ''
     }
   }
 
   const ffGetTitle = (step) => [
-    'Request Flight Following',
+    'Initial Contact',
     'Read Back Squawk Code',
-    'Acknowledge Radar Contact',
+    'State Your Request',
+    'Report Altitude',
   ][step] || ''
 
-  const ffIsReadback = (step) => step === 1 || step === 2
+  // Steps 1, 2, and 3 all follow a controller transmission
+  const ffIsReadback = (step) => step === 1 || step === 2 || step === 3
 
   // ── Flight following submit ───────────────────────────────────────────────────
   const ffSubmitCall = async (text) => {
     const pilotSaid = text
 
     if (ffStep === 0) {
-      // Initial call — fetch squawk assignment
+      // Step 0: Initial contact — fetch squawk + altimeter response
       setControllerLoading(true)
       setControllerText('')
       setControllerAudioUrl(null)
       setFFExchanges(prev => [...prev, {
-        step: 0, phase: 'initial_call', situation: ffGetSituation(0), pilot_said: pilotSaid,
+        step: 0, phase: 'initial_contact', situation: ffGetSituation(0), pilot_said: pilotSaid,
       }])
       try {
-        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'squawk_assignment', pilot_said: pilotSaid }) })
+        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'initial_contact', pilot_said: pilotSaid }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
         setControllerAudioUrl(result.audio_url)
+        if (result.squawk_code) setFFSquawkCode(result.squawk_code)
         setFFStep(1)
       } catch (e) { setErrorMessage(e.message); setPhase('error') }
       setControllerLoading(false)
 
     } else if (ffStep === 1) {
-      // Squawk readback — save with controller_said (squawk assignment), then fetch radar contact
-      const squawkText = controllerText
+      // Step 1: Squawk readback — save with controller_said, then fetch "go ahead"
+      const prevControllerText = controllerText
       setFFExchanges(prev => [...prev, {
         step: 1, phase: 'squawk_readback', situation: ffGetSituation(1),
-        controller_said: squawkText, pilot_said: pilotSaid,
+        controller_said: prevControllerText, pilot_said: pilotSaid,
+      }])
+      setControllerLoading(true)
+      setControllerText('')
+      setControllerAudioUrl(null)
+      try {
+        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'go_ahead', pilot_said: pilotSaid }) })
+        const result = await res.json()
+        if (result.error) throw new Error(result.error)
+        setControllerText(result.controller_text)
+        setControllerAudioUrl(result.audio_url)
+        setFFStep(2)
+      } catch (e) { setErrorMessage(e.message); setPhase('error') }
+      setControllerLoading(false)
+
+    } else if (ffStep === 2) {
+      // Step 2: Full request — save with controller_said, then fetch radar contact
+      const prevControllerText = controllerText
+      setFFExchanges(prev => [...prev, {
+        step: 2, phase: 'full_request', situation: ffGetSituation(2),
+        controller_said: prevControllerText, pilot_said: pilotSaid,
       }])
       setControllerLoading(true)
       setControllerText('')
@@ -348,21 +375,21 @@ export default function RadioLab() {
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
         setControllerAudioUrl(result.audio_url)
-        setFFStep(2)
+        setFFStep(3)
       } catch (e) { setErrorMessage(e.message); setPhase('error') }
       setControllerLoading(false)
 
     } else {
-      // Step 2: radar contact ack — save and grade
-      const radarText = controllerText
+      // Step 3: Altitude report — save and grade all 4 exchanges
+      const prevControllerText = controllerText
       const finalExchanges = [...ffExchanges, {
-        step: 2, phase: 'radar_contact_ack', situation: ffGetSituation(2),
-        controller_said: radarText, pilot_said: pilotSaid,
+        step: 3, phase: 'altitude_report', situation: ffGetSituation(3),
+        controller_said: prevControllerText, pilot_said: pilotSaid,
       }]
       setFFExchanges(finalExchanges)
       setPhase('grading')
       try {
-        const res    = await fetch('/api/vfr-flight-following-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges }) })
+        const res    = await fetch('/api/vfr-flight-following-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges, squawk_code: ffSquawkCode }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         if (!result.call_feedback) throw new Error('Missing call feedback in response.')
@@ -838,9 +865,14 @@ export default function RadioLab() {
             </div>
 
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-              <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-3">You Will Make 3 Transmissions</h2>
+              <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-3">You Will Make 4 Transmissions</h2>
               <div className="space-y-2">
-                {['Request flight following from ' + scenario.facility_name, 'Read back squawk code + ident', 'Acknowledge radar contact'].map((s, i) => (
+                {[
+                  'Initial contact — ' + scenario.facility_name + ', callsign, position',
+                  'Read back squawk code + ident',
+                  'State aircraft type, destination, request flight following',
+                  'Report your altitude',
+                ].map((s, i) => (
                   <div key={i} className="flex items-start gap-3 text-sm text-gray-400">
                     <span className="w-6 h-6 rounded-full border border-white/20 flex items-center justify-center text-xs text-gray-500 flex-shrink-0 mt-0.5">{i + 1}</span>
                     <span>{s}</span>
@@ -862,11 +894,11 @@ export default function RadioLab() {
           <div className="space-y-6">
             {/* Progress */}
             <div className="flex items-center gap-2">
-              {[0,1,2].map(i => (
+              {[0,1,2,3].map(i => (
                 <div key={i} className={`h-1.5 flex-1 rounded-full transition-all ${i < ffStep ? 'bg-green-400' : i === ffStep ? 'bg-blue-400' : 'bg-white/10'}`} />
               ))}
             </div>
-            <p className="text-sm text-gray-400">Transmission {ffStep + 1} of 3</p>
+            <p className="text-sm text-gray-400">Transmission {ffStep + 1} of 4</p>
 
             {/* Title + situation */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
@@ -879,7 +911,9 @@ export default function RadioLab() {
             {ffIsReadback(ffStep) && controllerAudioUrl && (
               <div className="bg-white/5 border border-blue-400/20 rounded-2xl p-5 space-y-3">
                 <p className="text-xs text-blue-400 uppercase tracking-wide">
-                  {ffStep === 1 ? 'Squawk assignment — write it down, then read it back' : 'Radar contact confirmed — acknowledge'}
+                  {ffStep === 1 ? 'Squawk assignment — write it down, then read it back'
+                    : ffStep === 2 ? 'Controller says go ahead — state your full request'
+                    : 'Radar contact — controller is asking for your altitude'}
                 </p>
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
                 <button
