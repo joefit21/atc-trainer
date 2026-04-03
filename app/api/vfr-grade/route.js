@@ -21,19 +21,34 @@ PILOT'S CALLS (${calls.length} total):
 ${callsText}
 
 REQUIRED ELEMENTS by call type:
-- Inbound (10 miles): airport name + "traffic", callsign, distance and direction from airport, "inbound for landing", runway number, airport name repeated at end
+- Inbound (10 miles): airport name + "traffic", callsign, distance and direction from airport, landing intent, runway number, airport name repeated at end
 - Entering 45°: airport name + "traffic", callsign, "entering 45" or "45 for the [pattern] downwind", runway number, airport name repeated at end
 - Base: airport name + "traffic", callsign, "[left/right] base", runway number, airport name repeated at end
-- Final: airport name + "traffic", callsign, "final", runway number, full stop or touch and go, airport name repeated at end
+- Final: airport name + "traffic", callsign, "final", runway number, full stop OR touch-and-go explicitly stated, airport name repeated at end
 - Clear of runway: airport name + "traffic", callsign, "clear of runway [specific number]", airport name repeated at end
 
-RUNWAY NUMBER — STRICTLY ENFORCED ON ALL CALLS:
-The runway number (a digit or digits, e.g. "16", "one six", "runway 7") is REQUIRED on every call except clear-of-runway (which has its own rule). Stating a pattern leg position alone ("right base", "left downwind", "final") does NOT satisfy the runway number requirement. The pilot must explicitly say the number. If the runway number is absent, score that call 60–74 maximum and note it clearly in feedback. Do not credit the runway as present unless you can identify an actual number in the transcript.
+LANDING INTENT (inbound call only):
+Accepted phrases: "inbound for landing", "inbound for the full stop", "inbound for runway [X]", "landing [airport]", or any equivalent that clearly states the pilot intends to land. "Inbound for runway [X]" is fully acceptable — the runway reference makes intent obvious. Do NOT penalize any phrasing that clearly communicates landing intent.
 
 AIRPORT NAME RULES — strictly enforced:
-- Every call must begin with "[Airport name] traffic" — if missing, deduct 10 points
-- Every call must end with the airport name repeated — if missing, deduct 5 points
+- Every call must BEGIN with "[Airport name] traffic" — if this is missing from the start of the transmission, deduct 10 points. Do not accept the end-of-call repeat as satisfying the opening requirement.
+- Every call must END with the airport name repeated — if missing, deduct 5 points
 - Both missing = deduct 15 points total
+- Check the BEGINNING of the transcript first. If the transmission starts with a callsign or any word other than the airport name, the opening "[Airport] traffic" is missing.
+
+RUNWAY NUMBER — STRICTLY ENFORCED ON ALL CALLS:
+The runway number (a digit or digits, e.g. "16", "one six", "runway 7", "runway 1") is REQUIRED on every call. You MUST find an actual number in the transcript — do NOT infer it from context, from the situation description, or from the pattern leg name.
+- "right base" alone → runway number ABSENT
+- "left downwind" alone → runway number ABSENT
+- "final" alone → runway number ABSENT
+- "runway 1", "runway one", "one", "16", "one six" → runway number PRESENT
+If the runway number is absent, score that call 60–74 maximum and note it in feedback. Do not credit the runway as present unless an actual number appears in the pilot's transcript text.
+
+FINAL CALL — extra elements strictly enforced:
+In addition to the runway number, the pilot MUST explicitly state their intention: "full stop", "touch and go", or "option". Do not infer this from context or situation description. If neither is stated in the transcript, deduct points and note it.
+
+FEEDBACK LANGUAGE — CTAF IS UNCONTROLLED:
+CTAF frequencies have no controller. Never write "controllers need to hear", "ATC", or any reference to a controller. Use "other traffic", "other pilots", or "traffic in the area" instead.
 
 CLEAR OF RUNWAY — strictly enforced:
 - The pilot MUST say "clear of runway [number]" — e.g., "clear of runway 33"
