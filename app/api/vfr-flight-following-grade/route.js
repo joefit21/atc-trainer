@@ -127,6 +127,8 @@ DIGIT TRANSPOSITION — VTT ARTIFACT: VTT frequently transposes adjacent digits.
 
 ABSOLUTE RULE: NEVER use the words "unintelligible", "broken", "split", "sloppy", "garbled", or "unclear" for a callsign.
 
+MISSING CALLSIGN — MANDATORY PENALTY: The callsign leniency rules above apply only when some recognizable portion is present. If the transmission contains ZERO digits, ZERO phonetic letters, and ZERO fragments that could reasonably be the callsign, the callsign is genuinely absent. A completely absent callsign MUST be penalized — minimum 15-point deduction from that exchange's score. This applies to every exchange (1, 2, 3, and 4). VTT leniency exists for garbled callsigns, not absent ones. Do NOT credit a callsign as present unless you can point to actual digits or phonetics in the transcript text.
+
 CALLSIGN POSITION — ABSOLUTE RULE: Callsign at the BEGINNING or END of any transmission — both are equally correct. NEVER mention placement, NEVER say callsign should come first or last, NEVER deduct for position.
 BANNED PHRASES — never write any of these: "buried the callsign", "lead with callsign", "callsign placement", "callsign prominence", "place it more prominently", "callsign convention", "callsign should be first", "end of transmission".
 
