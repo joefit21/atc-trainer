@@ -147,6 +147,24 @@ function HomeContent() {
         </div>
       </section>
 
+      {/* Built by a human */}
+      <section className="px-8 py-20 max-w-4xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center gap-10">
+          <img
+            src="https://www.flight-levels.com/joe-cockpit.png"
+            alt="Joe Mattison, CFI and former air traffic controller"
+            className="w-48 h-48 rounded-full object-cover object-top flex-shrink-0 border-2 border-white/10"
+          />
+          <div>
+            <p className="text-xs text-blue-400 uppercase tracking-widest mb-2">Built by a human</p>
+            <h2 className="text-2xl font-bold mb-4">Hi, I'm Joe.</h2>
+            <p className="text-gray-400 leading-relaxed">
+              I started as a flight instructor, teaching students how to fly — and how to talk on the radio. Later I crossed to the other side of the frequency and worked as an air traffic controller. I built ICAO Radio Lab because I know exactly what controllers need to hear, and I wanted every pilot to have a way to practice until it feels natural.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="px-8 py-20 bg-white/5">
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
