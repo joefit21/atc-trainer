@@ -1171,9 +1171,9 @@ export default function RadioLab() {
                 <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
                   <div className="text-3xl mb-3">🚀</div>
                   <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
-                  <p className="text-gray-400 mb-6">The demo uses fixed scenarios. Subscribe for unlimited random scenarios across all exercise types — new airports, callsigns, and routes every time.</p>
-                  <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe →</a>
-                  <p className="text-gray-500 text-sm mt-3">Cancel anytime.</p>
+                  <p className="text-gray-400 mb-2">The demo uses fixed scenarios. Subscribe for unlimited random scenarios across all exercise types — new airports, callsigns, and routes every time.</p>
+                  <p className="text-blue-300 font-semibold mb-6">$29/month · Cancel anytime</p>
+                  <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe — $29/mo →</a>
                 </div>
               </div>
             ) : (

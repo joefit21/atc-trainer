@@ -101,7 +101,7 @@ function SignupForm() {
   return (
     <div className="w-full max-w-lg">
       <div className="text-center mb-8">
-        <a href="/" className="text-2xl font-bold">✈️ ATC Trainer</a>
+        <a href="/" className="text-2xl font-bold">✈️ Flight Levels</a>
         <h1 className="text-3xl font-bold mt-6 mb-2">Create your account</h1>
         <p className="text-gray-400">Choose a plan and start practicing today</p>
       </div>
@@ -118,9 +118,9 @@ function SignupForm() {
               : 'border-white/10 bg-white/5 hover:border-white/30'
           }`}
         >
-          <div className="text-xl mb-2">✈️</div>
-          <div className="font-semibold text-sm text-white">ATC Trainer</div>
-          <div className="text-xs text-gray-400 mt-1">Ground · Clearance · Approach</div>
+          <div className="text-xl mb-2">🎙️</div>
+          <div className="font-semibold text-sm text-white">ICAO Radio Lab</div>
+          <div className="text-xs text-gray-400 mt-1">CTAF · Class D · Flight Following · IFR</div>
           <div className="text-blue-400 font-bold mt-2">{singlePrice}/mo</div>
         </button>
 
