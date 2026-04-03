@@ -22,10 +22,13 @@ ${callsText}
 
 REQUIRED ELEMENTS by call type:
 - Inbound (10 miles): airport name + "traffic", callsign, distance and direction from airport, "inbound for landing", runway number, airport name repeated at end
-- Entering 45°: airport name + "traffic", callsign, "entering 45" or "45 for the [pattern] downwind", runway, airport name repeated at end
-- Base: airport name + "traffic", callsign, "[left/right] base", runway, airport name repeated at end
-- Final: airport name + "traffic", callsign, "final", runway, full stop or touch and go, airport name repeated at end
+- Entering 45°: airport name + "traffic", callsign, "entering 45" or "45 for the [pattern] downwind", runway number, airport name repeated at end
+- Base: airport name + "traffic", callsign, "[left/right] base", runway number, airport name repeated at end
+- Final: airport name + "traffic", callsign, "final", runway number, full stop or touch and go, airport name repeated at end
 - Clear of runway: airport name + "traffic", callsign, "clear of runway [specific number]", airport name repeated at end
+
+RUNWAY NUMBER — STRICTLY ENFORCED ON ALL CALLS:
+The runway number (a digit or digits, e.g. "16", "one six", "runway 7") is REQUIRED on every call except clear-of-runway (which has its own rule). Stating a pattern leg position alone ("right base", "left downwind", "final") does NOT satisfy the runway number requirement. The pilot must explicitly say the number. If the runway number is absent, score that call 60–74 maximum and note it clearly in feedback. Do not credit the runway as present unless you can identify an actual number in the transcript.
 
 AIRPORT NAME RULES — strictly enforced:
 - Every call must begin with "[Airport name] traffic" — if missing, deduct 10 points
