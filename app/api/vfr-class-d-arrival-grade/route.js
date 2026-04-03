@@ -34,20 +34,24 @@ Exchange 1 — Initial tower call (inbound):
 - Distance and direction from airport (e.g., "10 miles northwest")
 - Altitude — OPTIONAL. Do NOT deduct any points for omitting altitude. Never comment on missing altitude.
 - "With Information [letter]" — must include current ATIS letter
-- Intention to land: "inbound for landing", "inbound for the full stop", "inbound for landing full stop", or any equivalent phrasing indicating they want to land — REQUIRED. Deduct points if omitted entirely.
+- Intention to land — REQUIRED. Accepted phrasings (any of these = full credit):
+  - "inbound for landing", "inbound for the full stop", "inbound for landing full stop"
+  - "landing with [ATIS letter]" — e.g., "landing with Hotel" ✓ — "landing" states intent, "with Hotel" states ATIS; this is fully acceptable real-world phrasing
+  - Any transmission that contains the word "landing" or "inbound" clearly indicating arrival intent
+  Deduct points ONLY if the pilot's intent to land is completely absent from the transmission.
 
 Exchange 2 — Pattern entry readback:
-- Callsign
+- Callsign — REQUIRED. Must find actual digits or phonetics in the transcript. Do NOT accept "callsign implied" or "callsign understood." If absent, deduct minimum 15 points.
 - Entry type: either "[left/right] downwind runway [X]" OR "straight in runway [X]" — must match what controller said
-- Runway number
+- Runway number — an actual digit must appear in the transcript (e.g., "13", "one three", "runway 13"). Stating the entry type alone ("straight in", "left downwind") does NOT satisfy this. If no digit is present, deduct points.
 - Reporting point: either "midfield" (for downwind entry) or "three-mile final" / "3-mile final" (for straight-in)
 
 Exchange 3 — Position report:
-- Callsign — this is the ONLY identifier required; do NOT require or penalize for missing "[Airport] Tower"
+- Callsign — REQUIRED. Must find actual digits or phonetics in the transcript. Do NOT accept "callsign implied" or "callsign understood." If absent, deduct minimum 15 points.
 - Position matching the reporting point controller specified:
   - If downwind entry: "midfield [left/right] downwind runway [X]" or equivalent
   - If straight-in: "[X]-mile final runway [X]" or equivalent
-- Must include runway number
+- Runway number — an actual digit must appear in the transcript. Stating the position alone ("3-mile final", "midfield downwind") does NOT satisfy the runway number requirement. If no digit is present, deduct points.
 - CRITICAL: Do NOT comment on or suggest that calling "[Airport] Tower" would be good practice. It is not required and mentioning it at all is wrong. Never reference the omission of the facility name on a position report.
 
 Exchange 4 — Landing clearance readback:
@@ -130,6 +134,7 @@ N-NUMBER FORMAT: ALL of the following represent the same callsign and must recei
 ABSOLUTE RULE: If ANY recognizable portion of the callsign is present (digits, phonetics, or fragments), it counts as the full callsign. NEVER use the words "unintelligible", "broken", "split", "sloppy", "garbled", or "unclear" to describe a callsign. NEVER suggest the pilot say it differently.
 
 MISSING CALLSIGN — MANDATORY PENALTY: The callsign leniency rules above apply only when some recognizable portion is present. If the transmission contains ZERO digits, ZERO phonetic letters, and ZERO fragments that could reasonably be the callsign, the callsign is genuinely absent. A completely absent callsign MUST be penalized — minimum 15-point deduction from that exchange's score. This applies to every exchange. VTT leniency exists for garbled callsigns, not absent ones.
+BANNED INFERENCES: You are NEVER allowed to write "callsign implied", "callsign understood", "callsign inferred", or any equivalent. Either the callsign is present in the text (digits or phonetics), or it is absent and must be penalized. There is no middle ground.
 
 CALLSIGN POSITION — ABSOLUTE RULE: The callsign may appear at the BEGINNING or END of any transmission. Both are equally correct standard phraseology. You must NEVER:
 - Mention that the callsign came at the end
