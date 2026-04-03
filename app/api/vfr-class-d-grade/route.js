@@ -50,7 +50,7 @@ Exchange 3 — Tower call at hold short:
 Exchange 4 — Tower readback:
 - Callsign (may be at beginning OR end — both are standard)
 - "Cleared for takeoff runway [X]" or equivalent
-- Departure direction if one was stated in the clearance (e.g., "northbound departure approved")
+- Do NOT require or penalize for departure direction — it was stated by the pilot in Exchange 3 and is NOT required in the takeoff clearance readback
 - Do NOT require a heading — none is issued in this exercise
 - Do NOT require a departure frequency — none was issued in this exercise
 

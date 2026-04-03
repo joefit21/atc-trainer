@@ -23,19 +23,20 @@ const DEMO_SCENARIOS = {
     ],
   },
   classd: {
-    scenario_type: 'classd', airport_id: 'KRDM', airport_name: 'Redmond', airport_state: 'OR',
+    scenario_type: 'classd', airport_id: 'KRDM', airport_name: 'Redmond', state: 'OR',
     tower_freq: '124.5', ground_freq: '121.8', runway: '5', pattern: 'left',
     aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
     callsign_spoken: 'November four five two one Hotel',
-    atis: { letter: 'Bravo', wind: '050/10', ceiling: 'clear', visibility: 10, altimeter: '30.02' },
-    departure_direction: 'north',
+    position: 'the general aviation ramp',
+    departure_intention: 'northbound departure',
+    atis: { letter: 'Bravo', phonetic: 'bravo', wind_dir: '050', wind_speed: 10, visibility: '10', sky: 'clear', altimeter: '30.02', active_runway: '5' },
   },
   classdarrival: {
-    scenario_type: 'classdarrival', airport_id: 'KPAO', airport_name: 'Palo Alto', airport_state: 'CA',
+    scenario_type: 'classdarrival', airport_id: 'KPAO', airport_name: 'Palo Alto', state: 'CA',
     tower_freq: '118.6', ground_freq: '125.0', runway: '13', pattern: 'left',
     aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
     callsign_spoken: 'November four five two one Hotel',
-    atis: { letter: 'Alpha', wind: '130/8', ceiling: 'clear', visibility: 10, altimeter: '29.98' },
+    atis: { letter: 'Alpha', phonetic: 'alpha', wind_dir: '130', wind_speed: 8, visibility: '10', sky: 'clear', altimeter: '29.98', active_runway: '13' },
     approach_direction: 'southeast', approach_distance: 10, approach_altitude: 3200, parking_destination: 'GA ramp',
   },
   flightfollowing: {
@@ -1149,12 +1150,31 @@ export default function RadioLab() {
             </div>
 
             {isDemo ? (
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
-                <div className="text-3xl mb-3">🚀</div>
-                <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
-                <p className="text-gray-400 mb-6">The demo uses fixed scenarios. Subscribe for unlimited random scenarios across all exercise types — new airports, callsigns, and routes every time.</p>
-                <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe →</a>
-                <p className="text-gray-500 text-sm mt-3">Cancel anytime.</p>
+              <div className="space-y-4">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+                  <p className="text-sm text-gray-400 mb-3 text-center">Try another demo scenario:</p>
+                  <div className="flex gap-1 bg-white/5 border border-white/10 rounded-xl p-1">
+                    {[
+                      { key: 'ctaf',            label: '📻 CTAF'          },
+                      { key: 'classd',          label: '🛫 Departure'     },
+                      { key: 'classdarrival',   label: '🛬 Arrival'       },
+                      { key: 'flightfollowing', label: '✈️ Following'     },
+                      { key: 'ifr',             label: '📋 IFR Clearance' },
+                    ].map(opt => (
+                      <button key={opt.key} onClick={() => handleTypeChange(opt.key)}
+                        className={`flex-1 py-2 rounded-lg text-xs font-medium transition ${scenarioType === opt.key ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'}`}>
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
+                  <div className="text-3xl mb-3">🚀</div>
+                  <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
+                  <p className="text-gray-400 mb-6">The demo uses fixed scenarios. Subscribe for unlimited random scenarios across all exercise types — new airports, callsigns, and routes every time.</p>
+                  <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe →</a>
+                  <p className="text-gray-500 text-sm mt-3">Cancel anytime.</p>
+                </div>
               </div>
             ) : (
               <button onClick={() => loadScenario(scenarioType, false)} className="w-full bg-blue-500 hover:bg-blue-600 py-4 rounded-xl font-bold text-lg transition">
