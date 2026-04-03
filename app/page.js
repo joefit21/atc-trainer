@@ -13,16 +13,16 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'SoftwareApplication',
-      name: 'ATC Trainer',
+      name: 'ICAO Radio Lab',
       applicationCategory: 'EducationalApplication',
       operatingSystem: 'Web',
       url: 'https://practice.flight-levels.com',
-      description: 'AI-powered ATC clearance practice for pilots. Practice IFR clearance readbacks and ground control with real-time AI scoring. Built by a former air traffic controller.',
+      description: 'AI-powered aviation English practice for pilots worldwide. Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller.',
       author: { '@type': 'Person', name: 'Joe Mattison' },
       offers: [
         {
           '@type': 'Offer',
-          name: 'ATC Trainer',
+          name: 'ICAO Radio Lab',
           price: '29.00',
           priceCurrency: 'USD',
           priceSpecification: { '@type': 'RecurringChargeSpecification', billingDuration: 'P1M', billingIncrement: 1 },
@@ -39,8 +39,8 @@ const jsonLd = {
     {
       '@type': 'WebSite',
       url: 'https://practice.flight-levels.com',
-      name: 'ATC Trainer',
-      description: 'Practice IFR clearances and ATC readbacks with AI-powered feedback.',
+      name: 'ICAO Radio Lab — Flight Levels',
+      description: 'Practice aviation English radio calls and ATC readbacks with AI-powered feedback. ICAO language proficiency training for pilots worldwide.',
     },
   ],
 }
@@ -76,7 +76,7 @@ function HomeContent() {
       <nav className="flex items-center justify-between px-8 py-6 border-b border-white/10">
         <div className="flex items-center gap-2">
           <span className="text-2xl">✈️</span>
-          <span className="text-xl font-bold">ATC Trainer</span>
+          <span className="text-xl font-bold">Flight Levels</span>
         </div>
         <div className="flex items-center gap-4">
           <a href="/login" className="text-gray-300 hover:text-white transition">Log In</a>
@@ -110,7 +110,7 @@ function HomeContent() {
       {/* Who this is for */}
       <section className="px-8 py-12 bg-white/5">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-8">Who uses ATC Trainer?</h2>
+          <h2 className="text-2xl font-bold mb-8">Who uses ICAO Radio Lab?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { flag: "🇮🇳", region: "India", description: "Student pilots preparing for DGCA exams and international operations requiring ICAO English proficiency." },
@@ -157,7 +157,7 @@ function HomeContent() {
             {/* ATC Trainer only */}
             <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
               <div className="text-4xl font-bold mb-1">{price}<span className="text-xl text-gray-400">/mo</span></div>
-              <p className="text-gray-400 text-sm mb-1">ATC Trainer only</p>
+              <p className="text-gray-400 text-sm mb-1">ICAO Radio Lab only</p>
               <p className="text-gray-500 text-xs mb-6">Less than one hour with a CFI</p>
               <ul className="text-left space-y-2 mb-8 flex-1">
                 {[
@@ -173,7 +173,7 @@ function HomeContent() {
                 ))}
               </ul>
               <a href={signupUrl} className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
-                Get ATC Trainer
+                Get ICAO Radio Lab
               </a>
             </div>
 
@@ -187,7 +187,7 @@ function HomeContent() {
               <p className="text-gray-500 text-xs mb-6">Save $9/mo vs. buying separately</p>
               <ul className="text-left space-y-2 mb-8 flex-1">
                 {[
-                  'Everything in ATC Trainer',
+                  'Everything in ICAO Radio Lab',
                   'Full access to Checkride Prep AI',
                   'Practice oral exams + radio comms',
                   'One subscription, two tools',
@@ -208,7 +208,7 @@ function HomeContent() {
       </section>
 
       <footer className="px-8 py-8 border-t border-white/10 text-center text-gray-500 text-sm">
-        <p>© 2026 ATC Trainer. Built for pilots worldwide, by a CFI & former air traffic controller.</p>
+        <p>© 2026 Flight Levels. Built for pilots worldwide, by a CFI & former air traffic controller.</p>
         <div className="flex justify-center gap-6 mt-3">
           <a href="/terms" className="hover:text-gray-300 transition">Terms of Service</a>
           <a href="/privacy" className="hover:text-gray-300 transition">Privacy Policy</a>
