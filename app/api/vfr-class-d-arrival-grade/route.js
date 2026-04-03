@@ -129,9 +129,10 @@ N-NUMBER FORMAT: ALL of the following represent the same callsign and must recei
 - VTT noise prefix: "No. 574 Juliet India" → N574JI ✓ — "No." is VTT for November/N-prefix
 - "Number 574 Juliet India" → N574JI ✓ — "Number" is VTT noise
 - Digit extraction: "Number 9 or 3, 6, Juliet Echo" → extract 9, 3, 6, J, E → N936JE ✓ — the words "Number", "or" are VTT noise between spoken digits; extract only the digits and phonetics
+- PHONETIC APPEARING AS SEPARATE WORD: "N538RO, Oscar" → the digits "538R" match plus "Oscar" = "O" → full callsign N538RO ✓ — VTT placed the final phonetic as a standalone word; both pieces together are the callsign
 - Any other combination: if you can extract digits and/or phonetics that match the actual callsign, it IS the callsign
 
-ABSOLUTE RULE: If ANY recognizable portion of the callsign is present (digits, phonetics, or fragments), it counts as the full callsign. NEVER use the words "unintelligible", "broken", "split", "sloppy", "garbled", or "unclear" to describe a callsign. NEVER suggest the pilot say it differently.
+ABSOLUTE RULE: If ANY recognizable portion of the callsign is present (digits, phonetics, or fragments), it counts as the full callsign. NEVER use the words "unintelligible", "broken", "split", "awkward", "sloppy", "garbled", or "unclear" to describe a callsign. NEVER comment on how the callsign was delivered. NEVER suggest the pilot say it differently or say it "once" or "as one unit."
 
 MISSING CALLSIGN — MANDATORY PENALTY: The callsign leniency rules above apply only when some recognizable portion is present. If the transmission contains ZERO digits, ZERO phonetic letters, and ZERO fragments that could reasonably be the callsign, the callsign is genuinely absent. A completely absent callsign MUST be penalized — minimum 15-point deduction from that exchange's score. This applies to every exchange. VTT leniency exists for garbled callsigns, not absent ones.
 BANNED INFERENCES: You are NEVER allowed to write "callsign implied", "callsign understood", "callsign inferred", or any equivalent. Either the callsign is present in the text (digits or phonetics), or it is absent and must be penalized. There is no middle ground.
