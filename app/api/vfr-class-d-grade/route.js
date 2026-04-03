@@ -98,6 +98,8 @@ N-NUMBER FORMAT: ALL of the following represent the same callsign and must recei
 
 ABSOLUTE RULE: If ANY recognizable portion of the callsign is present (digits, phonetics, or fragments), it counts as the full callsign. NEVER use the words "unintelligible", "broken", "split", "sloppy", "garbled", or "unclear" to describe a callsign. NEVER suggest the pilot say it differently.
 
+MISSING CALLSIGN — MANDATORY PENALTY: The callsign leniency rules above apply only when some recognizable portion is present. If the transmission contains ZERO digits, ZERO phonetic letters, and ZERO fragments that could reasonably be the callsign, the callsign is genuinely absent. A completely absent callsign MUST be penalized — minimum 15-point deduction from that exchange's score. This applies to every exchange. Do not forgive a completely missing callsign under any VTT leniency logic — VTT leniency exists for garbled callsigns, not absent ones.
+
 CALLSIGN POSITION — ABSOLUTE RULE: The callsign may appear at the BEGINNING or END of any transmission. Both are equally correct standard phraseology. You must NEVER:
 - Mention that the callsign came at the end
 - Suggest it should be at the beginning
