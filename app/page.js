@@ -92,7 +92,7 @@ function HomeContent() {
           Aviation English Practice <span className="text-blue-400">for Pilots Worldwide</span>
         </h1>
         <p className="text-gray-400 text-xl max-w-2xl mb-4">
-          ICAO requires all pilots operating internationally to demonstrate English proficiency. Practice ATC clearances and radio readbacks with an AI controller — at your own pace, any time, anywhere.
+          Every pilot has felt it — the moment ATC responds and your mind goes blank. ICAO Radio Lab gives you a safe place to practice until the words come naturally, no matter where you learned to fly.
         </p>
         <p className="text-gray-500 text-base max-w-xl mb-10">
           Used by student pilots in India, the UAE, and beyond preparing for ICAO Level 4 English proficiency and real-world cockpit communications.
@@ -131,12 +131,12 @@ function HomeContent() {
         <h2 className="text-3xl font-bold text-center mb-16">Everything you need to communicate with confidence</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { icon: "🌐", title: "ICAO English Proficiency", description: "Practice the standard aviation English phraseology required for ICAO Level 4 proficiency and international operations." },
-            { icon: "🎙️", title: "Real Controller Voice", description: "Listen to authentic ATC clearances delivered in a realistic controller voice — exactly what you will hear in the cockpit." },
-            { icon: "🤖", title: "AI-Powered Scoring", description: "Get instant feedback on your readback accuracy, completeness, and phraseology after every transmission." },
-            { icon: "🛫", title: "Ground & IFR Clearances", description: "Practice both taxi clearances and full IFR clearance delivery — the two most critical radio exchanges for any pilot." },
-            { icon: "🔁", title: "Unlimited Scenarios", description: "Never repeat the same clearance twice. New scenarios are generated continuously so every session is fresh." },
-            { icon: "📱", title: "Practice Anywhere", description: "No app to download. Train from your phone, tablet, or computer — wherever you have a few minutes to practice." },
+            { icon: "🌐", title: "Sound Like You Belong in the Cockpit", description: "Master the exact phrases controllers expect to hear — so you can focus on flying, not searching for words." },
+            { icon: "🎙️", title: "Hear What ATC Actually Sounds Like", description: "Train with a realistic controller voice so the real thing never catches you off guard." },
+            { icon: "🤖", title: "Know Exactly What You Got Wrong", description: "After every transmission, get specific feedback on what you missed, what was unclear, and what was perfect." },
+            { icon: "🛫", title: "Every Radio Call You'll Need", description: "From your first call on the ground to flight following in cruise — every scenario a real pilot faces." },
+            { icon: "🔁", title: "Practice Until It Feels Automatic", description: "New airports, new callsigns, new routes every session — because confidence comes from repetition." },
+            { icon: "📱", title: "No Classroom. No Schedule. No Waiting.", description: "Open your browser and start talking. Practice during lunch, before a flight, or whenever nerves hit." },
           ].map((feature, i) => (
             <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-blue-500/30 transition">
               <div className="text-3xl mb-4">{feature.icon}</div>
@@ -176,7 +176,7 @@ function HomeContent() {
             <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
               <div className="text-4xl font-bold mb-1">{price}<span className="text-xl text-gray-400">/mo</span></div>
               <p className="text-gray-400 text-sm mb-1">ICAO Radio Lab only</p>
-              <p className="text-gray-500 text-xs mb-6">Less than one hour with a CFI</p>
+              <p className="text-gray-500 text-xs mb-6">Less than one hour of flight instruction</p>
               <ul className="text-left space-y-2 mb-8 flex-1">
                 {[
                   'Unlimited practice scenarios',
