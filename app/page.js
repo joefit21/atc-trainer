@@ -107,23 +107,21 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* Who this is for */}
-      <section className="px-8 py-12 bg-white/5">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-8">Who uses ICAO Radio Lab?</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { flag: "🇮🇳", region: "India", description: "Student pilots preparing for DGCA exams and international operations requiring ICAO English proficiency." },
-              { flag: "🇦🇪", region: "UAE & Middle East", description: "Pilots building careers with Gulf carriers where precision English radio communication is essential." },
-              { flag: "🌏", region: "Asia & Beyond", description: "Any pilot who flies, trains, or communicates in English as a second language." },
-            ].map((item, i) => (
-              <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6">
-                <div className="text-4xl mb-3">{item.flag}</div>
-                <div className="font-semibold mb-2">{item.region}</div>
-                <p className="text-gray-400 text-sm">{item.description}</p>
-              </div>
-            ))}
-          </div>
+      {/* How It Works */}
+      <section className="px-8 py-20 max-w-5xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {[
+            { step: '01', title: 'Choose a Scenario', desc: 'Pick from ground control, VFR departures, IFR clearances, flight following, and more — or let the system randomize it.' },
+            { step: '02', title: 'Hear the Transmission & Respond', desc: 'A realistic ATC voice reads the clearance. You read it back exactly as a pilot would, speaking or typing your response.' },
+            { step: '03', title: 'Get Instant Feedback', desc: 'See exactly what you got right, what you missed, and what to work on — scored the way a real controller would evaluate it.' },
+          ].map((item) => (
+            <div key={item.step} className="bg-white/5 border border-white/10 rounded-2xl p-8">
+              <div className="text-blue-400 text-4xl font-bold mb-4">{item.step}</div>
+              <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
+              <p className="text-gray-400">{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -144,6 +142,26 @@ function HomeContent() {
               <p className="text-gray-400">{feature.description}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Who this is for */}
+      <section className="px-8 py-12 bg-white/5">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-8">Who uses ICAO Radio Lab?</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { flag: "🇮🇳", region: "India", description: "Student pilots preparing for DGCA exams and international operations requiring ICAO English proficiency." },
+              { flag: "🇦🇪", region: "UAE & Middle East", description: "Pilots building careers with Gulf carriers where precision English radio communication is essential." },
+              { flag: "🌏", region: "Asia & Beyond", description: "Any pilot who flies, trains, or communicates in English as a second language." },
+            ].map((item, i) => (
+              <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6">
+                <div className="text-4xl mb-3">{item.flag}</div>
+                <div className="font-semibold mb-2">{item.region}</div>
+                <p className="text-gray-400 text-sm">{item.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
