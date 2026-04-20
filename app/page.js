@@ -79,6 +79,7 @@ function HomeContent() {
           <span className="text-xl font-bold">Flight Levels</span>
         </div>
         <div className="flex items-center gap-4">
+          <a href="/study-guides" className="text-gray-300 hover:text-white transition text-sm">Study Guides</a>
           <a href="/login" className="text-gray-300 hover:text-white transition">Log In</a>
           <a href={signupUrl} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">Subscribe</a>
         </div>
