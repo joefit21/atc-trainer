@@ -1,0 +1,38 @@
+# ICAO Radio Lab
+
+> AI-powered ATC radio call practice for pilots worldwide. Built by Joe Mattison, a Certified Flight Instructor (CFI) and former air traffic controller.
+
+ICAO Radio Lab helps pilots practice aviation English radio communications — ground control calls, VFR departures, IFR clearances, flight following, and readbacks — with real-time AI scoring. Used by student pilots in India, the UAE, and other regions where English is a second language and ICAO language proficiency is required.
+
+## What It Covers
+
+- Ground control and taxi clearances
+- VFR departure and arrival calls
+- IFR clearance readbacks (CRAFT format)
+- Flight following requests and position reports
+- Class B, C, and D airspace communications
+- Instrument approach and missed approach calls
+
+## Who It's For
+
+- Student pilots preparing for DGCA exams (India)
+- Pilots building careers with Gulf carriers (UAE, Middle East)
+- Any pilot who flies or communicates in English as a second language
+- Pilots preparing for ICAO Level 4 English proficiency requirements
+
+## About the Author
+
+Joe Mattison is a Certified Flight Instructor and former FAA air traffic controller. He built ICAO Radio Lab because he has been on both sides of the frequency and knows exactly what controllers need to hear.
+
+## Key Pages
+
+- [Home](https://practice.flight-levels.com): Product overview and pricing
+- [Free Demo](https://practice.flight-levels.com/demo): Try a practice scenario without an account
+
+## Pricing
+
+$29/month (standard). Regional pricing: $9/month (India), $19/month (UAE). Also available as part of the Flight Levels Bundle ($49/month), which includes ICAO Radio Lab and Checkride Prep.
+
+## Related Product
+
+Checkride Prep (https://checkride.flight-levels.com) — AI mock oral exam practice for FAA pilot checkrides.
