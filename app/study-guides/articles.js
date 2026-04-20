@@ -11,7 +11,7 @@ export const articles = [
         heading: 'The CRAFT Format',
         paragraphs: [
           'CRAFT is the standard memory aid for IFR clearance components: Clearance limit, Route, Altitude, Frequency (departure), Transponder (squawk code). Every IFR clearance contains these elements, and your readback should too — in the same order they were given.',
-          'Clearance limit is almost always your destination airport, but occasionally it\'s a fix short of the destination if ATC needs to sequence you. Route includes your departure procedure (SID), airways, and any amendments. Altitude means your initial assigned altitude and any crossing restrictions. Frequency is the departure control frequency. Squawk is the four-digit transponder code.',
+          'Clearance limit is almost always your destination airport, but occasionally — when ATC cannot issue a full-route clearance — it may be a fix or navaid near the departure airport. In that case you\'d proceed to that fix and hold until ATC can issue the rest of your route. Route includes your departure procedure (SID), airways, and any amendments. Altitude means your initial assigned altitude and any crossing restrictions. Frequency is the departure control frequency. Squawk is the four-digit transponder code.',
         ],
       },
       {
@@ -57,7 +57,7 @@ export const articles = [
       {
         heading: 'The Structure of Every Radio Call',
         paragraphs: [
-          'Every ATC radio call follows the same structure: who you\'re calling, who you are, where you are, what you want. "Riverside Ground, Cessna 172 November 8-8-6 Papa Kilo, at the south ramp, VFR to Big Bear, request taxi." That\'s it. Facility, callsign, position, request.',
+          'Every ATC radio call follows the same structure: who you\'re calling, who you are, where you are, what you have, what you want. "Riverside Ground, Cessna 8-8-6 Papa Kilo, at the south ramp, with Information X-Ray, VFR to Big Bear, request taxi." That\'s it. Facility, callsign, position, ATIS, request.',
           'New pilots often skip elements or reorder them. The most common mistake is leading with the request instead of the callsign: "I\'d like to request taxi to runway 2-6." Controllers hear dozens of transmissions a minute. They need your callsign before anything else.',
         ],
       },
