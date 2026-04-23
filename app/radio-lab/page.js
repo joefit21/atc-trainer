@@ -1169,11 +1169,11 @@ export default function RadioLab() {
                   </div>
                 </div>
                 <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
-                  <div className="text-3xl mb-3">🚀</div>
-                  <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
-                  <p className="text-gray-400 mb-2">The demo uses fixed scenarios. Subscribe for unlimited random scenarios across all exercise types — new airports, callsigns, and routes every time.</p>
-                  <p className="text-blue-300 font-semibold mb-6">$29/month · Cancel anytime</p>
-                  <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe — $29/mo →</a>
+                  <p className="text-blue-400 text-xs font-semibold uppercase tracking-widest mb-2">Demo complete</p>
+                  <h3 className="text-xl font-bold mb-2">You just practiced one fixed scenario.</h3>
+                  <p className="text-gray-400 mb-6">The full version generates new airports, callsigns, and routes every session — so you're never repeating the same call. Unlimited sessions across all scenario types.</p>
+                  <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Get Full Access — $29/mo</a>
+                  <p className="text-gray-600 text-xs mt-4">Cancel anytime. No commitment.</p>
                 </div>
               </div>
             ) : (
@@ -1260,11 +1260,11 @@ export default function RadioLab() {
 
                     {isDemo ? (
                       <div className="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-8 text-center">
-                        <div className="text-3xl mb-3">🚀</div>
-                        <h3 className="text-xl font-bold mb-2">Ready for unlimited practice?</h3>
-                        <p className="text-gray-400 mb-2">Subscribe for unlimited random clearances — new airports, callsigns, and routes every time.</p>
-                        <p className="text-blue-300 font-semibold mb-6">$29/month · Cancel anytime</p>
-                        <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Subscribe — $29/mo →</a>
+                        <p className="text-blue-400 text-xs font-semibold uppercase tracking-widest mb-2">Demo complete</p>
+                        <h3 className="text-xl font-bold mb-2">You just practiced one fixed clearance.</h3>
+                        <p className="text-gray-400 mb-6">The full version generates new airports, callsigns, and routes every session. Unlimited IFR clearances — and every other scenario type — for one subscription.</p>
+                        <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Get Full Access — $29/mo</a>
+                        <p className="text-gray-600 text-xs mt-4">Cancel anytime. No commitment.</p>
                       </div>
                     ) : (
                       <button onClick={() => loadIFRScenario(false)} className="w-full bg-blue-500 hover:bg-blue-600 py-4 rounded-xl font-bold text-lg transition">
