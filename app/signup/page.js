@@ -61,7 +61,7 @@ function SignupForm() {
           .eq('id', signInData.user.id)
           .single()
         if (profile?.is_subscribed) {
-          window.location.href = '/trainer'
+          window.location.href = '/radio-lab'
           return
         }
         const res = await fetch(checkoutEndpoint, {

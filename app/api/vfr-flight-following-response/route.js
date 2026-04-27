@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { requireSubscribed } from '@/lib/require-auth'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -33,6 +34,9 @@ function callsignAbbrev(spoken) {
 }
 
 export async function POST(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   try {
     const { scenario, phase } = await request.json()
     const abbrev = callsignAbbrev(scenario.callsign_spoken)

@@ -1,8 +1,12 @@
 import Anthropic from '@anthropic-ai/sdk'
+import { requireSubscribed } from '@/lib/require-auth'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   try {
     const { scenario, exchanges, squawk_code } = await request.json()
 

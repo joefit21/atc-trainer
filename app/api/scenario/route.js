@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
+import { requireSubscribed } from '@/lib/require-auth'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -198,6 +199,9 @@ function flightLevelToWords(fl) {
 }
 
 export async function GET(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type') || 'ground'
@@ -268,7 +272,7 @@ Return raw JSON only, no markdown:
 
 Use this exact callsign in spoken form: "${callsign.spoken}"
 
-ROUTE: Include a realistic published departure procedure (DP) name for ${departure.icao}, then "as filed".
+ROUTE: Use "radar vectors, then as filed" — do not invent departure procedure names.
 
 Use these exact values in the clearance:
 - Initial altitude: ${initialAltWords}
@@ -276,7 +280,7 @@ Use these exact values in the clearance:
 - Departure frequency: ${freqWords}
 - Squawk: ${squawkWords}
 
-CLEARANCE FORMAT: "${callsign.spoken}, cleared to ${destination.city} via the [DP name], then as filed, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}"
+CLEARANCE FORMAT: "${callsign.spoken}, cleared to ${destination.city}, radar vectors, then as filed, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}"
 
 Return raw JSON only, no markdown:
 {"clearance_text":"the full spoken clearance here"}`

@@ -1,3 +1,5 @@
+import { requireSubscribed } from '@/lib/require-auth'
+
 // runways: array of { rwy, pattern } — verified against airnav.com FAA data
 const UNCONTROLLED_AIRPORTS = [
   { id: 'KAUN', name: 'Auburn',        state: 'CA', ctaf: '122.8', runways: [{ rwy: '7',  pattern: 'left'  }, { rwy: '25', pattern: 'left'  }] },
@@ -49,7 +51,10 @@ function generateTailNumber() {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   const airport     = pickRandom(UNCONTROLLED_AIRPORTS)
   const rwyObj      = pickRandom(airport.runways)
   const runway      = rwyObj.rwy

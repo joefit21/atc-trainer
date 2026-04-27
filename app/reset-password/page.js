@@ -52,7 +52,7 @@ export default function ResetPassword() {
     } else {
       setSuccess(true)
       setLoading(false)
-      setTimeout(() => router.push('/trainer'), 2500)
+      setTimeout(() => router.push('/radio-lab'), 2500)
     }
   }
 
@@ -71,7 +71,7 @@ export default function ResetPassword() {
     <main className="min-h-screen bg-[#0a0f1e] text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <a href="/" className="text-2xl font-bold">✈️ ATC Trainer</a>
+          <a href="/" className="text-2xl font-bold">🎙️ ICAO Radio Lab</a>
           <h1 className="text-3xl font-bold mt-6 mb-2">Set new password</h1>
           <p className="text-gray-400">Choose a strong password for your account</p>
         </div>
@@ -80,7 +80,7 @@ export default function ResetPassword() {
           <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center space-y-4">
             <div className="text-4xl">✅</div>
             <h2 className="text-xl font-semibold">Password updated!</h2>
-            <p className="text-gray-400">Taking you to the trainer...</p>
+            <p className="text-gray-400">Taking you to Radio Lab...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="bg-white/5 border border-white/10 rounded-2xl p-8 space-y-4">

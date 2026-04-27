@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
+import { requireSubscribed } from '@/lib/require-auth'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai    = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -10,6 +11,9 @@ function runwaySpoken(rwy) {
 }
 
 export async function POST(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   try {
     const { scenario, phase, pilot_said } = await request.json()
 

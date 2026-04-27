@@ -3,6 +3,15 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
+// ─── auth-aware fetch — attaches the Supabase session token to every API call ──
+async function authedFetch(url, options = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const token = session?.access_token
+  const headers = { ...options.headers }
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  return fetch(url, { ...options, headers })
+}
+
 // ─── shared helpers ────────────────────────────────────────────────────────────
 const scoreColor  = (s) => s >= 90 ? 'text-green-400'      : s >= 70 ? 'text-yellow-400'      : 'text-red-400'
 const scoreBorder = (s) => s >= 90 ? 'border-green-400/20' : s >= 70 ? 'border-yellow-400/20' : 'border-red-400/20'
@@ -167,7 +176,7 @@ export default function RadioLab() {
           : type === 'flightfollowing'
             ? '/api/vfr-flight-following-scenario'
             : '/api/vfr-scenario?type=ctaf'
-      const res  = await fetch(endpoint)
+      const res  = await authedFetch(endpoint)
       const data = await res.json()
       if (data.error) throw new Error(data.error)
       setScenario(data)
@@ -188,7 +197,7 @@ export default function RadioLab() {
     setIFRScenario(null)
     try {
       const endpoint = demoMode ? '/api/demo-scenario?type=ifr' : '/api/scenario?type=ifr'
-      const res  = await fetch(endpoint)
+      const res  = demoMode ? await fetch(endpoint) : await authedFetch(endpoint)
       const data = await res.json()
       setIFRScenario(data)
       setIFRAudioUrl(data.audio_url)
@@ -201,7 +210,7 @@ export default function RadioLab() {
     setIFRIsGrading(true)
     setIFRReadbackText(text)
     try {
-      const res = await fetch('/api/grade', {
+      const res = await authedFetch('/api/grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clearance_text: ifrScenario.clearance_text, readback_text: text, scenario_type: 'ifr' }),
@@ -238,7 +247,7 @@ export default function RadioLab() {
         try {
           const fd = new FormData()
           fd.append('audio', blob, 'call.webm')
-          const res     = await fetch('/api/transcribe', { method: 'POST', body: fd })
+          const res     = await authedFetch('/api/transcribe', { method: 'POST', body: fd })
           const { text } = await res.json()
           setIsTranscribing(false)
           if (submitFnRef.current) submitFnRef.current(text || '')
@@ -268,7 +277,7 @@ export default function RadioLab() {
     } else {
       setPhase('grading')
       try {
-        const res    = await fetch('/api/vfr-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, calls: updatedCalls }) })
+        const res    = await authedFetch('/api/vfr-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, calls: updatedCalls }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         if (!result.call_feedback) throw new Error('Missing call feedback in response.')
@@ -295,7 +304,7 @@ export default function RadioLab() {
         pilot_said: pilotSaid,
       }])
       try {
-        const res    = await fetch('/api/vfr-class-d-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: apiPhase, pilot_said: pilotSaid }) })
+        const res    = await authedFetch('/api/vfr-class-d-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: apiPhase, pilot_said: pilotSaid }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
@@ -330,7 +339,7 @@ export default function RadioLab() {
         }]
         setPhase('grading')
         try {
-          const res    = await fetch('/api/vfr-class-d-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges }) })
+          const res    = await authedFetch('/api/vfr-class-d-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges }) })
           const result = await res.json()
           if (result.error) throw new Error(result.error)
           if (!result.call_feedback) throw new Error('Missing call feedback in response.')
@@ -453,7 +462,7 @@ export default function RadioLab() {
         step: 0, phase: 'initial_contact', situation: ffGetSituation(0), pilot_said: pilotSaid,
       }])
       try {
-        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'initial_contact', pilot_said: pilotSaid }) })
+        const res    = await authedFetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'initial_contact', pilot_said: pilotSaid }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
@@ -474,7 +483,7 @@ export default function RadioLab() {
       setControllerText('')
       setControllerAudioUrl(null)
       try {
-        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'go_ahead', pilot_said: pilotSaid }) })
+        const res    = await authedFetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'go_ahead', pilot_said: pilotSaid }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
@@ -494,7 +503,7 @@ export default function RadioLab() {
       setControllerText('')
       setControllerAudioUrl(null)
       try {
-        const res    = await fetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'radar_contact', pilot_said: pilotSaid }) })
+        const res    = await authedFetch('/api/vfr-flight-following-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: 'radar_contact', pilot_said: pilotSaid }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
@@ -513,7 +522,7 @@ export default function RadioLab() {
       setFFExchanges(finalExchanges)
       setPhase('grading')
       try {
-        const res    = await fetch('/api/vfr-flight-following-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges, squawk_code: ffSquawkCode }) })
+        const res    = await authedFetch('/api/vfr-flight-following-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges, squawk_code: ffSquawkCode }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         if (!result.call_feedback) throw new Error('Missing call feedback in response.')
@@ -545,7 +554,7 @@ export default function RadioLab() {
         pilot_said: pilotSaid,
       }])
       try {
-        const res    = await fetch('/api/vfr-class-d-arrival-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: apiPhase, pilot_said: pilotSaid }) })
+        const res    = await authedFetch('/api/vfr-class-d-arrival-response', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, phase: apiPhase, pilot_said: pilotSaid }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         setControllerText(result.controller_text)
@@ -581,7 +590,7 @@ export default function RadioLab() {
       setClassDArrivalExchanges(finalExchanges)
       setPhase('grading')
       try {
-        const res    = await fetch('/api/vfr-class-d-arrival-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges }) })
+        const res    = await authedFetch('/api/vfr-class-d-arrival-grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario, exchanges: finalExchanges }) })
         const result = await res.json()
         if (result.error) throw new Error(result.error)
         if (!result.call_feedback) throw new Error('Missing call feedback in response.')
@@ -641,7 +650,7 @@ export default function RadioLab() {
   // ── render ────────────────────────────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-white/10">
+      <nav className="flex items-center justify-between px-8 py-4 border-b border-white/10 bg-[#0a0f1e]" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}>
         <a href="/" className="text-xl font-bold">✈️ Flight Levels</a>
         {isDemo ? (
           <div className="flex items-center gap-4">

@@ -1,3 +1,5 @@
+import { requireSubscribed } from '@/lib/require-auth'
+
 // Verified Class D airports — tower/ground/departure freqs and runway patterns from airnav.com
 const CLASS_D_AIRPORTS = [
   {
@@ -118,7 +120,10 @@ function randomWind() {
   return { dir, speed }
 }
 
-export async function GET() {
+export async function GET(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   const airport            = pickRandom(CLASS_D_AIRPORTS)
   const rwyObj             = pickRandom(airport.runways)
   const aircraft           = pickRandom(AIRCRAFT)

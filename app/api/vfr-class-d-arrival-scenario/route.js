@@ -1,3 +1,5 @@
+import { requireSubscribed } from '@/lib/require-auth'
+
 const CLASS_D_AIRPORTS = [
   {
     id: 'KRDM', name: 'Redmond', state: 'OR',
@@ -108,7 +110,10 @@ function randomWind() {
   return { dir, speed }
 }
 
-export async function GET() {
+export async function GET(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   const airport            = pickRandom(CLASS_D_AIRPORTS)
   const rwyObj             = pickRandom(airport.runways)
   const aircraft           = pickRandom(AIRCRAFT)

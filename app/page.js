@@ -73,7 +73,7 @@ function HomeContent() {
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-white/10">
+      <nav className="flex items-center justify-between px-8 py-6 border-b border-white/10 bg-[#0a0f1e]" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.5rem)' }}>
         <div className="flex items-center gap-2">
           <span className="text-2xl">✈️</span>
           <span className="text-xl font-bold">Flight Levels</span>

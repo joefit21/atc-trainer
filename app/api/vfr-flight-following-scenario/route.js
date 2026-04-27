@@ -1,3 +1,5 @@
+import { requireSubscribed } from '@/lib/require-auth'
+
 // Geographic regions — facility, position references, and destinations are
 // all within ~200 nm of each other so scenarios make geographic sense.
 // altimeter_station: the city/airport name the controller identifies when issuing the altimeter
@@ -101,7 +103,8 @@ const REGIONS = [
   },
 ]
 
-const VFR_ALTITUDES = [3500, 4500, 5500, 6500, 7500, 8500, 9500]
+// Odd+500 = eastbound (0–179°), even+500 = westbound (180–359°) per 14 CFR 91.159
+const VFR_ALTITUDES = [3500, 4500, 5500, 6500, 7500, 8500, 9500, 10500]
 
 const APPROACH_DIRECTIONS = [
   'north', 'south', 'east', 'west',
@@ -142,7 +145,10 @@ function randomAltimeter() {
   return (whole / 100).toFixed(2)
 }
 
-export async function GET() {
+export async function GET(request) {
+  const { authError } = await requireSubscribed(request)
+  if (authError) return authError
+
   const region      = pickRandom(REGIONS)
   const aircraft    = pickRandom(AIRCRAFT)
   const tail        = generateTailNumber()
