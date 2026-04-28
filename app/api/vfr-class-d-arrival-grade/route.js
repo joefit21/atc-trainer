@@ -3,6 +3,25 @@ import { requireSubscribed } from '@/lib/require-auth'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+const PHONETIC_WORDS = new Set([
+  'alpha','bravo','charlie','delta','echo','foxtrot','golf','hotel','india',
+  'juliet','kilo','lima','mike','november','oscar','papa','quebec','romeo',
+  'sierra','tango','uniform','victor','whiskey','xray','yankee','zulu'
+])
+const AIRLINE_WORDS = new Set([
+  'american','united','southwest','jetblue','spirit','frontier',
+  'alaska','hawaiian','allegiant'
+])
+
+function callsignIsAbsent(pilotSaid, callsignSpoken) {
+  if (!pilotSaid || pilotSaid.trim() === '') return true
+  const text = pilotSaid.toLowerCase()
+  const tokens = callsignSpoken.toLowerCase().split(/\s+/)
+  const distinctive = tokens.filter(t => PHONETIC_WORDS.has(t) || AIRLINE_WORDS.has(t))
+  if (distinctive.length === 0) return !tokens.some(t => text.includes(t))
+  return !distinctive.some(t => text.includes(t))
+}
+
 export async function POST(request) {
   const { authError } = await requireSubscribed(request)
   if (authError) return authError
@@ -12,8 +31,11 @@ export async function POST(request) {
 
     const exchangeText = exchanges.map((ex, i) => {
       const base = `Exchange ${i + 1} — ${ex.phase.replace(/_/g, ' ')}\nSituation: ${ex.situation}\nPilot said: "${ex.pilot_said || '(nothing recorded)'}"`
-      if (ex.controller_said) return base + `\nController said: "${ex.controller_said}"`
-      return base
+      const withController = ex.controller_said ? base + `\nController said: "${ex.controller_said}"` : base
+      if (callsignIsAbsent(ex.pilot_said, scenario.callsign_spoken)) {
+        return withController + `\n⚠️ SYSTEM FLAG: Callsign COMPLETELY ABSENT — no phonetics or digits matching "${scenario.callsign_display}" found. Mandatory minimum 15-point deduction. Max score for this exchange: 82.`
+      }
+      return withController
     }).join('\n\n')
 
     const prompt = `You are a CFI and former air traffic controller evaluating a student pilot's radio calls during a Class D airport arrival. Be direct and practical, like a post-flight debrief.
