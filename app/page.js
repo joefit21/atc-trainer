@@ -90,13 +90,13 @@ function HomeContent() {
           Built by a CFI & former air traffic controller
         </div>
         <h1 className="text-5xl md:text-6xl font-bold max-w-3xl leading-tight mb-6">
-          Aviation English Practice <span className="text-blue-400">for Pilots Worldwide</span>
+          Stop Freezing on the Radio. <span className="text-blue-400">Practice ATC Calls Until They're Automatic.</span>
         </h1>
         <p className="text-gray-400 text-xl max-w-2xl mb-4">
-          Every pilot has felt it — the moment ATC responds and your mind goes blank. ICAO Radio Lab gives you a safe place to practice until the words come naturally, no matter where you learned to fly.
+          Every pilot has felt it — ATC calls your tail number and your mind goes blank. ICAO Radio Lab gives you a safe place to practice until the words come naturally.
         </p>
         <p className="text-gray-500 text-base max-w-xl mb-10">
-          Used by student pilots in India, the UAE, and beyond preparing for ICAO Level 4 English proficiency and real-world cockpit communications.
+          Built by a CFI and former controller. Practice ground, tower, flight following, and IFR clearances — real scenarios, real AI feedback, no instructor required.
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <a href="/demo" className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold transition">
@@ -152,12 +152,12 @@ function HomeContent() {
           <h2 className="text-2xl font-bold mb-8">Who uses ICAO Radio Lab?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { flag: "🇮🇳", region: "India", description: "Student pilots preparing for DGCA exams and international operations requiring ICAO English proficiency." },
-              { flag: "🇦🇪", region: "UAE & Middle East", description: "Pilots building careers with Gulf carriers where precision English radio communication is essential." },
-              { flag: "🌏", region: "Asia & Beyond", description: "Any pilot who flies, trains, or communicates in English as a second language." },
+              { icon: "🎓", region: "Student Pilots", description: "Learning to work a towered airport for the first time. Practice ground, tower, and pattern calls before you ever key the mic for real." },
+              { icon: "📋", region: "IFR Students", description: "Mastering clearance readbacks is one of the hardest parts of instrument training. Practice until CRAFT is second nature." },
+              { icon: "🌍", region: "International Students", description: "Training at a US flight school? Build radio confidence fast so you can focus on flying, not searching for words." },
             ].map((item, i) => (
               <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-6">
-                <div className="text-4xl mb-3">{item.flag}</div>
+                <div className="text-4xl mb-3">{item.icon}</div>
                 <div className="font-semibold mb-2">{item.region}</div>
                 <p className="text-gray-400 text-sm">{item.description}</p>
               </div>
@@ -241,6 +241,43 @@ function HomeContent() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="px-8 py-20 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {[
+            {
+              q: "How is this different from just listening to LiveATC?",
+              a: "LiveATC is passive — you're a spectator. ICAO Radio Lab puts you in the pilot seat. You hear the clearance, you read it back, and you get scored on exactly what you got right and what you missed. Listening builds familiarity. Responding under pressure builds confidence."
+            },
+            {
+              q: "Do I need a headset or microphone?",
+              a: "No headset required. You can practice by typing your readbacks, or speak into any device mic — your phone, laptop, or earbuds. Whatever you have works."
+            },
+            {
+              q: "I'm still a VFR student. Is this only for IFR pilots?",
+              a: "Most scenarios are VFR. You'll practice ground control taxi clearances, Class D tower calls, pattern work arrivals, and VFR flight following — every radio call you'll face before you ever file IFR. The IFR clearance module is one of five scenario types."
+            },
+            {
+              q: "What scenarios are included?",
+              a: "Five types: CTAF calls at non-towered airports, Class D departures (ground + tower), Class D arrivals (pattern entry + landing clearance), VFR flight following with approach control, and IFR clearance readbacks. Every session generates a new airport, callsign, and route."
+            },
+            {
+              q: "Will this actually help if I'm nervous on the radio?",
+              a: "That's exactly what it's built for. Nervousness comes from uncertainty — not knowing what to say, or whether you said it right. Repetition is the only cure. This gives you unlimited reps in a zero-pressure environment, so when ATC calls your tail number for real, the words come automatically."
+            },
+          ].map((item, i) => (
+            <details key={i} className="group bg-white/5 border border-white/10 rounded-xl">
+              <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none">
+                <span className="font-semibold pr-4">{item.q}</span>
+                <span className="text-gray-400 group-open:rotate-180 transition-transform flex-shrink-0 text-sm">▼</span>
+              </summary>
+              <p className="px-6 pb-5 text-gray-400 leading-relaxed">{item.a}</p>
+            </details>
+          ))}
         </div>
       </section>
 
