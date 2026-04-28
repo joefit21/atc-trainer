@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'ICAO Radio Lab — Pilot Radio Communication Practice',
+  title: 'ATC Radio Lab — Pilot Radio Communication Practice',
   description:
     'Practice real-world pilot radio communications with AI-powered scoring. CTAF, Class D departures and arrivals, VFR flight following, and IFR clearances. Built by a former ATC and CFI.',
   keywords: [
@@ -17,7 +17,7 @@ export const metadata = {
     'ATC readback practice',
   ],
   openGraph: {
-    title: 'ICAO Radio Lab — Pilot Radio Communication Practice',
+    title: 'ATC Radio Lab — Pilot Radio Communication Practice',
     description:
       'Practice real-world pilot radio communications with AI-powered scoring. Built by a former ATC and CFI.',
     url: 'https://practice.flight-levels.com/radio-lab',

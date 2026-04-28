@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
       title: article.title,
       description: article.description,
       url: `https://practice.flight-levels.com/study-guides/${slug}`,
-      siteName: 'ICAO Radio Lab',
+      siteName: 'ATC Radio Lab',
       type: 'article',
       publishedTime: article.date,
     },

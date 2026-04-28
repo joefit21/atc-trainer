@@ -723,7 +723,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'ctaf' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ATC Radio Lab</h1>
               <p className="text-gray-400">CTAF — Uncontrolled Airport Arrival</p>
             </div>
             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
@@ -781,7 +781,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'classd' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ATC Radio Lab</h1>
               <p className="text-gray-400">Class D — Departure from a Towered Airport</p>
             </div>
 
@@ -894,7 +894,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'classdarrival' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ATC Radio Lab</h1>
               <p className="text-gray-400">Class D — Arrival at a Towered Airport</p>
             </div>
 
@@ -1007,7 +1007,7 @@ export default function RadioLab() {
         {phase === 'ready' && scenarioType === 'flightfollowing' && scenario && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ATC Radio Lab</h1>
               <p className="text-gray-400">VFR Flight Following Request</p>
             </div>
 
@@ -1199,7 +1199,7 @@ export default function RadioLab() {
         {scenarioType === 'ifr' && (
           <div className="space-y-6">
             <div>
-              <h1 className="text-2xl font-bold mb-1">ICAO Radio Lab</h1>
+              <h1 className="text-2xl font-bold mb-1">ATC Radio Lab</h1>
               <p className="text-gray-400">IFR Clearance Readback</p>
             </div>
 

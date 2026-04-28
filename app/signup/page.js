@@ -119,7 +119,7 @@ function SignupForm() {
           }`}
         >
           <div className="text-xl mb-2">🎙️</div>
-          <div className="font-semibold text-sm text-white">ICAO Radio Lab</div>
+          <div className="font-semibold text-sm text-white">ATC Radio Lab</div>
           <div className="text-xs text-gray-400 mt-1">CTAF · Class D · Flight Following · IFR</div>
           <div className="text-blue-400 font-bold mt-2">{singlePrice}/mo</div>
         </button>
