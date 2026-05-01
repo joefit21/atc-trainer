@@ -51,27 +51,72 @@ function HomeContent() {
   const searchParams = useSearchParams()
 
   // Audio preview state
+  // status: 'idle' | 'loading' | 'ready' | 'played'
   const [groundPreview, setGroundPreview] = useState({ status: 'idle', text: '' })
   const [ifrPreview, setIfrPreview]       = useState({ status: 'idle', text: '' })
-  const groundAudioRef = useRef(null)
-  const ifrAudioRef    = useRef(null)
+  const groundAudioRef    = useRef(null)
+  const ifrAudioRef       = useRef(null)
+  const previewSectionRef = useRef(null)
+  const groundFetched     = useRef(false)
+  const ifrFetched        = useRef(false)
 
-  const playPreview = async (type) => {
-    const setter   = type === 'ground' ? setGroundPreview : setIfrPreview
-    const audioRef = type === 'ground' ? groundAudioRef  : ifrAudioRef
+  // Fetch audio (optionally auto-play when done)
+  const fetchPreview = async (type, andPlay = false) => {
+    const setter    = type === 'ground' ? setGroundPreview : setIfrPreview
+    const audioRef  = type === 'ground' ? groundAudioRef   : ifrAudioRef
+    const guard     = type === 'ground' ? groundFetched    : ifrFetched
+    if (guard.current) {
+      // Already fetched — just play
+      if (andPlay) audioRef.current?.play().catch(() => {})
+      if (andPlay) setter(p => ({ ...p, status: 'played' }))
+      return
+    }
+    guard.current = true
     setter(p => ({ ...p, status: 'loading' }))
     try {
       const res  = await fetch(`/api/demo-scenario?type=${type}`)
       const data = await res.json()
-      setter({ status: 'ready', text: data.clearance_text })
       if (audioRef.current) {
         audioRef.current.src = data.audio_url
         audioRef.current.load()
-        audioRef.current.play().catch(() => {})
+        if (andPlay) audioRef.current.play().catch(() => {})
       }
+      setter({ status: andPlay ? 'played' : 'ready', text: data.clearance_text })
     } catch {
+      guard.current = false
       setter(p => ({ ...p, status: 'idle' }))
     }
+  }
+
+  // Pre-fetch when the preview section scrolls into view
+  useEffect(() => {
+    const el = previewSectionRef.current
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          fetchPreview('ground')
+          fetchPreview('ifr')
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const playPreview = (type) => {
+    const preview  = type === 'ground' ? groundPreview : ifrPreview
+    const setter   = type === 'ground' ? setGroundPreview : setIfrPreview
+    const audioRef = type === 'ground' ? groundAudioRef   : ifrAudioRef
+    if (preview.status === 'loading') return
+    if (preview.status === 'ready' || preview.status === 'played') {
+      setter(p => ({ ...p, status: 'played' }))
+      audioRef.current?.play().catch(() => {})
+      return
+    }
+    fetchPreview(type, true)
   }
 
   useEffect(() => {
@@ -133,7 +178,7 @@ function HomeContent() {
       </section>
 
       {/* Audio Preview */}
-      <section className="px-8 py-16 max-w-3xl mx-auto">
+      <section ref={previewSectionRef} className="px-8 py-16 max-w-3xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-3">Hear what it sounds like</h2>
         <p className="text-gray-400 text-center mb-10 max-w-lg mx-auto">
           The same AI controller voice you'll practice with. Click to hear a real transmission.
@@ -199,7 +244,7 @@ function HomeContent() {
                   <div className="space-y-1 text-xs">
                     <div><span className="text-blue-400 font-bold">C</span> <span className="text-gray-500">Clearance limit:</span> <span className="text-gray-300">Houston Intercontinental</span></div>
                     <div><span className="text-blue-400 font-bold">R</span> <span className="text-gray-500">Route:</span> <span className="text-gray-300">PODDE Two departure, as filed</span></div>
-                    <div><span className="text-blue-400 font-bold">A</span> <span className="text-gray-500">Altitude:</span> <span className="text-gray-300">Climb/maintain 11,000 · Expect FL230</span></div>
+                    <div><span className="text-blue-400 font-bold">A</span> <span className="text-gray-500">Altitude:</span> <span className="text-gray-300">Climb/maintain 11,000 · Expect 15,000 (10 min out)</span></div>
                     <div><span className="text-blue-400 font-bold">F</span> <span className="text-gray-500">Frequency:</span> <span className="text-gray-300">124.3</span></div>
                     <div><span className="text-blue-400 font-bold">T</span> <span className="text-gray-500">Transponder:</span> <span className="text-gray-300">4532</span></div>
                   </div>
