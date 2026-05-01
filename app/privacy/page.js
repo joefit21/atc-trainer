@@ -10,7 +10,7 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">1. Information We Collect</h2>
-            <p>We collect the following information when you use ATC Trainer:</p>
+            <p>We collect the following information when you use ATC Clearance Trainer:</p>
             <ul className="list-disc list-inside mt-3 space-y-2 text-gray-400">
               <li><strong className="text-gray-300">Account information:</strong> Email address and password (encrypted) when you create an account</li>
               <li><strong className="text-gray-300">Payment information:</strong> Processed securely by Stripe. We do not store your credit card details.</li>
@@ -33,7 +33,7 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">3. Voice Recordings</h2>
-            <p>When you record a readback, your audio is sent to OpenAI's Whisper API for transcription. Audio is processed in real time and is not permanently stored by ATC Trainer or OpenAI beyond the duration of the transcription request.</p>
+            <p>When you record a readback, your audio is sent to OpenAI's Whisper API for transcription. Audio is processed in real time and is not permanently stored by ATC Clearance Trainer or OpenAI beyond the duration of the transcription request.</p>
           </section>
 
           <section>
@@ -66,7 +66,7 @@ export default function Privacy() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">8. Children's Privacy</h2>
-            <p>ATC Trainer is not directed at children under 13. We do not knowingly collect personal information from children under 13.</p>
+            <p>ATC Clearance Trainer is not directed at children under 13. We do not knowingly collect personal information from children under 13.</p>
           </section>
 
           <section>

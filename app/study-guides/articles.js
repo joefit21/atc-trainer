@@ -43,7 +43,7 @@ export const articles = [
         ],
       },
     ],
-    cta: 'ATC Radio Lab lets you practice IFR clearance readbacks with a realistic controller voice and instant feedback on exactly what you got right and what you missed. Try it free at practice.flight-levels.com/demo.',
+    cta: 'ATC Clearance Trainer lets you practice IFR clearance readbacks with a realistic controller voice and instant feedback on exactly what you got right and what you missed. Try it free at practice.flight-levels.com/demo.',
   },
 
   {
@@ -97,7 +97,7 @@ export const articles = [
         ],
       },
     ],
-    cta: 'ATC Radio Lab is built around this exact problem. Practice every type of ATC radio call — ground, tower, departure, en route — with a realistic controller voice and real-time feedback. Try it free at practice.flight-levels.com/demo.',
+    cta: 'ATC Clearance Trainer is built around this exact problem. Practice every type of ATC radio call — ground, tower, departure, en route — with a realistic controller voice and real-time feedback. Try it free at practice.flight-levels.com/demo.',
   },
 
   {
@@ -144,7 +144,7 @@ export const articles = [
         ],
       },
     ],
-    cta: 'ATC Radio Lab is designed for exactly this gap — building the repetition and automaticity that formal test prep doesn\'t cover. Practice real ATC scenarios with a native English controller voice until it feels natural. Try it free at practice.flight-levels.com/demo.',
+    cta: 'ATC Clearance Trainer is designed for exactly this gap — building the repetition and automaticity that formal test prep doesn\'t cover. Practice real ATC scenarios with a native English controller voice until it feels natural. Try it free at practice.flight-levels.com/demo.',
   },
 
   {
@@ -198,7 +198,7 @@ export const articles = [
         ],
       },
     ],
-    cta: 'ATC Radio Lab scores your readbacks the way a real controller would — identifying exactly what you got right, what you missed, and what was garbled. Try it free at practice.flight-levels.com/demo.',
+    cta: 'ATC Clearance Trainer scores your readbacks the way a real controller would — identifying exactly what you got right, what you missed, and what was garbled. Try it free at practice.flight-levels.com/demo.',
   },
 ]
 

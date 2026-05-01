@@ -10,12 +10,12 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-            <p>By creating an account or using ATC Trainer ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service.</p>
+            <p>By creating an account or using ATC Clearance Trainer ("the Service"), you agree to be bound by these Terms of Service. If you do not agree, please do not use the Service.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">2. Description of Service</h2>
-            <p>ATC Trainer is an aviation training tool that provides simulated ATC clearance practice scenarios, voice recording, AI-powered transcription, and readback scoring. It is intended for educational purposes only and does not replace formal flight training or instruction from a certified flight instructor.</p>
+            <p>ATC Clearance Trainer is an aviation training tool that provides simulated ATC clearance practice scenarios, voice recording, AI-powered transcription, and readback scoring. It is intended for educational purposes only and does not replace formal flight training or instruction from a certified flight instructor.</p>
           </section>
 
           <section>
@@ -35,17 +35,17 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">6. Intellectual Property</h2>
-            <p>All content, scenarios, audio, and software associated with ATC Trainer are the property of Flight Levels and are protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without written permission.</p>
+            <p>All content, scenarios, audio, and software associated with ATC Clearance Trainer are the property of Flight Levels and are protected by applicable intellectual property laws. You may not reproduce, distribute, or create derivative works without written permission.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">7. Disclaimer of Warranties</h2>
-            <p>The Service is provided "as is" without warranties of any kind. ATC Trainer does not guarantee that practice scenarios reflect current FAA procedures, that AI scoring is 100% accurate, or that use of the Service will result in passing any aviation checkride or proficiency test.</p>
+            <p>The Service is provided "as is" without warranties of any kind. ATC Clearance Trainer does not guarantee that practice scenarios reflect current FAA procedures, that AI scoring is 100% accurate, or that use of the Service will result in passing any aviation checkride or proficiency test.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">8. Limitation of Liability</h2>
-            <p>To the maximum extent permitted by law, ATC Trainer and its owners shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
+            <p>To the maximum extent permitted by law, ATC Clearance Trainer and its owners shall not be liable for any indirect, incidental, or consequential damages arising from your use of the Service.</p>
           </section>
 
           <section>

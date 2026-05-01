@@ -26,7 +26,7 @@ export default function Login() {
     <main className="min-h-screen bg-[#0a0f1e] text-white flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <a href="/" className="text-2xl font-bold">🎙️ ATC Radio Lab</a>
+          <a href="/" className="text-2xl font-bold">🎙️ ATC Clearance Trainer</a>
           <h1 className="text-3xl font-bold mt-6 mb-2">Welcome back</h1>
           <p className="text-gray-400">Log in to continue practicing</p>
         </div>

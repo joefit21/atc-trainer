@@ -10,7 +10,7 @@ export const metadata = {
     title: 'Study Guides — ATC Radio Communication for Pilots',
     description: 'Free guides on ATC radio communication — written by a CFI and former air traffic controller.',
     url: 'https://practice.flight-levels.com/study-guides',
-    siteName: 'ATC Radio Lab',
+    siteName: 'ATC Clearance Trainer',
     type: 'website',
   },
 }

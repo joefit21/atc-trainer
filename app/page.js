@@ -13,7 +13,7 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'SoftwareApplication',
-      name: 'ATC Radio Lab',
+      name: 'ATC Clearance Trainer',
       applicationCategory: 'EducationalApplication',
       operatingSystem: 'Web',
       url: 'https://practice.flight-levels.com',
@@ -22,7 +22,7 @@ const jsonLd = {
       offers: [
         {
           '@type': 'Offer',
-          name: 'ATC Radio Lab',
+          name: 'ATC Clearance Trainer',
           price: '29.00',
           priceCurrency: 'USD',
           priceSpecification: { '@type': 'RecurringChargeSpecification', billingDuration: 'P1M', billingIncrement: 1 },
@@ -39,7 +39,7 @@ const jsonLd = {
     {
       '@type': 'WebSite',
       url: 'https://practice.flight-levels.com',
-      name: 'ATC Radio Lab — Flight Levels',
+      name: 'ATC Clearance Trainer — Flight Levels',
       description: 'Practice ATC radio calls and readbacks with AI-powered feedback. Built for student pilots, IFR students, and anyone who wants to sound confident on the radio.',
     },
   ],
@@ -93,7 +93,7 @@ function HomeContent() {
           Stop Freezing on the Radio. <span className="text-blue-400">Practice ATC Calls Until They're Automatic.</span>
         </h1>
         <p className="text-gray-400 text-xl max-w-2xl mb-4">
-          Every pilot has felt it — ATC calls your tail number and your mind goes blank. ATC Radio Lab gives you a safe place to practice until the words come naturally.
+          Every pilot has felt it — ATC calls your tail number and your mind goes blank. ATC Clearance Trainer gives you a safe place to practice until the words come naturally.
         </p>
         <p className="text-gray-500 text-base max-w-xl mb-10">
           Built by a CFI and former controller. Practice ground, tower, flight following, and IFR clearances — real scenarios, real AI feedback, no instructor required.
@@ -149,7 +149,7 @@ function HomeContent() {
       {/* Who this is for */}
       <section className="px-8 py-12 bg-white/5">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-8">Who uses ATC Radio Lab?</h2>
+          <h2 className="text-2xl font-bold mb-8">Who uses ATC Clearance Trainer?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { icon: "🎓", region: "Student Pilots", description: "Learning to work a towered airport for the first time. Practice ground, tower, and pattern calls before you ever key the mic for real." },
@@ -178,7 +178,7 @@ function HomeContent() {
             <p className="text-xs text-blue-400 uppercase tracking-widest mb-2">Built by a human</p>
             <h2 className="text-2xl font-bold mb-4">Hi, I'm Joe.</h2>
             <p className="text-gray-400 leading-relaxed">
-              I started as a flight instructor, teaching students how to fly — and how to talk on the radio. Later I crossed to the other side of the frequency and worked as an air traffic controller. I built ATC Radio Lab because I know exactly what controllers need to hear, and I wanted every pilot to have a way to practice until it feels natural.
+              I started as a flight instructor, teaching students how to fly — and how to talk on the radio. Later I crossed to the other side of the frequency and worked as an air traffic controller. I built ATC Clearance Trainer because I know exactly what controllers need to hear, and I wanted every pilot to have a way to practice until it feels natural.
             </p>
           </div>
         </div>
@@ -194,7 +194,7 @@ function HomeContent() {
             {/* ATC Trainer only */}
             <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
               <div className="text-4xl font-bold mb-1">{price}<span className="text-xl text-gray-400">/mo</span></div>
-              <p className="text-gray-400 text-sm mb-1">ATC Radio Lab only</p>
+              <p className="text-gray-400 text-sm mb-1">ATC Clearance Trainer only</p>
               <p className="text-gray-500 text-xs mb-6">Less than one hour of flight instruction</p>
               <ul className="text-left space-y-2 mb-8 flex-1">
                 {[
@@ -210,7 +210,7 @@ function HomeContent() {
                 ))}
               </ul>
               <a href={signupUrl} className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
-                Get ATC Radio Lab
+                Get ATC Clearance Trainer
               </a>
             </div>
 
@@ -224,7 +224,7 @@ function HomeContent() {
               <p className="text-gray-500 text-xs mb-6">Save $9/mo vs. buying separately</p>
               <ul className="text-left space-y-2 mb-8 flex-1">
                 {[
-                  'Everything in ATC Radio Lab',
+                  'Everything in ATC Clearance Trainer',
                   'Full access to Checkride Prep AI',
                   'Practice oral exams + radio comms',
                   'One subscription, two tools',
@@ -251,7 +251,7 @@ function HomeContent() {
           {[
             {
               q: "How is this different from just listening to LiveATC?",
-              a: "LiveATC is passive — you're a spectator. ATC Radio Lab puts you in the pilot seat. You hear the clearance, you read it back, and you get scored on exactly what you got right and what you missed. Listening builds familiarity. Responding under pressure builds confidence."
+              a: "LiveATC is passive — you're a spectator. ATC Clearance Trainer puts you in the pilot seat. You hear the clearance, you read it back, and you get scored on exactly what you got right and what you missed. Listening builds familiarity. Responding under pressure builds confidence."
             },
             {
               q: "Do I need a headset or microphone?",

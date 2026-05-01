@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 export const metadata = {
   metadataBase: new URL("https://practice.flight-levels.com"),
   title: {
-    default: "ATC Radio Lab — Practice ATC Radio Calls for Pilots",
-    template: "%s | ATC Radio Lab",
+    default: "ATC Clearance Trainer — Practice ATC Calls & Clearances for Pilots",
+    template: "%s | ATC Clearance Trainer",
   },
   description:
     "Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller. Perfect for student pilots, IFR students, and international pilots training in the US.",
@@ -46,18 +46,18 @@ export const metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "ATC Radio Lab — Practice ATC Radio Calls for Pilots",
+    title: "ATC Clearance Trainer — Practice ATC Radio Calls for Pilots",
     description:
       "Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller.",
     url: "https://practice.flight-levels.com",
-    siteName: "ATC Radio Lab — Flight Levels",
+    siteName: "ATC Clearance Trainer — Flight Levels",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/Practice_OG.jpg", width: 1200, height: 630, alt: "ATC Radio Lab — Practice ATC Radio Calls for Pilots" }],
+    images: [{ url: "/Practice_OG.jpg", width: 1200, height: 630, alt: "ATC Clearance Trainer — Practice ATC Radio Calls for Pilots" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATC Radio Lab — Practice ATC Radio Calls for Pilots",
+    title: "ATC Clearance Trainer — Practice ATC Radio Calls for Pilots",
     description:
       "Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller.",
   },
