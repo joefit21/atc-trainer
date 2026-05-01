@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 const REGIONAL_PRICE = {
@@ -49,6 +49,30 @@ function HomeContent() {
   const [price, setPrice] = useState('$29')
   const [region, setRegion] = useState('default')
   const searchParams = useSearchParams()
+
+  // Audio preview state
+  const [groundPreview, setGroundPreview] = useState({ status: 'idle', text: '' })
+  const [ifrPreview, setIfrPreview]       = useState({ status: 'idle', text: '' })
+  const groundAudioRef = useRef(null)
+  const ifrAudioRef    = useRef(null)
+
+  const playPreview = async (type) => {
+    const setter   = type === 'ground' ? setGroundPreview : setIfrPreview
+    const audioRef = type === 'ground' ? groundAudioRef  : ifrAudioRef
+    setter(p => ({ ...p, status: 'loading' }))
+    try {
+      const res  = await fetch(`/api/demo-scenario?type=${type}`)
+      const data = await res.json()
+      setter({ status: 'ready', text: data.clearance_text })
+      if (audioRef.current) {
+        audioRef.current.src = data.audio_url
+        audioRef.current.load()
+        audioRef.current.play().catch(() => {})
+      }
+    } catch {
+      setter(p => ({ ...p, status: 'idle' }))
+    }
+  }
 
   useEffect(() => {
     const override = searchParams.get('region')
@@ -106,6 +130,89 @@ function HomeContent() {
             Subscribe — {price}/mo
           </a>
         </div>
+      </section>
+
+      {/* Audio Preview */}
+      <section className="px-8 py-16 max-w-3xl mx-auto">
+        <h2 className="text-3xl font-bold text-center mb-3">Hear what it sounds like</h2>
+        <p className="text-gray-400 text-center mb-10 max-w-lg mx-auto">
+          The same AI controller voice you'll practice with. Click to hear a real transmission.
+        </p>
+        <div className="grid md:grid-cols-2 gap-6">
+
+          {/* VFR Ground Taxi */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col">
+            <div className="text-2xl mb-3">🛫</div>
+            <p className="text-xs text-blue-400 uppercase tracking-widest mb-1">VFR — Class D</p>
+            <h3 className="font-semibold mb-1">Ground Taxi Clearance</h3>
+            <p className="text-gray-500 text-sm mb-5 flex-1">You've called ground control ready to taxi. Hear what they say back — then you'd read it back.</p>
+            <audio ref={groundAudioRef} />
+            <button
+              onClick={() => playPreview('ground')}
+              disabled={groundPreview.status === 'loading'}
+              className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-60 text-white px-6 py-3 rounded-lg font-semibold transition w-full"
+            >
+              {groundPreview.status === 'loading'
+                ? <span className="animate-pulse">Loading audio...</span>
+                : '▶ Play Clearance'}
+            </button>
+            {groundPreview.text && (
+              <div className="mt-4 bg-black/20 rounded-lg px-4 py-3">
+                <p className="text-xs text-gray-500 mb-1">Ground said:</p>
+                <p className="text-sm text-gray-200 italic">&ldquo;{groundPreview.text}&rdquo;</p>
+                <button
+                  onClick={() => playPreview('ground')}
+                  className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition"
+                >▶ Play again</button>
+              </div>
+            )}
+          </div>
+
+          {/* IFR Clearance */}
+          <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex flex-col">
+            <div className="text-2xl mb-3">📋</div>
+            <p className="text-xs text-blue-400 uppercase tracking-widest mb-1">IFR — CRAFT Clearance</p>
+            <h3 className="font-semibold mb-1">IFR Departure Clearance</h3>
+            <p className="text-gray-500 text-sm mb-5 flex-1">A full IFR clearance — write it down in CRAFT format, then read it back verbatim.</p>
+            <audio ref={ifrAudioRef} />
+            <button
+              onClick={() => playPreview('ifr')}
+              disabled={ifrPreview.status === 'loading'}
+              className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-60 text-white px-6 py-3 rounded-lg font-semibold transition w-full"
+            >
+              {ifrPreview.status === 'loading'
+                ? <span className="animate-pulse">Loading audio...</span>
+                : '▶ Play Clearance'}
+            </button>
+            {ifrPreview.text && (
+              <div className="mt-4 bg-black/20 rounded-lg px-4 py-3 space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Clearance delivery said:</p>
+                  <p className="text-sm text-gray-200 italic">&ldquo;{ifrPreview.text}&rdquo;</p>
+                  <button
+                    onClick={() => playPreview('ifr')}
+                    className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition"
+                  >▶ Play again</button>
+                </div>
+                <div className="pt-3 border-t border-white/10">
+                  <p className="text-xs text-gray-500 mb-2">CRAFT breakdown:</p>
+                  <div className="space-y-1 text-xs">
+                    <div><span className="text-blue-400 font-bold">C</span> <span className="text-gray-500">Clearance limit:</span> <span className="text-gray-300">Houston Intercontinental</span></div>
+                    <div><span className="text-blue-400 font-bold">R</span> <span className="text-gray-500">Route:</span> <span className="text-gray-300">PODDE Two departure, as filed</span></div>
+                    <div><span className="text-blue-400 font-bold">A</span> <span className="text-gray-500">Altitude:</span> <span className="text-gray-300">Climb/maintain 11,000 · Expect FL230</span></div>
+                    <div><span className="text-blue-400 font-bold">F</span> <span className="text-gray-500">Frequency:</span> <span className="text-gray-300">124.3</span></div>
+                    <div><span className="text-blue-400 font-bold">T</span> <span className="text-gray-500">Transponder:</span> <span className="text-gray-300">4532</span></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+        <p className="text-center text-gray-500 text-sm mt-8">
+          Want to practice reading these back?{' '}
+          <a href="/demo" className="text-blue-400 hover:text-blue-300 transition">Try the free demo →</a>
+        </p>
       </section>
 
       {/* How It Works */}
