@@ -74,13 +74,13 @@ export default function RadioLab() {
   const [debrief, setDebrief]           = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
 
-  // ── recording ────────────────────────────────────────────────────────────────
+  // ── recording / input ────────────────────────────────────────────────────────
   const [isRecording, setIsRecording]       = useState(false)
   const [isTranscribing, setIsTranscribing] = useState(false)
   const [transcriptionFailed, setTranscriptionFailed] = useState(false)
-  const mediaRecorderRef  = useRef(null)
-  const audioChunksRef    = useRef([])
-  const submitFnRef       = useRef(null)
+  const [inputText, setInputText]           = useState('')
+  const mediaRecorderRef = useRef(null)
+  const audioChunksRef   = useRef([])
 
   // ── CTAF state ───────────────────────────────────────────────────────────────
   const [ctafStep, setCtafStep]   = useState(0)
@@ -233,9 +233,9 @@ export default function RadioLab() {
   }
 
   // ── recording helpers ─────────────────────────────────────────────────────────
-  const startRecording = async (onComplete) => {
+  const startRecording = async () => {
     setTranscriptionFailed(false)
-    submitFnRef.current = onComplete
+    setInputText('')
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
       mediaRecorderRef.current = new MediaRecorder(stream)
@@ -250,7 +250,7 @@ export default function RadioLab() {
           const res     = await authedFetch('/api/transcribe', { method: 'POST', body: fd })
           const { text } = await res.json()
           setIsTranscribing(false)
-          if (submitFnRef.current) submitFnRef.current(text || '')
+          setInputText(text || '')
         } catch {
           setIsTranscribing(false)
           setTranscriptionFailed(true)
@@ -600,33 +600,58 @@ export default function RadioLab() {
     }
   }
 
-  // ── recording UI ──────────────────────────────────────────────────────────────
-  const RecordingPanel = ({ onStart }) => (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
-      {!isRecording && !isTranscribing && !transcriptionFailed && (
-        <button onClick={() => startRecording(onStart)} className="flex items-center gap-3 bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
-          🎙️ Record Your Call
-        </button>
-      )}
-      {isRecording && (
-        <div className="space-y-3">
-          <button onClick={stopRecording} className="flex items-center gap-3 bg-red-700 px-6 py-3 rounded-lg font-semibold animate-pulse">
-            ⏹ Stop Recording
+  // ── input panel (type or speak) ───────────────────────────────────────────────
+  const InputPanel = ({ onSubmit }) => {
+    const handleSubmit = (e) => {
+      e.preventDefault()
+      if (!inputText.trim() || isRecording || isTranscribing) return
+      const text = inputText.trim()
+      setInputText('')
+      setTranscriptionFailed(false)
+      onSubmit(text)
+    }
+    return (
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={inputText}
+            onChange={e => setInputText(e.target.value)}
+            disabled={isRecording || isTranscribing}
+            placeholder={
+              isRecording    ? 'Listening...' :
+              isTranscribing ? 'Transcribing...' :
+              'Type your readback, or tap 🎙️ to speak'
+            }
+            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 disabled:opacity-50"
+          />
+          <button
+            type="button"
+            onClick={isRecording ? stopRecording : startRecording}
+            disabled={isTranscribing}
+            title={isRecording ? 'Stop recording' : 'Speak your readback'}
+            className={`px-4 py-3 rounded-xl font-semibold transition disabled:opacity-50 ${
+              isRecording
+                ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+                : 'bg-white/10 hover:bg-white/20 border border-white/20 text-white'
+            }`}
+          >
+            {isRecording ? '⏹' : isTranscribing ? '⏳' : '🎙️'}
           </button>
-          <p className="text-red-400 text-sm">Recording... make your call now.</p>
-        </div>
-      )}
-      {isTranscribing && <p className="text-gray-400 text-sm animate-pulse">Processing...</p>}
-      {transcriptionFailed && (
-        <div className="space-y-3">
-          <p className="text-red-400 text-sm">Transcription failed — please try again.</p>
-          <button onClick={() => setTranscriptionFailed(false)} className="flex items-center gap-3 bg-red-500 hover:bg-red-600 px-6 py-3 rounded-lg font-semibold transition">
-            🎙️ Try Again
+          <button
+            type="submit"
+            disabled={!inputText.trim() || isRecording || isTranscribing}
+            className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-semibold transition"
+          >
+            Submit
           </button>
         </div>
-      )}
-    </div>
-  )
+        {transcriptionFailed && (
+          <p className="text-red-400 text-sm">Transcription failed — please try again or type your readback.</p>
+        )}
+      </form>
+    )
+  }
 
   // ── debrief card ──────────────────────────────────────────────────────────────
   const DebriefCard = ({ cf, index, steps, calls }) => (
@@ -771,7 +796,7 @@ export default function RadioLab() {
               <span className="text-gray-500">Runway <span className="text-white font-medium">{scenario.runway} {scenario.pattern}</span></span>
               <span className="text-gray-500">Callsign <span className="text-white font-medium">{scenario.callsign_display}</span></span>
             </div>
-            <RecordingPanel onStart={ctafSaveAndAdvance} />
+            <InputPanel onSubmit={ctafSaveAndAdvance} />
           </div>
         )}
 
@@ -883,7 +908,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <RecordingPanel onStart={classDSubmitCall} />
+              <InputPanel onSubmit={classDSubmitCall} />
             )}
           </div>
         )}
@@ -996,7 +1021,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <RecordingPanel onStart={classDArrivalSubmitCall} />
+              <InputPanel onSubmit={classDArrivalSubmitCall} />
             )}
           </div>
         )}
@@ -1107,7 +1132,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <RecordingPanel onStart={ffSubmitCall} />
+              <InputPanel onSubmit={ffSubmitCall} />
             )}
           </div>
         )}
@@ -1237,7 +1262,7 @@ export default function RadioLab() {
                 {!ifrShowResults && (
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Step 2 — Record Your Readback</h2>
-                    <RecordingPanel onStart={ifrSubmitCall} />
+                    <InputPanel onSubmit={ifrSubmitCall} />
                     {ifrIsGrading && <p className="text-gray-400 mt-3 text-sm animate-pulse">Grading your readback...</p>}
                   </div>
                 )}
