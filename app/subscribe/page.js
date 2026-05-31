@@ -50,9 +50,12 @@ export default function Subscribe() {
         return
       }
 
-      // Load the monthly offering
+      // Load the monthly offering — fall back to ATC Trainer offering by name
       const offerings = await Purchases.getOfferings()
-      const pkg = offerings?.current?.monthly ?? null
+      const pkg = offerings?.current?.monthly
+        ?? offerings?.all?.['default - ATC Trainer']?.monthly
+        ?? offerings?.all?.['default - ATC Trainer']?.availablePackages?.[0]
+        ?? null
       setMonthlyPackage(pkg)
     } catch (e) {
       console.error('RC init error:', e)
@@ -67,7 +70,10 @@ export default function Subscribe() {
       let pkg = monthlyPackage
       if (!pkg) {
         const offerings = await Purchases.getOfferings()
-        pkg = offerings?.current?.monthly ?? null
+        pkg = offerings?.current?.monthly
+          ?? offerings?.all?.['default - ATC Trainer']?.monthly
+          ?? offerings?.all?.['default - ATC Trainer']?.availablePackages?.[0]
+          ?? null
         setMonthlyPackage(pkg)
       }
       if (!pkg) {
