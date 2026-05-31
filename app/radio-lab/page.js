@@ -27,8 +27,8 @@ const DEMO_SCENARIOS = {
       { index: 0, phase: 'inbound_10',  situation: 'You are 10 miles south of Auburn at 3,400 ft MSL, inbound for landing. Runway in use is 7, left traffic. CTAF is 122.8.', hint: 'Say: "Auburn traffic", callsign, distance and direction, intentions, runway.' },
       { index: 1, phase: 'entering_45', situation: 'You are entering the 45° to the left downwind for Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", callsign, "entering 45 left downwind", runway, "Auburn".' },
       { index: 2, phase: 'base',        situation: 'You are turning left base for Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", callsign, "left base runway 7", "Auburn".' },
-      { index: 3, phase: 'final',       situation: 'You are turning final for Runway 7 at Auburn, full stop.', hint: 'Say: "Auburn traffic", type, callsign, "final runway 7", full stop, "Auburn".' },
-      { index: 4, phase: 'clear_runway',situation: 'You have landed and are clear of Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", type, callsign, "clear of runway 7", "Auburn".' },
+      { index: 3, phase: 'final',       situation: 'You are turning final for Runway 7 at Auburn, full stop.', hint: 'Say: "Auburn traffic", callsign, "final runway 7", full stop, "Auburn".' },
+      { index: 4, phase: 'clear_runway',situation: 'You have landed and are clear of Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", callsign, "clear of runway 7", "Auburn".' },
     ],
   },
   classd: {
@@ -56,6 +56,58 @@ const DEMO_SCENARIOS = {
     position_reference: 'Auburn', position_direction: 'south', position_distance: 12,
     altitude: 5500, altimeter: '30.04',
   },
+}
+
+function InputPanel({ onSubmit, inputText, setInputText, isRecording, isTranscribing, transcriptionFailed, setTranscriptionFailed, startRecording, stopRecording }) {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!inputText.trim() || isRecording || isTranscribing) return
+    const text = inputText.trim()
+    setInputText('')
+    setTranscriptionFailed(false)
+    onSubmit(text)
+  }
+  return (
+    <form onSubmit={handleSubmit} className="space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={inputText}
+          onChange={e => setInputText(e.target.value)}
+          disabled={isRecording || isTranscribing}
+          placeholder={
+            isRecording    ? 'Listening...' :
+            isTranscribing ? 'Transcribing...' :
+            'Type your readback, or tap 🎙️ to speak'
+          }
+          className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 disabled:opacity-50"
+        />
+        <button
+          type="button"
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={isTranscribing}
+          title={isRecording ? 'Stop recording' : 'Speak your readback'}
+          className={`px-4 py-3 rounded-xl font-semibold transition disabled:opacity-50 ${
+            isRecording
+              ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
+              : 'bg-white/10 hover:bg-white/20 border border-white/20 text-white'
+          }`}
+        >
+          {isRecording ? '⏹' : isTranscribing ? '⏳' : '🎙️'}
+        </button>
+        <button
+          type="submit"
+          disabled={!inputText.trim() || isRecording || isTranscribing}
+          className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-semibold transition"
+        >
+          Submit
+        </button>
+      </div>
+      {transcriptionFailed && (
+        <p className="text-red-400 text-sm">Transcription failed — please try again or type your readback.</p>
+      )}
+    </form>
+  )
 }
 
 export default function RadioLab() {
@@ -613,58 +665,6 @@ export default function RadioLab() {
   }
 
   // ── input panel (type or speak) ───────────────────────────────────────────────
-  const InputPanel = ({ onSubmit }) => {
-    const handleSubmit = (e) => {
-      e.preventDefault()
-      if (!inputText.trim() || isRecording || isTranscribing) return
-      const text = inputText.trim()
-      setInputText('')
-      setTranscriptionFailed(false)
-      onSubmit(text)
-    }
-    return (
-      <form onSubmit={handleSubmit} className="space-y-2">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={inputText}
-            onChange={e => setInputText(e.target.value)}
-            disabled={isRecording || isTranscribing}
-            placeholder={
-              isRecording    ? 'Listening...' :
-              isTranscribing ? 'Transcribing...' :
-              'Type your readback, or tap 🎙️ to speak'
-            }
-            className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 disabled:opacity-50"
-          />
-          <button
-            type="button"
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isTranscribing}
-            title={isRecording ? 'Stop recording' : 'Speak your readback'}
-            className={`px-4 py-3 rounded-xl font-semibold transition disabled:opacity-50 ${
-              isRecording
-                ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
-                : 'bg-white/10 hover:bg-white/20 border border-white/20 text-white'
-            }`}
-          >
-            {isRecording ? '⏹' : isTranscribing ? '⏳' : '🎙️'}
-          </button>
-          <button
-            type="submit"
-            disabled={!inputText.trim() || isRecording || isTranscribing}
-            className="bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white px-5 py-3 rounded-xl font-semibold transition"
-          >
-            Submit
-          </button>
-        </div>
-        {transcriptionFailed && (
-          <p className="text-red-400 text-sm">Transcription failed — please try again or type your readback.</p>
-        )}
-      </form>
-    )
-  }
-
   // ── debrief card ──────────────────────────────────────────────────────────────
   const DebriefCard = ({ cf, index, steps, calls }) => (
     <div className={`border rounded-2xl p-5 bg-white/3 ${scoreBorder(cf.score)}`}>
@@ -808,7 +808,7 @@ export default function RadioLab() {
               <span className="text-gray-500">Runway <span className="text-white font-medium">{scenario.runway} {scenario.pattern}</span></span>
               <span className="text-gray-500">Callsign <span className="text-white font-medium">{scenario.callsign_display}</span></span>
             </div>
-            <InputPanel onSubmit={ctafSaveAndAdvance} />
+            <InputPanel onSubmit={ctafSaveAndAdvance} inputText={inputText} setInputText={setInputText} isRecording={isRecording} isTranscribing={isTranscribing} transcriptionFailed={transcriptionFailed} setTranscriptionFailed={setTranscriptionFailed} startRecording={startRecording} stopRecording={stopRecording} />
           </div>
         )}
 
@@ -920,7 +920,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <InputPanel onSubmit={classDSubmitCall} />
+              <InputPanel onSubmit={classDSubmitCall} inputText={inputText} setInputText={setInputText} isRecording={isRecording} isTranscribing={isTranscribing} transcriptionFailed={transcriptionFailed} setTranscriptionFailed={setTranscriptionFailed} startRecording={startRecording} stopRecording={stopRecording} />
             )}
           </div>
         )}
@@ -1033,7 +1033,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <InputPanel onSubmit={classDArrivalSubmitCall} />
+              <InputPanel onSubmit={classDArrivalSubmitCall} inputText={inputText} setInputText={setInputText} isRecording={isRecording} isTranscribing={isTranscribing} transcriptionFailed={transcriptionFailed} setTranscriptionFailed={setTranscriptionFailed} startRecording={startRecording} stopRecording={stopRecording} />
             )}
           </div>
         )}
@@ -1144,7 +1144,7 @@ export default function RadioLab() {
             </div>
 
             {!controllerLoading && (
-              <InputPanel onSubmit={ffSubmitCall} />
+              <InputPanel onSubmit={ffSubmitCall} inputText={inputText} setInputText={setInputText} isRecording={isRecording} isTranscribing={isTranscribing} transcriptionFailed={transcriptionFailed} setTranscriptionFailed={setTranscriptionFailed} startRecording={startRecording} stopRecording={stopRecording} />
             )}
           </div>
         )}
@@ -1274,7 +1274,7 @@ export default function RadioLab() {
                 {!ifrShowResults && (
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                     <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Step 2 — Record Your Readback</h2>
-                    <InputPanel onSubmit={ifrSubmitCall} />
+                    <InputPanel onSubmit={ifrSubmitCall} inputText={inputText} setInputText={setInputText} isRecording={isRecording} isTranscribing={isTranscribing} transcriptionFailed={transcriptionFailed} setTranscriptionFailed={setTranscriptionFailed} startRecording={startRecording} stopRecording={stopRecording} />
                     {ifrIsGrading && <p className="text-gray-400 mt-3 text-sm animate-pulse">Grading your readback...</p>}
                   </div>
                 )}
