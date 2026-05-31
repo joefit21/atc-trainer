@@ -376,9 +376,9 @@ export default function RadioLab() {
   const classDGetHint = (step) => {
     if (!scenario) return ''
     switch (step) {
-      case 0: return `Say: "${scenario.airport_name} Ground", aircraft type, callsign, your position (${scenario.position}), "with Information ${scenario.atis.letter}", and your intended departure (${scenario.departure_intention}). Ground will assign your runway.`
+      case 0: return `Say: "${scenario.airport_name} Ground", callsign, your position (${scenario.position}), "with Information ${scenario.atis.letter}", and your intended departure (${scenario.departure_intention}). Ground will assign your runway.`
       case 1: return `Write down what Ground said, then read it back: callsign, assigned runway, taxiway route, and any hold short instructions.`
-      case 2: return `Say: "${scenario.airport_name} Tower", aircraft type, callsign, "holding short Runway ${scenario.runway}", ready for departure, and your departure direction (${scenario.departure_intention}). Do not reference ATIS again.`
+      case 2: return `Say: "${scenario.airport_name} Tower", callsign, "holding short Runway ${scenario.runway}", ready for departure, and your departure direction (${scenario.departure_intention}). Do not reference ATIS again.`
       case 3: return `Write down what Tower said, then read it back: callsign, "cleared for takeoff Runway ${scenario.runway}", and any heading instructions issued.`
       default: return ''
     }
@@ -407,7 +407,7 @@ export default function RadioLab() {
   const classDArrivalGetHint = (step) => {
     if (!scenario) return ''
     switch (step) {
-      case 0: return `Say: "${scenario.airport_name} Tower", aircraft type, callsign, distance and direction (${scenario.approach_distance} miles ${scenario.approach_direction}), altitude (${scenario.approach_altitude.toLocaleString()} ft), "with Information ${scenario.atis.letter}", inbound for landing.`
+      case 0: return `Say: "${scenario.airport_name} Tower", callsign, distance and direction (${scenario.approach_distance} miles ${scenario.approach_direction}), altitude (${scenario.approach_altitude.toLocaleString()} ft), "with Information ${scenario.atis.letter}", inbound for landing.`
       case 1: return `Read back: callsign, entry type and runway (e.g., "left downwind runway ${scenario.runway}"), and the reporting point — either "midfield" or "three-mile final."`
       case 2: return `Callsign only — no need to say "${scenario.airport_name} Tower." Report the position Tower asked for (midfield downwind or three-mile final) and include the runway number.`
       case 3: return `Read back: callsign, "cleared to land runway ${scenario.runway}", and wind if Tower stated it.`
