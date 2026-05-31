@@ -1,7 +1,8 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { Capacitor } from '@capacitor/core'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -73,7 +74,7 @@ export default function Login() {
 
         <p className="text-center text-gray-400 mt-6">
           Don't have an account?{' '}
-          <a href="/signup" className="text-blue-400 hover:text-blue-300">Sign up</a>
+          <a href={Capacitor.isNativePlatform() ? '/subscribe' : '/signup'} className="text-blue-400 hover:text-blue-300">Sign up</a>
         </p>
       </div>
     </main>
