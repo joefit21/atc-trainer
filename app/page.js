@@ -322,7 +322,7 @@ function HomeContent() {
       <section className="px-8 py-20 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row items-center gap-10">
           <img
-            src="https://www.flight-levels.com/joe-cockpit.png"
+            src="https://www.flight-levels.com/joe-cockpit.jpg"
             alt="Joe Mattison, CFI and former air traffic controller"
             className="w-48 h-48 rounded-full object-cover object-top flex-shrink-0 border-2 border-white/10"
           />

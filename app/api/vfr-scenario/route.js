@@ -69,31 +69,31 @@ export async function GET(request) {
       index: 0,
       phase: 'inbound_10',
       situation: `You are 10 miles ${approachDir} of ${airport.name} at ${approachAlt.toLocaleString()} ft MSL, inbound for landing. Runway in use is ${runway}, ${pattern} traffic. CTAF is ${airport.ctaf}.`,
-      hint: `Say: "${airport.name} traffic", aircraft type, callsign, distance and direction from field, intentions, and runway number.`,
+      hint: `Say: "${airport.name} traffic", callsign, distance and direction from field, intentions, and runway number.`,
     },
     {
       index: 1,
       phase: 'entering_45',
       situation: `You are entering the 45° to the ${pattern} downwind for Runway ${runway} at ${airport.name}.`,
-      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "entering 45" or "45 for the ${pattern} downwind", runway, and "${airport.name}".`,
+      hint: `Say: "${airport.name} traffic", callsign, "entering 45" or "45 for the ${pattern} downwind", runway, and "${airport.name}".`,
     },
     {
       index: 2,
       phase: 'base',
       situation: `You are turning ${pattern} base for Runway ${runway} at ${airport.name}.`,
-      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "${pattern} base, runway ${runway}", and "${airport.name}".`,
+      hint: `Say: "${airport.name} traffic", callsign, "${pattern} base, runway ${runway}", and "${airport.name}".`,
     },
     {
       index: 3,
       phase: 'final',
       situation: `You are turning final for Runway ${runway} at ${airport.name}, full stop.`,
-      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "final, runway ${runway}", full stop, and "${airport.name}".`,
+      hint: `Say: "${airport.name} traffic", callsign, "final, runway ${runway}", full stop, and "${airport.name}".`,
     },
     {
       index: 4,
       phase: 'clear_runway',
       situation: `You have landed and are clear of Runway ${runway} at ${airport.name}.`,
-      hint: `Say: "${airport.name} traffic", aircraft type, callsign, "clear of runway ${runway}", and "${airport.name}".`,
+      hint: `Say: "${airport.name} traffic", callsign, "clear of runway ${runway}", and "${airport.name}".`,
     },
   ]
 
