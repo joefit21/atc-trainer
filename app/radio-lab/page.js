@@ -114,8 +114,9 @@ export default function RadioLab() {
   const router = useRouter()
 
   // ── auth / demo ──────────────────────────────────────────────────────────────
-  const [user, setUser]     = useState(null)
-  const [isDemo, setIsDemo] = useState(false)
+  const [user, setUser]         = useState(null)
+  const [isDemo, setIsDemo]     = useState(false)
+  const [isNative, setIsNative] = useState(false)
 
   // ── scenario type ────────────────────────────────────────────────────────────
   const [scenarioType, setScenarioType] = useState('ctaf')
@@ -177,6 +178,7 @@ export default function RadioLab() {
     } else {
       const checkAuth = async () => {
         const { Capacitor } = await import('@capacitor/core')
+        if (Capacitor.isNativePlatform()) setIsNative(true)
         if (Capacitor.isNativePlatform()) {
           // iOS — check RevenueCat entitlement
           const { Purchases } = await import('@revenuecat/purchases-capacitor')
@@ -692,7 +694,7 @@ export default function RadioLab() {
         {isDemo ? (
           <div className="flex items-center gap-4">
             <span className="text-yellow-400 text-sm font-medium">🔓 Demo Mode</span>
-            <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition">Subscribe →</a>
+            <a href={isNative ? '/subscribe' : '/signup'} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm font-semibold transition">Subscribe →</a>
           </div>
         ) : (
           <div className="flex items-center gap-4">
@@ -1218,7 +1220,7 @@ export default function RadioLab() {
                   <p className="text-blue-400 text-xs font-semibold uppercase tracking-widest mb-2">Nice work</p>
                   <h3 className="text-xl font-bold mb-2">Now do it again — with a different airport, callsign, and scenario.</h3>
                   <p className="text-gray-400 mb-6">The full version randomizes everything every session. That's how you build the kind of confidence that doesn't disappear when ATC calls your tail number. Unlimited reps across all five scenario types.</p>
-                  <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Start Practicing — $29/mo</a>
+                  <a href={isNative ? '/subscribe' : '/signup'} className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Start Practicing — $29/mo</a>
                   <p className="text-gray-600 text-xs mt-4">Cancel anytime.</p>
                 </div>
               </div>
@@ -1309,7 +1311,7 @@ export default function RadioLab() {
                         <p className="text-blue-400 text-xs font-semibold uppercase tracking-widest mb-2">Nice work</p>
                         <h3 className="text-xl font-bold mb-2">CRAFT starts to feel automatic around rep 20. You're on rep 1.</h3>
                         <p className="text-gray-400 mb-6">The full version generates different airports, departure procedures, altitudes, and squawk codes every session — so the format becomes second nature before your checkride. Unlimited IFR clearances, plus all four other scenario types.</p>
-                        <a href="/signup" className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Keep Practicing — $29/mo</a>
+                        <a href={isNative ? '/subscribe' : '/signup'} className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-semibold transition">Keep Practicing — $29/mo</a>
                         <p className="text-gray-600 text-xs mt-4">Cancel anytime.</p>
                       </div>
                     ) : (
