@@ -84,6 +84,28 @@ function pickSID(icao) {
   return pickRandom(list)
 }
 
+// Generic transition names — plausible 5-letter fix names used across US airspace
+const transitions = [
+  'BURLY', 'FINGR', 'HILEX', 'JAYMS', 'KARNS',
+  'LEENA', 'MARTZ', 'NOREX', 'OTTOS', 'PARKE',
+  'QUAIL', 'REDFN', 'SHIPP', 'TESSY', 'UPTON',
+  'VANCE', 'WAVEY', 'XENON', 'YUTES', 'ZORAX',
+  'BIGJN', 'COYOT', 'DUNNO', 'ELROI', 'FOXXY',
+  'GREKO', 'HARLD', 'INKOV', 'JURNY', 'KLEAN',
+  'LOVEE', 'MIKEY', 'NUDGE', 'OZZZY', 'PENNS',
+  'RABBT', 'SIEEX', 'TURBO', 'UMBRA', 'VENTI',
+]
+
+function buildRoutePhrase(sid) {
+  if (!sid) return 'via the filed route'
+  const useTransition = Math.random() < 0.6
+  if (useTransition) {
+    const transition = pickRandom(transitions)
+    return `via the ${sid} departure, ${transition} transition, then as filed`
+  }
+  return `via the ${sid} departure, then as filed`
+}
+
 const airports = [
   { icao: 'KATL', city: 'atlanta' },
   { icao: 'KBOS', city: 'boston' },
@@ -348,9 +370,7 @@ Return raw JSON only, no markdown:
         : altitudeToWords(expectAlt)
 
       const sid = pickSID(departure.icao)
-      const routePhrase = sid
-        ? `via the ${sid} departure, then as filed`
-        : `via the filed route`
+      const routePhrase = buildRoutePhrase(sid)
 
       const prompt = `Generate a realistic IFR clearance delivery from ${departure.icao} (${departure.city}) to ${destination.icao} (${destination.city}).
 
