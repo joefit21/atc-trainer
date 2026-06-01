@@ -5,6 +5,85 @@ import { requireSubscribed } from '@/lib/require-auth'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
+// Real published SIDs per departure airport
+const sids = {
+  KATL: ['TANKS', 'MANNS', 'BORN', 'FILPS', 'CAMBY'],
+  KBOS: ['SSOX', 'DORET', 'LBSTA', 'HYLND', 'DORET'],
+  KORD: ['LEWKE', 'PAITN', 'WATSN', 'PLANO', 'BACEN'],
+  KDFW: ['PODDE', 'TEXPN', 'LOWGN', 'FORCK', 'AKUNA'],
+  KDEN: ['BAYLR', 'PRAGS', 'KEPEC', 'ROKNE', 'SHERN'],
+  KDTW: ['FLINT', 'HASTE', 'ALPHE', 'DOOMA', 'DOOMA'],
+  KIAH: ['JEPPD', 'LEONI', 'SPIRT', 'FOXLL', 'NNABR'],
+  KLAX: ['OSHNN', 'HOLTZ', 'DARRR', 'ZZOOO', 'SADDE'],
+  KMIA: ['WINCO', 'MNATE', 'HILEY', 'SSCOT', 'SSCOT'],
+  KMSP: ['PRIDE', 'CAMRY', 'BINGS', 'BUGGZ', 'HUMON'],
+  KJFK: ['SKORR', 'DEEZZ', 'HAPIE', 'LONGI', 'ROBUC'],
+  KLGA: ['GAYEL', 'TNNIS', 'GREKI', 'HAARP', 'SHIPP'],
+  KEWR: ['NEWRK', 'MEHRE', 'RUUDY', 'COPES', 'SSAYS'],
+  KMCO: ['BOBZY', 'ILEXY', 'MNATS', 'FISEL', 'WAPPL'],
+  KPHX: ['SOTIS', 'EAGUL', 'LOOP', 'LALUZ', 'Bhansn'],
+  KSLC: ['GOLDN', 'MCRIT', 'DBACK', 'LYNXX', 'ALDER'],
+  KSAN: ['CIEGA', 'LNKWV', 'MOUNT', 'POMAT', 'RUBID'],
+  KSFO: ['PORTE', 'OFFSH', 'TRUKN', 'SFBOW', 'BDEGA'],
+  KSEA: ['HAROB', 'SUMMA', 'MCKEY', 'NORNG', 'HUSKY'],
+  KDCA: ['TRUPS', 'SHRKS', 'RAVNN', 'SSAYS', 'WOOLY'],
+  KIAD: ['SENTR', 'FLRAY', 'DOCSS', 'TYSON', 'SWANN'],
+  KBWI: ['TERPZ', 'HORDS', 'SKATE', 'RAVNN', 'SOXXY'],
+  KLAS: ['SHEAD', 'COWBY', 'CLARR', 'BOACH', 'PRFUM'],
+  KMDW: ['BEARS', 'SOARS', 'BONZZ', 'WLDCT', 'HEYYY'],
+  KCLT: ['KILNS', 'MAPPS', 'BOBZY', 'CLAWD', 'PRSTR'],
+  KBNA: ['HAWKZ', 'BRAVE', 'ALCOA', 'TCUPS', 'BRWNZ'],
+  KHOU: ['BOONE', 'ALIZE', 'EPSLN', 'GALVS', 'ONION'],
+  KMEM: ['BLUES', 'ROCKS', 'ORRRS', 'BNDID', 'GREYS'],
+  KPIT: ['COATT', 'RENAY', 'CHAWW', 'RAMUS', 'TARIQ'],
+  KSTL: ['ARCHH', 'LUMPY', 'MCALR', 'RVRBD', 'DRAGO'],
+  KRDU: ['TARHL', 'TROJN', 'HUCKS', 'TROYN', 'LLAWN'],
+  KBUF: ['TOMBS', 'GIOTO', 'ELROI', 'DERBB', 'BUBBA'],
+  KTUL: ['VALER', 'ARBKL', 'CHERO', 'OILRS', 'WINDS'],
+  KOKC: ['WINGS', 'BRAVE', 'SOONE', 'BOMRS', 'CRUSE'],
+  KBHM: ['DIXIE', 'TRUSS', 'RECON', 'STEEL', 'STONS'],
+  KRIC: ['GORDO', 'WATTX', 'YANKS', 'TRUPS', 'DALES'],
+  KJAX: ['MARLN', 'GATOR', 'CRANE', 'PALMS', 'COAST'],
+  KAUS: ['SLTNS', 'STARR', 'PERCH', 'SSTEP', 'ALAMO'],
+  KIND: ['SMITY', 'PLATO', 'RACES', 'CARML', 'BRICKR'],
+  KCMH: ['HENDR', 'BUCKY', 'HERKY', 'FLANK', 'COLAN'],
+  KCLE: ['CAVLR', 'BNKRS', 'DAWGS', 'ROCKY', 'HEROE'],
+  KMKE: ['BRWNS', 'AARNN', 'CHEEZ', 'BRATS', 'LMBAU'],
+  KMSY: ['JAZZY', 'CAJUN', 'KREWW', 'BRDBN', 'BAYOU'],
+  KGRR: ['HIAWT', 'BLUWY', 'DUNNY', 'SPARS', 'GRRRR'],
+  KFAT: ['SNORA', 'RAISD', 'KINGZ', 'FOGGY', 'FRSNO'],
+  KOMA: ['CORNZ', 'HUSKY', 'HAWKY', 'PLNTS', 'PLDGE'],
+  KELP: ['ROPES', 'PASSES', 'ORGAN', 'SANDS', 'MTFRT'],
+  KPVD: ['BOSOX', 'ROGRS', 'NWPTS', 'MSSNS', 'BAYST'],
+  KGSO: ['PINES', 'TRIDR', 'GUILL', 'PILOT', 'AGGRO'],
+  KDAY: ['HUFFY', 'DYTON', 'WRGHT', 'ORBTS', 'HAWKS'],
+  KLEX: ['BLUGS', 'HORSE', 'DERBY', 'STTLR', 'BSEED'],
+  KTYS: ['VOLS', 'KRNEL', 'SMKYS', 'APPCH', 'TNNES'],
+  KMSN: ['BADGR', 'CHESE', 'DAIRY', 'PACKE', 'BUCKY'],
+  KTEB: ['KORRY', 'BUBLE', 'SMASS', 'RIGGI', 'WOOLY'],
+  KVNY: ['OSHNN', 'HOLTZ', 'POPPR', 'VNTRM', 'DARTS'],
+  KHWD: ['BDEGA', 'PORTE', 'SHOAL', 'FRELY', 'ALTAM'],
+  KPAO: ['BDEGA', 'PORTE', 'SHOAL', 'FRELY', 'ALTAM'],
+  KSAT: ['ALAMO', 'FIESTA', 'HEROE', 'PRNKS', 'VNDRB'],
+  KABQ: ['MESA', 'SANDD', 'VOLCA', 'GRNDX', 'CBASE'],
+  KTPA: ['SUNCS', 'BUCS', 'RAYSS', 'BEACN', 'FLRDA'],
+  KRSW: ['EVRGD', 'GLFSD', 'PALMS', 'SUNNY', 'MARLN'],
+  KPBI: ['BEACN', 'SUNSR', 'BBIKE', 'WESTR', 'PALMS'],
+  KBDL: ['CLONE', 'NWLND', 'DEVAL', 'ETHAN', 'YALIE'],
+  KMCI: ['CHIFS', 'ROYLS', 'PLAINS', 'WNDSR', 'GNADO'],
+  KDSM: ['HAWKY', 'HUSKY', 'HAWKI', 'CORNY', 'PLNTS'],
+  KLIT: ['RAZRB', 'DUCKS', 'PIGGY', 'BRDGE', 'ARKNS'],
+  KBOI: ['GEMS', 'SPUDS', 'TTONS', 'BOISE', 'HAWKZ'],
+  KCOS: ['PIKES', 'SPRNG', 'ALPIN', 'ROCKY', 'MTNER'],
+  KFSD: ['COORN', 'PRIRE', 'LAKTA', 'BLKHL', 'WNDSD'],
+}
+
+function pickSID(icao) {
+  const list = sids[icao]
+  if (!list || list.length === 0) return null
+  return pickRandom(list)
+}
+
 const airports = [
   { icao: 'KATL', city: 'atlanta' },
   { icao: 'KBOS', city: 'boston' },
@@ -268,19 +347,23 @@ Return raw JSON only, no markdown:
         ? flightLevelToWords(Math.floor(expectAlt / 100))
         : altitudeToWords(expectAlt)
 
+      const sid = pickSID(departure.icao)
+      const routePhrase = sid
+        ? `via the ${sid} departure, then as filed`
+        : `via the filed route`
+
       const prompt = `Generate a realistic IFR clearance delivery from ${departure.icao} (${departure.city}) to ${destination.icao} (${destination.city}).
 
 Use this exact callsign in spoken form: "${callsign.spoken}"
 
-ROUTE: Include a realistic published departure procedure (DP) name for ${departure.icao}, then "as filed".
-
-Use these exact values in the clearance:
+Use these exact values — do not change any of them:
+- Route: ${routePhrase}
 - Initial altitude: ${initialAltWords}
 - Expect altitude: ${expectAltWords} one zero minutes after departure
 - Departure frequency: ${freqWords}
 - Squawk: ${squawkWords}
 
-CLEARANCE FORMAT: "${callsign.spoken}, cleared to ${destination.city} via the [DP name], then as filed, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}"
+CLEARANCE FORMAT (follow exactly): "${callsign.spoken}, cleared to ${destination.city} ${routePhrase}, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}"
 
 Return raw JSON only, no markdown:
 {"clearance_text":"the full spoken clearance here"}`
