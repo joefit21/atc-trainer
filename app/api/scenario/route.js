@@ -98,12 +98,13 @@ const transitions = [
 
 function buildRoutePhrase(sid) {
   if (!sid) return 'via the filed route'
+  const sidNum = randomInt(1, 9)
   const useTransition = Math.random() < 0.6
   if (useTransition) {
     const transition = pickRandom(transitions)
-    return `via the ${sid} departure, ${transition} transition, then as filed`
+    return `via the ${sid} ${sidNum} departure, ${transition} transition, then as filed`
   }
-  return `via the ${sid} departure, then as filed`
+  return `via the ${sid} ${sidNum} departure, then as filed`
 }
 
 const airports = [
