@@ -33,7 +33,7 @@ export async function POST(request) {
     const exchangeText = exchanges.map((ex, i) => {
       const base = `Exchange ${i + 1} — ${ex.phase.replace(/_/g, ' ')}\nSituation: ${ex.situation}\nPilot said: "${ex.pilot_said || '(nothing recorded)'}"`
       const withController = ex.controller_said ? base + `\nController said: "${ex.controller_said}"` : base
-      if (callsignIsAbsent(ex.pilot_said, scenario.callsign_spoken)) {
+      if (callsignIsAbsent(ex.pilot_said, scenario.callsign_spoken, scenario.callsign_display)) {
         return withController + `\n⚠️ SYSTEM FLAG: Callsign COMPLETELY ABSENT — no phonetics or digits matching "${scenario.callsign_display}" found. Mandatory minimum 15-point deduction. Max score for this exchange: 82.`
       }
       return withController

@@ -18,16 +18,27 @@ const AIRLINE_WORDS = new Set([
 // Checks for phonetic and airline tokens from the spoken callsign — digit words
 // (one, two, etc.) are intentionally excluded because they appear in runway
 // numbers and altitudes, causing false positives.
-function callsignIsAbsent(pilotSaid, callsignSpoken) {
+function callsignIsAbsent(pilotSaid, callsignSpoken, callsignDisplay) {
   if (!pilotSaid || pilotSaid.trim() === '') return true
-  const text = pilotSaid.toLowerCase()
+  const text = pilotSaid.toLowerCase().replace(/[-\s]/g, '')
+
+  // Check for N-number written directly (e.g. "N4521H", "N-4521H")
+  // Strip non-alphanumeric from display and check if it appears in the text
+  if (callsignDisplay) {
+    const displayStripped = callsignDisplay.toLowerCase().replace(/[-\s]/g, '')
+    if (text.includes(displayStripped)) return false
+    // Also check just the numeric portion (e.g. "4521") for partial matches
+    const digits = displayStripped.replace(/[a-z]/g, '')
+    if (digits.length >= 3 && text.includes(digits)) return false
+  }
+
+  const textWithSpaces = pilotSaid.toLowerCase()
   const tokens = callsignSpoken.toLowerCase().split(/\s+/)
   const distinctive = tokens.filter(t => PHONETIC_WORDS.has(t) || AIRLINE_WORDS.has(t))
   if (distinctive.length === 0) {
-    // Pure digit callsign (rare) — fall back to checking any token
-    return !tokens.some(t => text.includes(t))
+    return !tokens.some(t => textWithSpaces.includes(t))
   }
-  return !distinctive.some(t => text.includes(t))
+  return !distinctive.some(t => textWithSpaces.includes(t))
 }
 
 export async function POST(request) {
@@ -40,7 +51,7 @@ export async function POST(request) {
     const exchangeText = exchanges.map((ex, i) => {
       const base = `Exchange ${i + 1} — ${ex.phase.replace(/_/g, ' ')}\nSituation: ${ex.situation}\nPilot said: "${ex.pilot_said || '(nothing recorded)'}"`
       const withController = ex.controller_said ? base + `\nController said: "${ex.controller_said}"` : base
-      if (callsignIsAbsent(ex.pilot_said, scenario.callsign_spoken)) {
+      if (callsignIsAbsent(ex.pilot_said, scenario.callsign_spoken, scenario.callsign_display)) {
         return withController + `\n⚠️ SYSTEM FLAG: Callsign COMPLETELY ABSENT — no phonetics or digits matching "${scenario.callsign_display}" found. Mandatory minimum 15-point deduction. Max score for this exchange: 82.`
       }
       return withController
