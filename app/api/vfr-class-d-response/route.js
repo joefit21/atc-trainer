@@ -1,3 +1,4 @@
+import { parseAIJson } from '@/lib/parse-json'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
@@ -85,8 +86,8 @@ Return raw JSON only, no markdown:
       messages: [{ role: 'user', content: prompt }],
     })
 
-    const rawText = message.content[0].text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-    const parsed  = JSON.parse(rawText)
+    const rawText = message.content[0].text
+    const parsed  = parseAIJson(rawText)
 
     const ttsResponse = await openai.audio.speech.create({
       model: 'tts-1',

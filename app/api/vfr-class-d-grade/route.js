@@ -1,3 +1,4 @@
+import { parseAIJson } from '@/lib/parse-json'
 import Anthropic from '@anthropic-ai/sdk'
 import { requireSubscribed } from '@/lib/require-auth'
 
@@ -192,8 +193,8 @@ Return raw JSON only, no markdown:
       messages: [{ role: 'user', content: prompt }],
     })
 
-    const rawText = message.content[0].text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-    const result  = JSON.parse(rawText)
+    const rawText = message.content[0].text
+    const result  = parseAIJson(rawText)
 
     if (Array.isArray(result.call_feedback)) {
       result.call_feedback = result.call_feedback.slice(0, exchanges.length)
