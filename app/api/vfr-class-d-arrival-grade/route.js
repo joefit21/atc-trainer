@@ -14,13 +14,20 @@ const AIRLINE_WORDS = new Set([
   'alaska','hawaiian','allegiant'
 ])
 
-function callsignIsAbsent(pilotSaid, callsignSpoken) {
+function callsignIsAbsent(pilotSaid, callsignSpoken, callsignDisplay) {
   if (!pilotSaid || pilotSaid.trim() === '') return true
-  const text = pilotSaid.toLowerCase()
+  const text = pilotSaid.toLowerCase().replace(/[-\s]/g, '')
+  if (callsignDisplay) {
+    const displayStripped = callsignDisplay.toLowerCase().replace(/[-\s]/g, '')
+    if (text.includes(displayStripped)) return false
+    const digits = displayStripped.replace(/[a-z]/g, '')
+    if (digits.length >= 3 && text.includes(digits)) return false
+  }
+  const textWithSpaces = pilotSaid.toLowerCase()
   const tokens = callsignSpoken.toLowerCase().split(/\s+/)
   const distinctive = tokens.filter(t => PHONETIC_WORDS.has(t) || AIRLINE_WORDS.has(t))
-  if (distinctive.length === 0) return !tokens.some(t => text.includes(t))
-  return !distinctive.some(t => text.includes(t))
+  if (distinctive.length === 0) return !tokens.some(t => textWithSpaces.includes(t))
+  return !distinctive.some(t => textWithSpaces.includes(t))
 }
 
 export async function POST(request) {
