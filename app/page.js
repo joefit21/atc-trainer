@@ -368,7 +368,8 @@ function HomeContent() {
               </a>
             </div>
 
-            {/* Bundle */}
+            {/* Bundle — hidden on iOS, web only */}
+            {!isNative && (
             <div className="bg-[#0a0f1e] border-2 border-purple-500/70 rounded-2xl p-8 text-center flex flex-col relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">
                 BEST VALUE
@@ -389,10 +390,11 @@ function HomeContent() {
                   </li>
                 ))}
               </ul>
-              <a href={isNative ? '/subscribe' : 'https://checkride.flight-levels.com/signup?bundle=1'} className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
+              <a href="https://checkride.flight-levels.com/signup?bundle=1" className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
                 Get the Bundle
               </a>
             </div>
+            )}
 
           </div>
         </div>
