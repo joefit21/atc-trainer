@@ -906,7 +906,7 @@ export default function RadioLab() {
                 <p className="text-xs text-blue-400 uppercase tracking-wide">
                   {classDStep === 1 ? 'Ground Control' : 'Tower'} — write down the clearance, then read it back
                 </p>
-                <audio ref={controllerAudioRef} src={controllerAudioUrl} />
+                <audio ref={controllerAudioRef} src={controllerAudioUrl} onPlay={() => { if (controllerAudioRef.current) controllerAudioRef.current.playbackRate = playbackSpeed }} />
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
                     onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.currentTime = 0; controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
@@ -1028,7 +1028,7 @@ export default function RadioLab() {
                 <p className="text-xs text-blue-400 uppercase tracking-wide">
                   {classDArrivalStep === 5 ? 'Ground Control' : 'Tower'} — write down the clearance, then read it back
                 </p>
-                <audio ref={controllerAudioRef} src={controllerAudioUrl} />
+                <audio ref={controllerAudioRef} src={controllerAudioUrl} onPlay={() => { if (controllerAudioRef.current) controllerAudioRef.current.playbackRate = playbackSpeed }} />
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
                     onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.currentTime = 0; controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
@@ -1150,7 +1150,7 @@ export default function RadioLab() {
                     : ffStep === 2 ? 'Controller says go ahead — state your full request'
                     : 'Radar contact — controller is asking for your altitude'}
                 </p>
-                <audio ref={controllerAudioRef} src={controllerAudioUrl} />
+                <audio ref={controllerAudioRef} src={controllerAudioUrl} onPlay={() => { if (controllerAudioRef.current) controllerAudioRef.current.playbackRate = playbackSpeed }} />
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
                     onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.currentTime = 0; controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
@@ -1305,7 +1305,7 @@ export default function RadioLab() {
                 {/* Step 1 — Listen */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                   <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Step 1 — Listen to the Clearance</h2>
-                  {ifrAudioUrl && <audio ref={ifrAudioRef} src={ifrAudioUrl} />}
+                  {ifrAudioUrl && <audio ref={ifrAudioRef} src={ifrAudioUrl} onPlay={() => { if (ifrAudioRef.current) ifrAudioRef.current.playbackRate = playbackSpeed }} />}
                   <div className="flex items-center gap-3 flex-wrap">
                     <button onClick={() => {
                       if (ifrAudioRef.current) {
