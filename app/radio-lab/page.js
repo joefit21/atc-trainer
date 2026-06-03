@@ -217,6 +217,7 @@ export default function RadioLab() {
     const audio = controllerAudioRef.current
     if (!audio) return
     audio.load()
+    audio.playbackRate = playbackSpeed
     audio.play().catch(() => {})
   }, [controllerAudioUrl])
 
@@ -906,12 +907,22 @@ export default function RadioLab() {
                   {classDStep === 1 ? 'Ground Control' : 'Tower'} — write down the clearance, then read it back
                 </p>
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
-                <button
-                  onClick={() => { controllerAudioRef.current?.load(); controllerAudioRef.current?.play() }}
-                  className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
-                >
-                  ▶ Play Clearance Again
-                </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.load(); controllerAudioRef.current.play() } }}
+                    className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
+                  >
+                    ▶ Play Clearance Again
+                  </button>
+                  <div className="flex items-center gap-1">
+                    {[{ label: 'Slow', rate: 0.66 }, { label: 'Medium', rate: 0.8 }, { label: 'Full Speed', rate: 1.0 }].map(({ label, rate }) => (
+                      <button key={rate} onClick={() => { setPlaybackSpeed(rate); if (controllerAudioRef.current) controllerAudioRef.current.playbackRate = rate }}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition ${playbackSpeed === rate ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1018,12 +1029,22 @@ export default function RadioLab() {
                   {classDArrivalStep === 5 ? 'Ground Control' : 'Tower'} — write down the clearance, then read it back
                 </p>
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
-                <button
-                  onClick={() => { controllerAudioRef.current?.load(); controllerAudioRef.current?.play() }}
-                  className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
-                >
-                  ▶ Play Again
-                </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.load(); controllerAudioRef.current.play() } }}
+                    className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
+                  >
+                    ▶ Play Again
+                  </button>
+                  <div className="flex items-center gap-1">
+                    {[{ label: 'Slow', rate: 0.66 }, { label: 'Medium', rate: 0.8 }, { label: 'Full Speed', rate: 1.0 }].map(({ label, rate }) => (
+                      <button key={rate} onClick={() => { setPlaybackSpeed(rate); if (controllerAudioRef.current) controllerAudioRef.current.playbackRate = rate }}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition ${playbackSpeed === rate ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1130,12 +1151,22 @@ export default function RadioLab() {
                     : 'Radar contact — controller is asking for your altitude'}
                 </p>
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
-                <button
-                  onClick={() => { controllerAudioRef.current?.load(); controllerAudioRef.current?.play() }}
-                  className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
-                >
-                  ▶ Play Again
-                </button>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.load(); controllerAudioRef.current.play() } }}
+                    className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
+                  >
+                    ▶ Play Again
+                  </button>
+                  <div className="flex items-center gap-1">
+                    {[{ label: 'Slow', rate: 0.66 }, { label: 'Medium', rate: 0.8 }, { label: 'Full Speed', rate: 1.0 }].map(({ label, rate }) => (
+                      <button key={rate} onClick={() => { setPlaybackSpeed(rate); if (controllerAudioRef.current) controllerAudioRef.current.playbackRate = rate }}
+                        className={`px-3 py-1 rounded-lg text-sm font-medium transition ${playbackSpeed === rate ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'}`}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
 
