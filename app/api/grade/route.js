@@ -5,11 +5,13 @@ import { requireSubscribed } from '@/lib/require-auth'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(request) {
-  const { authError } = await requireSubscribed(request)
-  if (authError) return authError
-
   try {
-    const { clearance_text, readback_text, scenario_type } = await request.json()
+    const { clearance_text, readback_text, scenario_type, is_demo } = await request.json()
+
+    if (!is_demo) {
+      const { authError } = await requireSubscribed(request)
+      if (authError) return authError
+    }
 
     const message = await anthropic.messages.create({
       model: 'claude-haiku-4-5',
