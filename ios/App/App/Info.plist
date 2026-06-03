@@ -45,5 +45,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ATC Clearance AI uses the microphone so you can speak your radio readbacks aloud, just like a real pilot.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>ATC Clearance AI uses speech recognition to transcribe your radio readbacks for grading.</string>
 </dict>
 </plist>
