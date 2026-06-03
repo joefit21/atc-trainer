@@ -27,7 +27,7 @@ export default function StudyGuidesIndex() {
           <a href="/study-guides" className="text-white text-sm font-medium">Study Guides</a>
           <a href="/demo" className="text-gray-300 hover:text-white transition text-sm">Try Demo</a>
           <a href="/login" className="text-gray-300 hover:text-white transition">Log In</a>
-          <a href="/signup" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm">Subscribe</a>
+          <a href="/subscribe" className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition text-sm">Subscribe</a>
         </div>
       </nav>
 

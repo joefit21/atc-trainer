@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { Capacitor } from '@capacitor/core'
 
 const REGIONAL_PRICE = {
   india: '$9',
@@ -137,7 +138,8 @@ function HomeContent() {
       .catch(() => {})
   }, [])
 
-  const signupUrl = region && region !== 'default' ? `/signup?region=${region}` : '/signup'
+  const isNative = Capacitor.isNativePlatform()
+  const signupUrl = isNative ? '/subscribe' : (region && region !== 'default' ? `/signup?region=${region}` : '/signup')
 
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
@@ -387,7 +389,7 @@ function HomeContent() {
                   </li>
                 ))}
               </ul>
-              <a href="https://checkride.flight-levels.com/signup?bundle=1" className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
+              <a href={isNative ? '/subscribe' : 'https://checkride.flight-levels.com/signup?bundle=1'} className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
                 Get the Bundle
               </a>
             </div>

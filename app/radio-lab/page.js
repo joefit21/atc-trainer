@@ -713,7 +713,7 @@ export default function RadioLab() {
         <div className="bg-blue-500/10 border-b border-blue-500/20 px-8 py-3 text-center">
           <p className="text-blue-300 text-sm">
             🎯 <strong>Demo Mode</strong> — Fixed scenarios, unlimited attempts.
-            <a href="/signup" className="underline ml-2 hover:text-blue-200">Subscribe for unlimited random scenarios →</a>
+            <a href={isNative ? '/subscribe' : '/signup'} className="underline ml-2 hover:text-blue-200">Subscribe for unlimited random scenarios →</a>
           </p>
         </div>
       )}
