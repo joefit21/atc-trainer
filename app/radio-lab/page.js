@@ -157,6 +157,7 @@ export default function RadioLab() {
   // ── IFR Clearance state ───────────────────────────────────────────────────────
   const [ifrScenario, setIFRScenario]       = useState(null)
   const [ifrAudioUrl, setIFRAudioUrl]       = useState(null)
+  const [playbackSpeed, setPlaybackSpeed]   = useState(1.0)
   const [ifrIsLoading, setIFRIsLoading]     = useState(false)
   const [ifrIsGrading, setIFRIsGrading]     = useState(false)
   const [ifrReadbackText, setIFRReadbackText] = useState('')
@@ -1274,10 +1275,35 @@ export default function RadioLab() {
                 <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                   <h2 className="text-sm text-gray-400 uppercase tracking-wide mb-4">Step 1 — Listen to the Clearance</h2>
                   {ifrAudioUrl && <audio ref={ifrAudioRef} src={ifrAudioUrl} />}
-                  <button onClick={() => ifrAudioRef.current?.play()}
-                    className="flex items-center gap-3 bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg font-semibold transition">
-                    ▶ Play Clearance
-                  </button>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <button onClick={() => {
+                      if (ifrAudioRef.current) {
+                        ifrAudioRef.current.playbackRate = playbackSpeed
+                        ifrAudioRef.current.play()
+                      }
+                    }}
+                      className="flex items-center gap-3 bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-lg font-semibold transition">
+                      ▶ Play Clearance
+                    </button>
+                    <div className="flex items-center gap-1">
+                      {[{ label: 'Slow', rate: 0.66 }, { label: 'Medium', rate: 0.8 }, { label: 'Full Speed', rate: 1.0 }].map(({ label, rate }) => (
+                        <button
+                          key={rate}
+                          onClick={() => {
+                            setPlaybackSpeed(rate)
+                            if (ifrAudioRef.current) ifrAudioRef.current.playbackRate = rate
+                          }}
+                          className={`px-3 py-1 rounded-lg text-sm font-medium transition ${
+                            playbackSpeed === rate
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-white/10 text-gray-400 hover:bg-white/20 hover:text-white'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                   <p className="text-gray-500 text-sm mt-3">Write it down as you listen — CRAFT format. Then read it back.</p>
                 </div>
 
