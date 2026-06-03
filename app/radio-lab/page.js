@@ -180,13 +180,21 @@ export default function RadioLab() {
         const { Capacitor } = await import('@capacitor/core')
         if (Capacitor.isNativePlatform()) setIsNative(true)
         if (Capacitor.isNativePlatform()) {
-          // iOS — check RevenueCat entitlement
+          // iOS — check RevenueCat entitlement, fall back to Supabase profile for demo/reviewer accounts
           const { Purchases } = await import('@revenuecat/purchases-capacitor')
           await Purchases.configure({ apiKey: 'appl_tDPYfYHwQoiOXsOakSfWGJuIwjJ' })
           const { data: { session } } = await supabase.auth.getSession()
           if (session) await Purchases.logIn({ appUserID: session.user.id })
           const { customerInfo } = await Purchases.getCustomerInfo()
-          if (!customerInfo.entitlements.active['atc_access']) { router.push('/subscribe'); return }
+          if (!customerInfo.entitlements.active['atc_access']) {
+            // Fallback: check Supabase profile (covers demo/reviewer accounts)
+            if (session) {
+              const { data: profile } = await supabase.from('profiles').select('is_subscribed').eq('id', session.user.id).single()
+              if (!profile?.is_subscribed) { router.push('/subscribe'); return }
+            } else {
+              router.push('/subscribe'); return
+            }
+          }
         } else {
           // Web — check Supabase subscription flag
           const { data: { user } } = await supabase.auth.getUser()
