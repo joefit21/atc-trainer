@@ -909,7 +909,7 @@ export default function RadioLab() {
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
-                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.load(); controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
+                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.currentTime = 0; controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
                     className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
                   >
                     ▶ Play Clearance Again
@@ -1031,7 +1031,7 @@ export default function RadioLab() {
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
-                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.load(); controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
+                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.currentTime = 0; controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
                     className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
                   >
                     ▶ Play Again
@@ -1153,7 +1153,7 @@ export default function RadioLab() {
                 <audio ref={controllerAudioRef} src={controllerAudioUrl} />
                 <div className="flex items-center gap-3 flex-wrap">
                   <button
-                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.load(); controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
+                    onClick={() => { if (controllerAudioRef.current) { controllerAudioRef.current.currentTime = 0; controllerAudioRef.current.playbackRate = playbackSpeed; controllerAudioRef.current.play() } }}
                     className="flex items-center gap-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 px-4 py-2 rounded-lg text-sm text-blue-300 transition"
                   >
                     ▶ Play Again
