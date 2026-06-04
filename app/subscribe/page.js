@@ -50,17 +50,16 @@ export default function Subscribe() {
         return
       }
 
-      // Load offering — try current offering first (any package type), then named fallbacks
+      // Always use the ATC Trainer-specific offering — the RC project is shared with
+      // Checkride Prep, so `current` points to the wrong product (checkrideprep.monthly).
       const offerings = await Purchases.getOfferings()
       console.log('RC offerings:', JSON.stringify(offerings?.all ? Object.keys(offerings.all) : null))
-      const pkg = offerings?.current?.monthly
-        ?? offerings?.current?.availablePackages?.[0]
-        ?? offerings?.all?.['default - ATC Trainer']?.monthly
+      const pkg = offerings?.all?.['default - ATC Trainer']?.monthly
         ?? offerings?.all?.['default - ATC Trainer']?.availablePackages?.[0]
-        ?? offerings?.all?.['default']?.monthly
-        ?? offerings?.all?.['default']?.availablePackages?.[0]
+        ?? offerings?.current?.monthly
+        ?? offerings?.current?.availablePackages?.[0]
         ?? null
-      console.log('RC selected pkg:', pkg?.identifier ?? 'null')
+      console.log('RC selected pkg:', pkg?.identifier ?? 'null', pkg?.product?.identifier ?? '')
       setMonthlyPackage(pkg)
     } catch (e) {
       console.error('RC init error:', e)
@@ -76,12 +75,10 @@ export default function Subscribe() {
       let pkg = monthlyPackage
       if (!pkg) {
         const offerings = await Purchases.getOfferings()
-        pkg = offerings?.current?.monthly
-          ?? offerings?.current?.availablePackages?.[0]
-          ?? offerings?.all?.['default - ATC Trainer']?.monthly
+        pkg = offerings?.all?.['default - ATC Trainer']?.monthly
           ?? offerings?.all?.['default - ATC Trainer']?.availablePackages?.[0]
-          ?? offerings?.all?.['default']?.monthly
-          ?? offerings?.all?.['default']?.availablePackages?.[0]
+          ?? offerings?.current?.monthly
+          ?? offerings?.current?.availablePackages?.[0]
           ?? null
         setMonthlyPackage(pkg)
       }
