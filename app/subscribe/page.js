@@ -50,15 +50,21 @@ export default function Subscribe() {
         return
       }
 
-      // Load the monthly offering — fall back to ATC Trainer offering by name
+      // Load offering — try current offering first (any package type), then named fallbacks
       const offerings = await Purchases.getOfferings()
+      console.log('RC offerings:', JSON.stringify(offerings?.all ? Object.keys(offerings.all) : null))
       const pkg = offerings?.current?.monthly
+        ?? offerings?.current?.availablePackages?.[0]
         ?? offerings?.all?.['default - ATC Trainer']?.monthly
         ?? offerings?.all?.['default - ATC Trainer']?.availablePackages?.[0]
+        ?? offerings?.all?.['default']?.monthly
+        ?? offerings?.all?.['default']?.availablePackages?.[0]
         ?? null
+      console.log('RC selected pkg:', pkg?.identifier ?? 'null')
       setMonthlyPackage(pkg)
     } catch (e) {
       console.error('RC init error:', e)
+      setError('Could not connect to the App Store. Please check your connection and try again.')
     }
     setLoading(false)
   }
@@ -71,8 +77,11 @@ export default function Subscribe() {
       if (!pkg) {
         const offerings = await Purchases.getOfferings()
         pkg = offerings?.current?.monthly
+          ?? offerings?.current?.availablePackages?.[0]
           ?? offerings?.all?.['default - ATC Trainer']?.monthly
           ?? offerings?.all?.['default - ATC Trainer']?.availablePackages?.[0]
+          ?? offerings?.all?.['default']?.monthly
+          ?? offerings?.all?.['default']?.availablePackages?.[0]
           ?? null
         setMonthlyPackage(pkg)
       }
@@ -219,11 +228,11 @@ export default function Subscribe() {
         {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
 
         <button
-          onClick={handleSubscribe}
-          disabled={purchasing}
+          onClick={monthlyPackage ? handleSubscribe : initRC}
+          disabled={purchasing || loading}
           className="w-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white py-4 rounded-xl font-bold text-lg transition mb-4"
         >
-          {purchasing ? 'Processing...' : 'Subscribe — $29/month'}
+          {purchasing ? 'Processing…' : loading ? 'Loading…' : monthlyPackage ? 'Subscribe — $29/month' : 'Retry Loading Subscription'}
         </button>
 
         <a href="/login" className="block text-gray-400 text-sm mb-6 hover:text-white transition">
