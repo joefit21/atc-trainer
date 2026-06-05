@@ -88,14 +88,15 @@ export default function Subscribe() {
         return
       }
       const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkg })
-      if (customerInfo.entitlements.active['atc_access']) {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session) {
-          await supabase.from('profiles').upsert({ id: session.user.id, is_subscribed: true })
-          router.replace('/radio-lab')
-        } else {
-          setStep('account')
-        }
+      // Purchase succeeded — navigate forward regardless of whether the entitlement
+      // has propagated yet (sandbox can be slow to activate entitlements)
+      const { data: { session } } = await supabase.auth.getSession()
+      if (customerInfo.entitlements.active['atc_access'] && session) {
+        await supabase.from('profiles').upsert({ id: session.user.id, is_subscribed: true })
+        router.replace('/radio-lab')
+      } else {
+        // No session yet (new user) or entitlement delayed — go to account creation
+        setStep('account')
       }
     } catch (e) {
       if (!e.userCancelled) setError('Purchase failed. Please try again.')
