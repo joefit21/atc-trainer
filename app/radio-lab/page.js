@@ -120,6 +120,8 @@ export default function RadioLab() {
   // ── auth / demo ──────────────────────────────────────────────────────────────
   const [user, setUser]         = useState(null)
   const [isDemo, setIsDemo]     = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   // ── scenario type ────────────────────────────────────────────────────────────
   const [scenarioType, setScenarioType] = useState('ctaf')
@@ -718,9 +720,58 @@ export default function RadioLab() {
             }} className="text-gray-400 hover:text-white text-sm transition">Manage Subscription</button>
             <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
               className="text-gray-400 hover:text-white text-sm transition">Log Out</button>
+            <button onClick={() => setShowDeleteConfirm(true)}
+              className="text-red-400 hover:text-red-300 text-sm transition">Delete Account</button>
           </div>
         )}
       </nav>
+
+      {/* Account deletion confirmation modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6">
+          <div className="bg-[#0f1729] border border-white/10 rounded-2xl p-8 max-w-sm w-full text-center">
+            <h2 className="text-xl font-bold mb-3">Delete Account?</h2>
+            <p className="text-gray-400 text-sm mb-6">This permanently deletes your account and all data. This cannot be undone.</p>
+            {deleting ? (
+              <p className="text-gray-400 text-sm">Deleting…</p>
+            ) : (
+              <div className="flex flex-col gap-3">
+                <button
+                  onClick={async () => {
+                    setDeleting(true)
+                    try {
+                      const { data: { session } } = await supabase.auth.getSession()
+                      const res = await fetch('/api/delete-account', {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${session?.access_token}` },
+                      })
+                      if (res.ok) {
+                        await supabase.auth.signOut()
+                        router.push('/')
+                      } else {
+                        alert('Something went wrong. Please try again.')
+                        setDeleting(false)
+                      }
+                    } catch {
+                      alert('Something went wrong. Please try again.')
+                      setDeleting(false)
+                    }
+                  }}
+                  className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg font-semibold transition"
+                >
+                  Yes, Delete My Account
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="w-full bg-white/10 hover:bg-white/20 text-white py-3 rounded-lg font-semibold transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {isDemo && (
         <div className="bg-blue-500/10 border-b border-blue-500/20 px-8 py-3 text-center">
           <p className="text-blue-300 text-sm">
