@@ -244,6 +244,21 @@ export default function Subscribe() {
         >
           Restore purchases
         </button>
+
+        {/* Required Apple auto-renewable subscription disclosure */}
+        <div className="mt-8 text-xs text-gray-500 text-left space-y-2 leading-relaxed">
+          <p>
+            <strong className="text-gray-400">ATC Clearance AI — Monthly Subscription</strong><br />
+            $29.99 / month. Payment will be charged to your Apple ID account at confirmation of purchase.
+            Subscription automatically renews unless cancelled at least 24 hours before the end of the current period.
+            Your account will be charged for renewal within 24 hours prior to the end of the current period.
+            You can manage and cancel your subscription in your App Store account settings at any time after purchase.
+          </p>
+          <p className="flex gap-4">
+            <a href="https://www.flight-levels.com/terms" className="underline hover:text-gray-300 transition">Terms of Use</a>
+            <a href="https://www.flight-levels.com/privacy" className="underline hover:text-gray-300 transition">Privacy Policy</a>
+          </p>
+        </div>
       </div>
     </main>
   )
