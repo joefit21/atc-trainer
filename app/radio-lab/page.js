@@ -226,6 +226,9 @@ export default function RadioLab() {
 
   // ── load scenario ─────────────────────────────────────────────────────────────
   const loadScenario = async (type, demoMode = false) => {
+    if (!demoMode && typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'scenario_started', { scenario_type: type })
+    }
     setPhase('loading')
     setScenario(null)
     setDebrief(null)

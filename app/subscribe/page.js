@@ -69,6 +69,9 @@ export default function Subscribe() {
   }
 
   const handleSubscribe = async () => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'subscribe_clicked', { app: 'atc_trainer' })
+    }
     setPurchasing(true)
     setError('')
     try {
