@@ -6,6 +6,19 @@ import { requireSubscribed } from '@/lib/require-auth'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
+function logUsage({ model, usage, duration_ms, route }) {
+  fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/api_usage`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      Prefer: 'return=minimal',
+    },
+    body: JSON.stringify({ model, input_tokens: usage?.input_tokens, output_tokens: usage?.output_tokens, duration_ms, route }),
+  }).catch(e => console.error('Usage log error:', e))
+}
+
 // Real published SIDs per departure airport
 const sids = {
   KATL: ['TANKS', 'MANNS', 'BORN', 'FILPS', 'CAMBY'],
@@ -309,6 +322,8 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type') || 'ground'
 
+    const t0 = Date.now()
+
     if (type === 'ground') {
       const airport = pickRandom(airports)
       const callsign = generateCallsign()
@@ -344,6 +359,8 @@ Return raw JSON only, no markdown:
 
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer())
       const audioUrl = `data:audio/mp3;base64,${audioBuffer.toString('base64')}`
+
+      logUsage({ model: message.model, usage: message.usage, duration_ms: Date.now() - t0, route: 'scenario/ground' })
 
       return Response.json({
         callsign: callsign.display,
@@ -405,6 +422,8 @@ Return raw JSON only, no markdown:
 
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer())
       const audioUrl = `data:audio/mp3;base64,${audioBuffer.toString('base64')}`
+
+      logUsage({ model: message.model, usage: message.usage, duration_ms: Date.now() - t0, route: 'scenario/ifr' })
 
       return Response.json({
         callsign: callsign.display,
