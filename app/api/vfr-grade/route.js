@@ -42,12 +42,21 @@ AIRPORT NAME RULES — strictly enforced:
 - Check the BEGINNING of the transcript first. If the transmission starts with a callsign or any word other than the airport name, the opening "[Airport] traffic" is missing.
 
 RUNWAY NUMBER — STRICTLY ENFORCED ON ALL CALLS:
-The runway number (a digit or digits, e.g. "16", "one six", "runway 7", "runway 1") is REQUIRED on every call. You MUST find an actual number in the transcript — do NOT infer it from context, from the situation description, or from the pattern leg name.
-- "right base" alone → runway number ABSENT
-- "left downwind" alone → runway number ABSENT
-- "final" alone → runway number ABSENT
-- "runway 1", "runway one", "one", "16", "one six" → runway number PRESENT
-If the runway number is absent, score that call 60–74 maximum and note it in feedback. Do not credit the runway as present unless an actual number appears in the pilot's transcript text.
+Before scoring runway number on any call, perform this explicit extraction step: scan the transcript word by word and list every digit, number word ("one", "two", "seven", "niner", etc.), or "runway N" phrase you see. If ANY number between 1 and 36 appears ANYWHERE in the transcript (even after the position leg, even near the airport repeat), the runway number is PRESENT — full credit, do not deduct.
+
+Examples of runway number PRESENT:
+- "left base, runway 7, Auburn" → "runway 7" is present ✓
+- "runway 1", "runway one", "one", "16", "one six", "runway seven" → present ✓
+- Any digit that plausibly refers to a runway (1–36) anywhere in the call → present ✓
+
+Examples of runway number ABSENT:
+- "right base" alone with NO number anywhere in transcript → absent
+- "left downwind" alone with NO number anywhere in transcript → absent
+- "final" alone with NO number anywhere in transcript → absent
+
+CRITICAL: Do NOT mistake callsign digits for the runway number. The callsign (e.g., "452", "614") is a different element — it does NOT satisfy the runway requirement. The runway number must be a 1-2 digit number (1–36) stated in the position context, such as "runway 7", "left base runway seven", or "final runway 16". If the only number in the transcript is the callsign, runway is ABSENT.
+
+If the runway number is absent, score that call 60–74 maximum and note it in feedback.
 
 FINAL CALL — extra elements strictly enforced:
 In addition to the runway number, the pilot MUST explicitly state their intention: "full stop", "touch and go", or "option". Do not infer this from context or situation description. If neither is stated in the transcript, deduct points and note it.
