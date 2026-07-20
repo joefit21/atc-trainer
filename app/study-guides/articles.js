@@ -202,6 +202,128 @@ export const articles = [
   },
 ]
 
+  {
+    slug: 'how-to-talk-to-atc',
+    title: 'How to Talk to ATC: A Practical Guide for Pilots',
+    description: 'A CFI and former air traffic controller explains how to communicate with ATC clearly and correctly — from your first ground call to flight following en route.',
+    date: 'July 20, 2026',
+    readTime: '8 min read',
+    intro: "Talking to ATC is a skill, not a talent. The pilots who sound confident on the radio weren't born that way — they learned the patterns and practiced until the words came automatically. This guide covers the full sequence from engine start to landing, written from the perspective of someone who has worked both sides of the frequency.",
+    sections: [
+      {
+        heading: 'Before You Key the Mic: Know What You\'re Going to Say',
+        paragraphs: [
+          'The number one habit that separates comfortable pilots on the radio from anxious ones is preparation. Before you transmit, know your callsign, your position, what information you have (ATIS), and what you want. Controllers are busy. They need that information in order, without filler.',
+          'Write down your callsign abbreviation and key items before departure. Know which frequencies you\'ll use. Tune and monitor the frequency before you need to transmit so you can hear the pace and pick a gap.',
+        ],
+      },
+      {
+        heading: 'Ground Control: Getting Your Taxi Clearance',
+        paragraphs: [
+          'At a towered airport, you contact ground control for taxi instructions before moving. The call structure: who you\'re calling, who you are, where you are, what you have, what you want.',
+          '"Cessna Ground, Cessna 8-8-6 Papa Kilo, south ramp, with Information Kilo, VFR to Riverside, request taxi."',
+          'Ground will respond with your taxi route and any hold-short instructions. Read back the runway assignment and any hold-short instructions verbatim — these are required readbacks. "Taxi to runway 2-6 via Alpha, hold short of runway 3-1, 8-8-6 Papa Kilo."',
+        ],
+      },
+      {
+        heading: 'Tower: Takeoff and Pattern Calls',
+        paragraphs: [
+          'When you\'re ready for departure, switch to tower frequency and call when you\'re number one or at the hold-short line: "Riverside Tower, Cessna 8-8-6 Papa Kilo, holding short runway 2-6, ready for departure, VFR northbound."',
+          'Tower will issue a takeoff clearance, possibly with instructions: "Cessna 8-8-6 Papa Kilo, Riverside Tower, runway 2-6, cleared for takeoff, fly runway heading." Read back the runway and clearance: "Runway 2-6, cleared for takeoff, 8-8-6 Papa Kilo."',
+          'In the pattern, calls are brief: "Cessna 8-8-6 Papa Kilo, left downwind runway 2-6" or "Cessna 8-8-6 Papa Kilo, turning base." Tower will sequence you and issue your landing clearance.',
+        ],
+      },
+      {
+        heading: 'Departure Control: Transitioning to Radar',
+        paragraphs: [
+          'After takeoff at airports with departure control, tower will hand you off: "Cessna 8-8-6 Papa Kilo, contact SoCal Departure 1-2-4-point-4." Read back the frequency: "1-2-4-point-4, 8-8-6 Papa Kilo." Then switch and check in.',
+          'The check-in call: "SoCal Departure, Cessna 8-8-6 Papa Kilo, out of 1,200, climbing 5,500." Departure will identify you on radar, confirm your transponder code, and issue any instructions. Respond to each one with a readback.',
+        ],
+      },
+      {
+        heading: 'Requesting VFR Flight Following',
+        paragraphs: [
+          'Flight following is radar traffic advisories for VFR aircraft. It\'s optional, useful, and free — and it requires a short initial call to request it.',
+          '"SoCal Approach, Cessna 8-8-6 Papa Kilo, request VFR flight following." The controller will ask your position, altitude, and destination. Have those ready: "8-8-6 Papa Kilo, 10 miles south of Riverside, 5,500, VFR to Big Bear." They\'ll assign a squawk code and radar identify you.',
+          'Once established on flight following, ATC will call traffic. Acknowledge each one: "Traffic in sight, 8-8-6 Papa Kilo" or "Negative contact, 8-8-6 Papa Kilo." If you lose contact or don\'t need the service anymore, say "8-8-6 Papa Kilo, cancel flight following."',
+        ],
+      },
+      {
+        heading: 'Arrival: Getting Back on the Ground',
+        paragraphs: [
+          'Approach the destination airport with ATIS information in hand. Call tower about 10 miles out: "Riverside Tower, Cessna 8-8-6 Papa Kilo, 10 miles to the northeast, 3,500, with Information Lima, full stop."',
+          'Tower will sequence you into the pattern or give you a straight-in instruction. Follow their instructions, read back runway assignments and any traffic advisories, and keep calls brief once you\'re in the pattern.',
+        ],
+      },
+      {
+        heading: 'The One Thing That Makes Everything Easier',
+        paragraphs: [
+          'Radio competence is built through repetition. The more times you\'ve said the words before you need to say them in the airplane — the more you\'ve heard the patterns, formed the responses, and recovered from getting it wrong — the more automatic it becomes.',
+          'Practicing in a low-stakes environment before the cockpit is the most efficient way to accelerate that repetition. Listen to LiveATC.net to hear real controllers and pilots. Practice your calls out loud before a flight. Use a simulator that gives feedback. The goal is to make the words come automatically so your cognitive bandwidth stays available for flying the airplane.',
+        ],
+      },
+    ],
+    cta: 'ATC Clearance Trainer lets you practice every type of ATC radio call — ground, tower, departure, flight following — with a realistic controller voice and instant feedback on your readbacks. Try it free.',
+  },
+
+  {
+    slug: 'pilot-radio-anxiety',
+    title: 'Pilot Radio Anxiety: Why It Happens and How to Get Over It',
+    description: 'Radio anxiety affects more pilots than anyone admits. A CFI and former air traffic controller explains why it happens, what controllers actually think, and how to build genuine confidence on the frequency.',
+    date: 'July 20, 2026',
+    readTime: '6 min read',
+    intro: "Radio anxiety is one of the most common and least talked-about challenges in pilot training. Students who are performing well in every other area of flight training freeze when they have to key the mic. Some student pilots delay solo cross-countries or avoid controlled airspace specifically to avoid talking to ATC. If that sounds familiar, you're not alone — and it's fixable.",
+    sections: [
+      {
+        heading: 'Why Radio Anxiety Is So Common',
+        paragraphs: [
+          'Talking on the radio requires you to do several things at once: recall the correct phraseology, remember your callsign and position, listen for the controller\'s response, and do all of this while also flying the airplane. For a student pilot, every one of those tasks requires conscious effort. That leaves very little cognitive bandwidth for the radio.',
+          'The anxiety compounds because ATC frequencies are public. Other pilots hear your transmissions. A stumble on the radio feels more exposed than a stumble on a maneuver. That perception makes pilots hesitate, and hesitation makes the radio feel harder than it is.',
+        ],
+      },
+      {
+        heading: 'What Controllers Actually Think',
+        paragraphs: [
+          'Having worked in an ATC facility, I can tell you: controllers are not judging student pilots for hesitating or saying the wrong thing. Controllers are focused on traffic separation and sequencing. A student who stumbles is a minor task — issue a correction, move on.',
+          'What controllers notice more than mistakes is a pilot who doesn\'t respond, executes an instruction incorrectly without reading it back, or refuses to clarify when they\'re unsure. A student who says "say again" or "unable" is handling the situation correctly. A student who guesses and executes the wrong instruction is a real problem.',
+          'The radio is a tool for two-way communication. Use it. Controllers would rather re-issue an instruction than have a pilot act on a misheard one.',
+        ],
+      },
+      {
+        heading: 'The Real Cause: Lack of Automaticity',
+        paragraphs: [
+          'Radio anxiety isn\'t usually about fear of judgment. It\'s about cognitive load. When you haven\'t formed a particular type of radio call dozens of times, assembling it in the cockpit while flying requires active thought. Active thought under pressure is stressful.',
+          'The solution isn\'t confidence — it\'s repetition. When you\'ve said "Riverside Ground, Cessna 8-8-6 Papa Kilo, south ramp, with Information Kilo, request taxi" enough times, you don\'t think about the words anymore. They come out automatically. That\'s when flying and talking simultaneously becomes manageable.',
+        ],
+      },
+      {
+        heading: 'How to Build Real Confidence on the Radio',
+        paragraphs: [
+          'Practice the calls out loud, not just in your head. Sit at home, imagine you\'re on the ramp, and say the words out loud. This feels silly. Do it anyway. The muscle memory and verbal fluency you build translates directly to the cockpit.',
+          'Listen to LiveATC.net. Find your local airport\'s frequency and listen to real controllers and pilots. You\'ll start to hear the patterns — the pace, the abbreviations, the rhythm of a busy frequency. Familiarity reduces anxiety.',
+          'Practice in a low-stakes environment first. A non-towered airport removes ATC from the equation so you can focus on flying. A practice app gives you the ATC interaction without the simultaneous airplane workload. Build the radio skill separately before combining it with the full flight environment.',
+        ],
+      },
+      {
+        heading: 'What to Do When You Freeze',
+        paragraphs: [
+          'If you freeze mid-transmission, stop. Take a breath. Start again with your callsign. "Cessna 8-8-6 Papa Kilo, standby" buys you a moment. Controllers understand.',
+          'If you missed an instruction, say "say again" — every time, without hesitation. Never execute an instruction you\'re not sure about. A missed transmission is recoverable. An incorrect maneuver on a busy frequency is not.',
+          'If you said the wrong thing, correct it: "Correction, 8-8-6 Papa Kilo..." and state what you meant. Controllers hear corrections all the time. What they don\'t hear as often as they\'d like is pilots correcting themselves before executing something wrong.',
+        ],
+      },
+      {
+        heading: 'The Timeline for Getting Comfortable',
+        paragraphs: [
+          'Most student pilots report that radio anxiety significantly decreases after 15 to 20 hours of flight time — not because they studied more, but because they\'ve had enough repetitions. The calls that felt foreign at 5 hours feel automatic at 20.',
+          'You can accelerate that timeline. Every rep you get outside the cockpit — listening, practicing out loud, using a trainer — compresses the time it takes to reach automaticity in the air.',
+        ],
+      },
+    ],
+    cta: 'ATC Clearance Trainer is built for exactly this problem — practice every ATC radio call type with a realistic controller voice, at your own pace, with instant feedback. No judgment, no pressure, unlimited reps. Try it free.',
+  },
+]
+
 export function getArticle(slug) {
   return articles.find(a => a.slug === slug) || null
 }
