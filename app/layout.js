@@ -15,11 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata = {
   metadataBase: new URL("https://practice.flight-levels.com"),
   title: {
-    default: "ATC Clearance Trainer — Practice ATC Calls & Clearances for Pilots",
+    default: "ATC Clearance Trainer — Practice ATC Radio Calls, IFR Clearances & Readbacks",
     template: "%s | ATC Clearance Trainer",
   },
   description:
-    "Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller. Perfect for student pilots, IFR students, and international pilots training in the US.",
+    "Nervous about talking to ATC? Practice real ATC radio calls, IFR clearances, and readbacks with AI scoring and instant feedback. Built by a CFI and former air traffic controller. Perfect for student pilots, IFR students, and international pilots.",
   keywords: [
     "ATC radio practice",
     "student pilot radio practice",
@@ -46,9 +46,9 @@ export const metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "ATC Clearance Trainer — Practice ATC Radio Calls for Pilots",
+    title: "ATC Clearance Trainer — Practice ATC Radio Calls, IFR Clearances & Readbacks",
     description:
-      "Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller.",
+      "Nervous about talking to ATC? Practice real ATC radio calls, IFR clearances, and readbacks with AI scoring and instant feedback. Built by a CFI and former air traffic controller.",
     url: "https://practice.flight-levels.com",
     siteName: "ATC Clearance Trainer — Flight Levels",
     type: "website",
@@ -57,9 +57,9 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ATC Clearance Trainer — Practice ATC Radio Calls for Pilots",
+    title: "ATC Clearance Trainer — Practice ATC Radio Calls, IFR Clearances & Readbacks",
     description:
-      "Practice ATC radio calls, IFR clearances, and readbacks with real-time AI scoring. Built by a CFI and former air traffic controller.",
+      "Nervous about talking to ATC? Practice real ATC radio calls, IFR clearances, and readbacks with AI scoring. Built by a CFI and former ATC.",
   },
   robots: {
     index: true,
