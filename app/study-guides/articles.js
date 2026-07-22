@@ -200,7 +200,6 @@ export const articles = [
     ],
     cta: 'ATC Clearance Trainer scores your readbacks the way a real controller would — identifying exactly what you got right, what you missed, and what was garbled. Try it free at practice.flight-levels.com/demo.',
   },
-]
 
   {
     slug: 'how-to-talk-to-atc',
