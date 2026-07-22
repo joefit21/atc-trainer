@@ -93,7 +93,7 @@ export default async function ArticlePage({ params }) {
         {/* Byline */}
         <div className="flex items-center gap-4 border-t border-b border-white/10 py-5 mb-10">
           <img
-            src="https://www.flight-levels.com/joe-cockpit.png"
+            src="/joe-cockpit.jpg"
             alt="Joe Mattison"
             className="w-12 h-12 rounded-full object-cover object-top border border-white/10"
           />
