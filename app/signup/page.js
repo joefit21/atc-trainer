@@ -33,6 +33,25 @@ function SignupForm() {
       .catch(() => {})
   }, [])
 
+  // If already logged in and not subscribed, skip the form and go straight to checkout
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      const { data: profile } = await supabase.from('profiles').select('is_subscribed').eq('id', user.id).single()
+      if (profile?.is_subscribed) { window.location.href = '/radio-lab'; return }
+      const endpoint = searchParams.get('bundle') === '1' ? '/api/create-bundle-checkout' : '/api/create-checkout'
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, email: user.email, region }),
+      })
+      const result = await res.json()
+      if (result.url) window.location.href = result.url
+    }
+    checkExistingSession()
+  }, [region])
+
   const singlePrice = REGIONAL_PRICE[region] || '$29'
 
   const isBundleFlow = selectedPlan === 'bundle'

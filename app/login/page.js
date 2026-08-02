@@ -14,11 +14,20 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault()
     setLoading(true)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setMessage(error.message)
     } else {
-      router.push('/radio-lab')
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_subscribed')
+        .eq('id', data.user.id)
+        .single()
+      if (profile?.is_subscribed) {
+        router.push('/radio-lab')
+      } else {
+        router.push('/signup')
+      }
     }
     setLoading(false)
   }
