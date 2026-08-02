@@ -9,7 +9,7 @@ const supabase = createClient(
 
 export async function POST(request) {
   try {
-    const { userId } = await request.json()
+    const { userId, email } = await request.json()
 
     const { data: profile } = await supabase
       .from('profiles')
@@ -20,12 +20,9 @@ export async function POST(request) {
     let customerId = profile?.stripe_customer_id
 
     // Fallback: look up Stripe customer by email (covers iOS subscribers with no stripe_customer_id)
-    if (!customerId) {
-      const { data: { user } } = await supabase.auth.admin.getUserById(userId)
-      if (user?.email) {
-        const customers = await stripe.customers.list({ email: user.email, limit: 1 })
-        customerId = customers.data[0]?.id
-      }
+    if (!customerId && email) {
+      const customers = await stripe.customers.list({ email, limit: 1 })
+      customerId = customers.data[0]?.id
     }
 
     if (!customerId) {

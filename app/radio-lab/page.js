@@ -717,7 +717,7 @@ export default function RadioLab() {
           <div className="flex items-center gap-4">
             <span className="text-gray-400 text-sm hidden sm:block">{user?.email}</span>
             <button onClick={async () => {
-              const res = await fetch('/api/create-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user?.id }) })
+              const res = await fetch('/api/create-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user?.id, email: user?.email }) })
               const { url, error } = await res.json()
               if (error === 'no_stripe_customer') { alert('Your subscription is managed through the App Store. Open the Settings app on your iPhone to manage it.'); return }
               if (!url) { alert('Could not open subscription portal. Please contact support.'); return }
