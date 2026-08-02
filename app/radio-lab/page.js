@@ -718,7 +718,9 @@ export default function RadioLab() {
             <span className="text-gray-400 text-sm hidden sm:block">{user?.email}</span>
             <button onClick={async () => {
               const res = await fetch('/api/create-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user?.id }) })
-              const { url } = await res.json()
+              const { url, error } = await res.json()
+              if (error === 'no_stripe_customer') { alert('Your subscription is managed through the App Store. Open the Settings app on your iPhone to manage it.'); return }
+              if (!url) { alert('Could not open subscription portal. Please contact support.'); return }
               window.location.href = url
             }} className="text-gray-400 hover:text-white text-sm transition">Manage Subscription</button>
             <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}

@@ -17,13 +17,24 @@ export async function POST(request) {
       .eq('id', userId)
       .single()
 
-    if (!profile?.stripe_customer_id) {
-      return Response.json({ error: 'No customer found' }, { status: 404 })
+    let customerId = profile?.stripe_customer_id
+
+    // Fallback: look up Stripe customer by email (covers iOS subscribers with no stripe_customer_id)
+    if (!customerId) {
+      const { data: { user } } = await supabase.auth.admin.getUserById(userId)
+      if (user?.email) {
+        const customers = await stripe.customers.list({ email: user.email, limit: 1 })
+        customerId = customers.data[0]?.id
+      }
+    }
+
+    if (!customerId) {
+      return Response.json({ error: 'no_stripe_customer' }, { status: 404 })
     }
 
     const session = await stripe.billingPortal.sessions.create({
-      customer: profile.stripe_customer_id,
-      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/radio-lab`
+      customer: customerId,
+      return_url: `${process.env.NEXT_PUBLIC_SITE_URL}/radio-lab`,
     })
 
     return Response.json({ url: session.url })
