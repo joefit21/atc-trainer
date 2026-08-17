@@ -41,16 +41,19 @@ function SignupForm() {
       const { data: profile } = await supabase.from('profiles').select('is_subscribed').eq('id', user.id).single()
       if (profile?.is_subscribed) { window.location.href = '/radio-lab'; return }
       const endpoint = searchParams.get('bundle') === '1' ? '/api/create-bundle-checkout' : '/api/create-checkout'
+      // Read region from state at call time via a query param fallback to avoid double-firing
+      const regionOverride = searchParams.get('region')
+      const activeRegion = regionOverride || region
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, email: user.email, region }),
+        body: JSON.stringify({ userId: user.id, email: user.email, region: activeRegion }),
       })
       const result = await res.json()
       if (result.url) window.location.href = result.url
     }
     checkExistingSession()
-  }, [region])
+  }, []) // run once on mount only — region is read at call time
 
   const singlePrice = REGIONAL_PRICE[region] || '$29'
 
