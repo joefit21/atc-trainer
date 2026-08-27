@@ -46,6 +46,70 @@ const jsonLd = {
   ],
 }
 
+const HOME_BILLING = {
+  monthly: { label: 'Monthly', single: null, bundle: '$49', singleSave: null, bundleSave: null },
+  '6mo': { label: '6 Months', single: '$99', bundle: '$159', singleSave: 'Save $75', bundleSave: 'Save $135' },
+  annual: { label: 'Annual', single: '$169', bundle: '$249', singleSave: 'Save $179', bundleSave: 'Save $339' },
+}
+
+function HomePricingToggle({ price, signupUrl, isNative }) {
+  const [cycle, setCycle] = useState('monthly')
+  const b = HOME_BILLING[cycle]
+  const singlePrice = cycle === 'monthly' ? price : b.single
+  const bundlePrice = b.bundle
+
+  return (
+    <>
+      <div className="bg-white/5 border border-white/10 rounded-xl p-1 flex gap-1 mb-8 max-w-sm mx-auto">
+        {Object.entries(HOME_BILLING).map(([key, v]) => (
+          <button key={key} type="button" onClick={() => setCycle(key)}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${cycle === key ? 'bg-white/15 text-white' : 'text-gray-400 hover:text-white'}`}>
+            {v.label}
+            {key === 'annual' && <span className="block text-xs text-green-400 font-normal">Best deal</span>}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
+          <div className="text-4xl font-bold mb-1">{singlePrice}{cycle === 'monthly' && <span className="text-xl text-gray-400">/mo</span>}</div>
+          {cycle !== 'monthly' && <div className="text-green-400 text-sm font-semibold mb-1">{b.singleSave}</div>}
+          <p className="text-gray-400 text-sm mb-1">ATC Clearance Trainer only</p>
+          <p className="text-gray-500 text-xs mb-6">Less than one hour of flight instruction</p>
+          <ul className="text-left space-y-2 mb-8 flex-1">
+            {['Unlimited practice scenarios', 'Ground & IFR clearances', 'AI readback scoring', 'Detailed feedback on every readback', 'New scenarios every session'].map((item) => (
+              <li key={item} className="flex items-center gap-3 text-sm text-gray-300"><span className="text-blue-400">✓</span> {item}</li>
+            ))}
+          </ul>
+          <a href={`${signupUrl}${cycle !== 'monthly' ? `${signupUrl.includes('?') ? '&' : '?'}plan=${cycle}` : ''}`}
+            className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
+            Get ATC Clearance Trainer
+          </a>
+        </div>
+
+        {!isNative && (
+          <div className="bg-[#0a0f1e] border-2 border-purple-500/70 rounded-2xl p-8 text-center flex flex-col relative">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">BEST VALUE</div>
+            <div className="text-4xl font-bold mb-1">{bundlePrice}{cycle === 'monthly' && <span className="text-xl text-gray-400">/mo</span>}</div>
+            {cycle !== 'monthly' && <div className="text-green-400 text-sm font-semibold mb-1">{b.bundleSave}</div>}
+            <p className="text-gray-300 text-sm mb-1 font-medium">Flight Levels Bundle</p>
+            <p className="text-gray-500 text-xs mb-6">Save $9/mo vs. buying separately</p>
+            <ul className="text-left space-y-2 mb-8 flex-1">
+              {['Everything in ATC Clearance Trainer', 'Full access to Checkride Prep AI', 'Practice oral exams + radio comms', 'One subscription, two tools', 'Cancel anytime'].map((item) => (
+                <li key={item} className="flex items-center gap-3 text-sm text-gray-300"><span className="text-purple-400">✓</span> {item}</li>
+              ))}
+            </ul>
+            <a href={`https://checkride.flight-levels.com/signup?bundle=1${cycle !== 'monthly' ? `&plan=${cycle}` : ''}`}
+              className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
+              Get the Bundle
+            </a>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
 function HomeContent() {
   const [price, setPrice] = useState('$29')
   const [region, setRegion] = useState('default')
@@ -342,61 +406,10 @@ function HomeContent() {
         <div className="max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-4">Simple Pricing</h2>
           <p className="text-gray-400 text-center mb-2">Unlimited sessions. Cancel anytime.</p>
-          <p className="text-gray-500 text-sm text-center mb-10">Regional pricing applied automatically. Questions? <a href="mailto:joe@flight-levels.com" className="text-blue-400 hover:text-blue-300 transition">Contact us</a>.</p>
-          <div className="grid md:grid-cols-2 gap-6">
+          <p className="text-gray-500 text-sm text-center mb-8">Regional pricing applied automatically. Questions? <a href="mailto:joe@flight-levels.com" className="text-blue-400 hover:text-blue-300 transition">Contact us</a>.</p>
 
-            {/* ATC Trainer only */}
-            <div className="bg-[#0a0f1e] border border-white/20 rounded-2xl p-8 text-center flex flex-col">
-              <div className="text-4xl font-bold mb-1">{price}<span className="text-xl text-gray-400">/mo</span></div>
-              <p className="text-gray-400 text-sm mb-1">ATC Clearance Trainer only</p>
-              <p className="text-gray-500 text-xs mb-6">Less than one hour of flight instruction</p>
-              <ul className="text-left space-y-2 mb-8 flex-1">
-                {[
-                  'Unlimited practice scenarios',
-                  'Ground & IFR clearances',
-                  'AI readback scoring',
-                  'Detailed feedback on every readback',
-                  'New scenarios every session',
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-gray-300">
-                    <span className="text-blue-400">✓</span> {item}
-                  </li>
-                ))}
-              </ul>
-              <a href={signupUrl} className="block w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 rounded-xl font-semibold transition">
-                Get ATC Clearance Trainer
-              </a>
-            </div>
-
-            {/* Bundle — hidden on iOS, web only */}
-            {!isNative && (
-            <div className="bg-[#0a0f1e] border-2 border-purple-500/70 rounded-2xl p-8 text-center flex flex-col relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">
-                BEST VALUE
-              </div>
-              <div className="text-4xl font-bold mb-1">$49<span className="text-xl text-gray-400">/mo</span></div>
-              <p className="text-gray-300 text-sm mb-1 font-medium">Flight Levels Bundle</p>
-              <p className="text-gray-500 text-xs mb-6">Save $9/mo vs. buying separately</p>
-              <ul className="text-left space-y-2 mb-8 flex-1">
-                {[
-                  'Everything in ATC Clearance Trainer',
-                  'Full access to Checkride Prep AI',
-                  'Practice oral exams + radio comms',
-                  'One subscription, two tools',
-                  'Cancel anytime',
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-sm text-gray-300">
-                    <span className="text-purple-400">✓</span> {item}
-                  </li>
-                ))}
-              </ul>
-              <a href="https://checkride.flight-levels.com/signup?bundle=1" className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-bold transition">
-                Get the Bundle
-              </a>
-            </div>
-            )}
-
-          </div>
+          {/* Billing cycle toggle */}
+          <HomePricingToggle price={price} signupUrl={signupUrl} isNative={isNative} />
         </div>
       </section>
 

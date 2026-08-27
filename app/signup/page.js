@@ -9,19 +9,45 @@ const REGIONAL_PRICE = {
   default: '$29',
 }
 
+const BILLING = {
+  monthly: {
+    label: 'Monthly',
+    singlePrice: null, // use regional
+    bundlePrice: '$49',
+    singleSavings: null,
+    bundleSavings: null,
+    plan: 'monthly',
+  },
+  '6mo': {
+    label: '6 Months',
+    singlePrice: '$99',
+    bundlePrice: '$159',
+    singleSavings: 'Save $75',
+    bundleSavings: 'Save $135',
+    plan: '6mo',
+  },
+  annual: {
+    label: 'Annual',
+    singlePrice: '$169',
+    bundlePrice: '$249',
+    singleSavings: 'Save $179',
+    bundleSavings: 'Save $339',
+    plan: 'annual',
+  },
+}
+
 function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [selectedPlan, setSelectedPlan] = useState('single') // 'single' | 'bundle'
+  const [billingCycle, setBillingCycle] = useState('monthly')
   const [region, setRegion] = useState('default')
   const searchParams = useSearchParams()
 
   useEffect(() => {
-    if (searchParams.get('bundle') === '1') {
-      setSelectedPlan('bundle')
-    }
+    if (searchParams.get('bundle') === '1') setSelectedPlan('bundle')
   }, [searchParams])
 
   useEffect(() => {
@@ -41,7 +67,6 @@ function SignupForm() {
       const { data: profile } = await supabase.from('profiles').select('is_subscribed').eq('id', user.id).single()
       if (profile?.is_subscribed) { window.location.href = '/radio-lab'; return }
       const endpoint = searchParams.get('bundle') === '1' ? '/api/create-bundle-checkout' : '/api/create-checkout'
-      // Read region from state at call time via a query param fallback to avoid double-firing
       const regionOverride = searchParams.get('region')
       const activeRegion = regionOverride || region
       const res = await fetch(endpoint, {
@@ -53,13 +78,24 @@ function SignupForm() {
       if (result.url) window.location.href = result.url
     }
     checkExistingSession()
-  }, []) // run once on mount only — region is read at call time
-
-  const singlePrice = REGIONAL_PRICE[region] || '$29'
+  }, []) // run once on mount only
 
   const isBundleFlow = selectedPlan === 'bundle'
   const checkoutEndpoint = isBundleFlow ? '/api/create-bundle-checkout' : '/api/create-checkout'
   const loginRedirect = isBundleFlow ? '/login?bundle=1' : '/login?subscribe=1'
+  const billing = BILLING[billingCycle]
+  const monthlyPrice = REGIONAL_PRICE[region] || '$29'
+  const displayPrice = isBundleFlow
+    ? (billing.bundlePrice || billing.bundlePrice)
+    : (billingCycle === 'monthly' ? monthlyPrice : billing.singlePrice)
+  const savings = isBundleFlow ? billing.bundleSavings : billing.singleSavings
+
+  const buildCheckoutBody = (userId, userEmail) => ({
+    userId,
+    email: userEmail,
+    region,
+    plan: billingCycle === 'monthly' ? undefined : billingCycle,
+  })
 
   const handleSignup = async (e) => {
     e.preventDefault()
@@ -89,14 +125,10 @@ function SignupForm() {
         const res = await fetch(checkoutEndpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: signInData.user.id, email, region }),
+          body: JSON.stringify(buildCheckoutBody(signInData.user.id, email)),
         })
         const result = await res.json()
-        if (result.error) {
-          setMessage('Checkout error: ' + result.error)
-          setLoading(false)
-          return
-        }
+        if (result.error) { setMessage('Checkout error: ' + result.error); setLoading(false); return }
         window.location.href = result.url
         return
       }
@@ -108,15 +140,10 @@ function SignupForm() {
     const res = await fetch(checkoutEndpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: data.user.id, email, region }),
+      body: JSON.stringify(buildCheckoutBody(data.user.id, email)),
     })
-
     const result = await res.json()
-    if (result.error) {
-      setMessage('Checkout error: ' + result.error)
-      setLoading(false)
-      return
-    }
+    if (result.error) { setMessage('Checkout error: ' + result.error); setLoading(false); return }
     window.location.href = result.url
   }
 
@@ -128,9 +155,8 @@ function SignupForm() {
         <p className="text-gray-400">Choose a plan and start practicing today</p>
       </div>
 
-      {/* Plan Selection */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
-        {/* Single plan */}
+      {/* Product Selection */}
+      <div className="grid grid-cols-2 gap-3 mb-5">
         <button
           type="button"
           onClick={() => setSelectedPlan('single')}
@@ -143,10 +169,9 @@ function SignupForm() {
           <div className="text-xl mb-2">🎙️</div>
           <div className="font-semibold text-sm text-white">ATC Clearance Trainer</div>
           <div className="text-xs text-gray-400 mt-1">CTAF · Class D · Flight Following · IFR</div>
-          <div className="text-blue-400 font-bold mt-2">{singlePrice}/mo</div>
+          <div className="text-blue-400 font-bold mt-2">{monthlyPrice}/mo</div>
         </button>
 
-        {/* Bundle plan */}
         <button
           type="button"
           onClick={() => setSelectedPlan('bundle')}
@@ -164,6 +189,33 @@ function SignupForm() {
           <div className="text-xs text-gray-400 mt-1">ATC Clearance Trainer + Checkride Prep</div>
           <div className="text-purple-400 font-bold mt-2">$49/mo</div>
         </button>
+      </div>
+
+      {/* Billing Cycle */}
+      <div className="bg-white/5 border border-white/10 rounded-xl p-1 flex gap-1 mb-6">
+        {Object.entries(BILLING).map(([key, b]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setBillingCycle(key)}
+            className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+              billingCycle === key
+                ? 'bg-white/15 text-white'
+                : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            {b.label}
+            {key === 'annual' && <span className="block text-xs text-green-400 font-normal">Best deal</span>}
+          </button>
+        ))}
+      </div>
+
+      {/* Price summary */}
+      <div className="text-center mb-5">
+        <span className="text-2xl font-bold text-white">{displayPrice}</span>
+        {billingCycle !== 'monthly' && <span className="text-gray-400 text-sm ml-1">total</span>}
+        {billingCycle === 'monthly' && <span className="text-gray-400 text-sm ml-1">/ month</span>}
+        {savings && <span className="ml-3 text-green-400 text-sm font-semibold">{savings}</span>}
       </div>
 
       {/* Form */}
@@ -191,24 +243,18 @@ function SignupForm() {
           />
         </div>
 
-        {message && (
-          <p className="text-sm text-red-400 text-center">{message}</p>
-        )}
+        {message && <p className="text-sm text-red-400 text-center">{message}</p>}
 
         <button
           type="submit"
           disabled={loading}
           className={`w-full disabled:opacity-50 text-white py-3 rounded-lg font-semibold transition ${
-            isBundleFlow
-              ? 'bg-purple-500 hover:bg-purple-600'
-              : 'bg-blue-500 hover:bg-blue-600'
+            isBundleFlow ? 'bg-purple-500 hover:bg-purple-600' : 'bg-blue-500 hover:bg-blue-600'
           }`}
         >
           {loading
             ? 'Setting up your account...'
-            : isBundleFlow
-              ? 'Create Account & Subscribe — $49/mo'
-              : `Create Account & Subscribe — ${singlePrice}/mo`}
+            : `Create Account & Subscribe — ${displayPrice}${billingCycle === 'monthly' ? '/mo' : ''}`}
         </button>
       </form>
 

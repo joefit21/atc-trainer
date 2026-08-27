@@ -4,7 +4,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(req) {
   try {
-    const { userId, email } = await req.json()
+    const { userId, email, plan } = await req.json()
+
+    const priceId = plan === '6mo'
+      ? process.env.BUNDLE_6MO_STRIPE_PRICE_ID
+      : plan === 'annual'
+        ? process.env.BUNDLE_ANNUAL_STRIPE_PRICE_ID
+        : process.env.BUNDLE_STRIPE_PRICE_ID
 
     // Check for existing Stripe customer to avoid duplicates
     const existing = await stripe.customers.list({ email, limit: 1 })
@@ -19,7 +25,7 @@ export async function POST(req) {
       customer: customer.id,
       payment_method_types: ['card'],
       mode: 'subscription',
-      line_items: [{ price: process.env.BUNDLE_STRIPE_PRICE_ID, quantity: 1 }],
+      line_items: [{ price: priceId, quantity: 1 }],
       metadata: { userId },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/payment-success?bundle=1`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/signup`,

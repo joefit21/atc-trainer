@@ -4,13 +4,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export async function POST(request) {
   try {
-    const { userId, email, region } = await request.json()
+    const { userId, email, region, plan } = await request.json()
 
-    const priceId = region === 'india'
+    const basePriceId = region === 'india'
       ? process.env.INDIA_STRIPE_PRICE_ID
       : region === 'uae'
         ? process.env.UAE_STRIPE_PRICE_ID
         : process.env.STRIPE_PRICE_ID
+
+    const priceId = plan === '6mo'
+      ? process.env.ATC_6MO_STRIPE_PRICE_ID
+      : plan === 'annual'
+        ? process.env.ATC_ANNUAL_STRIPE_PRICE_ID
+        : basePriceId
 
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
