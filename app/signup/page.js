@@ -169,7 +169,7 @@ function SignupForm() {
           <div className="text-xl mb-2">🎙️</div>
           <div className="font-semibold text-sm text-white">ATC Clearance Trainer</div>
           <div className="text-xs text-gray-400 mt-1">CTAF · Class D · Flight Following · IFR</div>
-          <div className="text-blue-400 font-bold mt-2">{monthlyPrice}/mo</div>
+          <div className="text-blue-400 font-bold mt-2">{displayPrice}{billingCycle === 'monthly' ? '/mo' : ' total'}</div>
         </button>
 
         <button
@@ -187,7 +187,7 @@ function SignupForm() {
           <div className="text-xl mb-2">🎁</div>
           <div className="font-semibold text-sm text-white">Both Apps</div>
           <div className="text-xs text-gray-400 mt-1">ATC Clearance Trainer + Checkride Prep</div>
-          <div className="text-purple-400 font-bold mt-2">$49/mo</div>
+          <div className="text-purple-400 font-bold mt-2">{billing.bundlePrice || '$49'}{billingCycle === 'monthly' ? '/mo' : ' total'}</div>
         </button>
       </div>
 
