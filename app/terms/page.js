@@ -20,7 +20,7 @@ export default function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold text-white mb-3">3. Subscription and Billing</h2>
-            <p>Access to the full Service requires a paid subscription at $29 per month. Subscriptions are billed monthly and renew automatically until canceled. You may cancel at any time through your account settings. No refunds are issued for partial months.</p>
+            <p>Access to the full Service requires a paid subscription. Plans are available on a monthly, 6-month, or annual basis at the prices displayed at checkout. Subscriptions renew automatically at the end of each billing period until canceled. You may cancel at any time through your account settings or App Store subscription settings. No refunds are issued for unused portions of a billing period.</p>
           </section>
 
           <section>
