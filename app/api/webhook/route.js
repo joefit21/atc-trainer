@@ -21,6 +21,8 @@ export async function POST(request) {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object
+    // ADM Trainer shares this Stripe account and customers; its purchases are handled by its own webhook.
+    if (session.metadata?.product === 'adm') return Response.json({ received: true })
 
     // Primary: userId in session metadata (ATC Trainer individual checkout)
     // Fallback: supabase_uid in customer metadata (bundle checkout)
@@ -45,6 +47,7 @@ export async function POST(request) {
 
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object
+    if (subscription.metadata?.product === 'adm') return Response.json({ received: true })
     const { data } = await supabase
       .from('profiles')
       .select('id')
