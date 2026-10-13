@@ -214,6 +214,7 @@ function HomeContent() {
           <span className="text-xl font-bold">Flight Levels</span>
         </div>
         <div className="flex items-center gap-4">
+          {!isNative && <a href="https://www.flight-levels.com" className="hidden md:inline text-gray-400 hover:text-white transition text-sm">&larr; Flight Levels</a>}
           <a href="/study-guides" className="text-gray-300 hover:text-white transition text-sm">Study Guides</a>
           <a href="/login" className="text-gray-300 hover:text-white transition">Log In</a>
           <a href={signupUrl} className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition">Subscribe</a>
@@ -455,6 +456,7 @@ function HomeContent() {
         <div className="flex justify-center gap-6 mt-3">
           <a href="/terms" className="hover:text-gray-300 transition">Terms of Service</a>
           <a href="/privacy" className="hover:text-gray-300 transition">Privacy Policy</a>
+          {!isNative && <a href="https://www.flight-levels.com" className="hover:text-gray-300 transition">flight-levels.com</a>}
         </div>
       </footer>
     </main>
