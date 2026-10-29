@@ -703,6 +703,35 @@ export default function RadioLab() {
     </div>
   )
 
+  // Who bills this person decides where they can cancel, so ask before answering.
+  // An App Store subscription can only be managed in Apple's own settings; a
+  // subscription started on the website has a Stripe billing account.
+  async function manageSubscription() {
+    const { data: { session } } = await supabase.auth.getSession()
+    const uid = session?.user?.id || user?.id
+    const email = session?.user?.email || user?.email
+    if (IS_NATIVE) {
+      try {
+        const { Purchases } = await import('@revenuecat/purchases-capacitor')
+        const { customerInfo } = await Purchases.getCustomerInfo()
+        if (customerInfo.entitlements.active['atc_access']) {
+          window.location.href = 'itms-apps://apps.apple.com/account/subscriptions'
+          return
+        }
+      } catch {}
+    }
+    try {
+      const res = await fetch('/api/create-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: uid, email }) })
+      const { url, error } = await res.json()
+      if (url) { window.location.href = url; return }
+      if (error === 'no_stripe_customer') {
+        alert("We couldn't find a billing account for this login. If you subscribed through the App Store, open Settings, tap your name, then Subscriptions. If you subscribed on our website, email joe@flight-levels.com and we'll cancel it right away.")
+        return
+      }
+    } catch {}
+    alert("We couldn't open your billing page. Please email joe@flight-levels.com and we'll take care of it right away.")
+  }
+
   // ── render ────────────────────────────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-[#0a0f1e] text-white">
@@ -716,13 +745,7 @@ export default function RadioLab() {
         ) : (
           <div className="flex items-center gap-4">
             <span className="text-gray-400 text-sm hidden sm:block">{user?.email}</span>
-            <button onClick={async () => {
-              const res = await fetch('/api/create-portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: user?.id, email: user?.email }) })
-              const { url, error } = await res.json()
-              if (error === 'no_stripe_customer') { alert('Your subscription is managed through the App Store. Open the Settings app on your iPhone to manage it.'); return }
-              if (!url) { alert('Could not open subscription portal. Please contact support.'); return }
-              window.location.href = url
-            }} className="text-gray-400 hover:text-white text-sm transition">Manage Subscription</button>
+            <button onClick={manageSubscription} className="text-gray-400 hover:text-white text-sm transition">Manage Subscription</button>
             <button onClick={async () => { await supabase.auth.signOut(); router.push('/') }}
               className="text-gray-400 hover:text-white text-sm transition">Log Out</button>
             <button onClick={() => setShowDeleteConfirm(true)}

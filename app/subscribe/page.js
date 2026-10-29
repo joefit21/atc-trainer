@@ -252,6 +252,7 @@ export default function Subscribe() {
             Subscription automatically renews unless cancelled at least 24 hours before the end of the current period.
             Your account will be charged for renewal within 24 hours prior to the end of the current period.
             You can manage and cancel your subscription in your App Store account settings at any time after purchase.
+            Subscribed on our website instead? That subscription is billed by us, not by Apple. To manage or cancel it, email joe@flight-levels.com.
           </p>
           <p className="flex gap-4">
             <a href="https://www.flight-levels.com/terms" className="underline hover:text-gray-300 transition">Terms of Use</a>
