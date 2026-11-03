@@ -759,7 +759,11 @@ export default function RadioLab() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6">
           <div className="bg-[#0f1729] border border-white/10 rounded-2xl p-8 max-w-sm w-full text-center">
             <h2 className="text-xl font-bold mb-3">Delete Account?</h2>
-            <p className="text-gray-400 text-sm mb-6">This permanently deletes your account and all data. This cannot be undone.</p>
+            <p className="text-gray-400 text-sm mb-3">This permanently deletes your account and all data, cancels any subscription billed through our website, and removes your login for all Flight Levels apps. This cannot be undone.</p>
+            {IS_NATIVE && (
+              <p className="text-gray-400 text-sm mb-6">A subscription bought through the App Store is not cancelled by this. Cancel it in Settings: tap your name, then Subscriptions.</p>
+            )}
+            {!IS_NATIVE && <div className="mb-3" />}
             {deleting ? (
               <p className="text-gray-400 text-sm">Deleting…</p>
             ) : (
@@ -777,7 +781,14 @@ export default function RadioLab() {
                         await supabase.auth.signOut()
                         router.push('/')
                       } else {
-                        alert('Something went wrong. Please try again.')
+                        const { error } = await res.json().catch(() => ({}))
+                        if (error === 'billing_not_cancelled') {
+                          alert("We couldn't cancel your subscription, so your account has NOT been deleted. Nothing has changed. Please try again, or email joe@flight-levels.com and we'll take care of it right away.")
+                        } else if (error === 'delete_incomplete') {
+                          alert("Your subscription is cancelled and you will not be charged again, but we couldn't finish deleting your account. Please email joe@flight-levels.com and we'll finish it for you.")
+                        } else {
+                          alert('Something went wrong. Please try again.')
+                        }
                         setDeleting(false)
                       }
                     } catch {

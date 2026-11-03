@@ -1,38 +1,27 @@
+import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
-import { requireSubscribed } from '@/lib/require-auth'
+import { deleteAccount } from '@/lib/delete-account.mjs'
 
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 export async function DELETE(request) {
-  // Verify the user is authenticated (or is a demo request)
-  const auth = await requireSubscribed(request)
+  const token = request.headers.get('Authorization')?.replace('Bearer ', '').trim()
+  if (!token) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const authHeader = request.headers.get('Authorization')
-  const token = authHeader?.replace('Bearer ', '').trim()
-  if (!token) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  // Get the user from the token
+  // Who is deleted comes from the verified login token, never from the request body.
   const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token)
-  if (userError || !user) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  if (userError || !user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
-  try {
-    // Delete the profile row first (FK constraint)
-    await supabaseAdmin.from('profiles').delete().eq('id', user.id)
-
-    // Delete the auth user (this is permanent)
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
-    if (deleteError) throw deleteError
-
-    return Response.json({ success: true })
-  } catch (e) {
-    console.error('Delete account error:', e)
-    return Response.json({ error: 'Failed to delete account.' }, { status: 500 })
-  }
+  const result = await deleteAccount(user, {
+    stripe,
+    db: supabaseAdmin,
+    deleteUser: (id) => supabaseAdmin.auth.admin.deleteUser(id),
+    log: (msg, e) => console.error('Delete account:', msg, e),
+  })
+  if (result.ok) return Response.json({ success: true })
+  return Response.json({ error: result.error }, { status: result.error === 'billing_not_cancelled' ? 502 : 500 })
 }
