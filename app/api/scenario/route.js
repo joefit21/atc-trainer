@@ -2,6 +2,8 @@ import { parseAIJson } from '@/lib/parse-json'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
+import sidData from '@/lib/sids.json'
+import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -17,108 +19,6 @@ function logUsage({ model, usage, duration_ms, route }) {
     },
     body: JSON.stringify({ model, input_tokens: usage?.input_tokens, output_tokens: usage?.output_tokens, duration_ms, route }),
   }).catch(e => console.error('Usage log error:', e))
-}
-
-// Real published SIDs per departure airport
-const sids = {
-  KATL: ['TANKS', 'MANNS', 'BORN', 'FILPS', 'CAMBY'],
-  KBOS: ['SSOX', 'DORET', 'LBSTA', 'HYLND', 'DORET'],
-  KORD: ['LEWKE', 'PAITN', 'WATSN', 'PLANO', 'BACEN'],
-  KDFW: ['PODDE', 'TEXPN', 'LOWGN', 'FORCK', 'AKUNA'],
-  KDEN: ['BAYLR', 'PRAGS', 'KEPEC', 'ROKNE', 'SHERN'],
-  KDTW: ['FLINT', 'HASTE', 'ALPHE', 'DOOMA', 'DOOMA'],
-  KIAH: ['JEPPD', 'LEONI', 'SPIRT', 'FOXLL', 'NNABR'],
-  KLAX: ['OSHNN', 'HOLTZ', 'DARRR', 'ZZOOO', 'SADDE'],
-  KMIA: ['WINCO', 'MNATE', 'HILEY', 'SSCOT', 'SSCOT'],
-  KMSP: ['PRIDE', 'CAMRY', 'BINGS', 'BUGGZ', 'HUMON'],
-  KJFK: ['SKORR', 'DEEZZ', 'HAPIE', 'LONGI', 'ROBUC'],
-  KLGA: ['GAYEL', 'TNNIS', 'GREKI', 'HAARP', 'SHIPP'],
-  KEWR: ['NEWRK', 'MEHRE', 'RUUDY', 'COPES', 'SSAYS'],
-  KMCO: ['BOBZY', 'ILEXY', 'MNATS', 'FISEL', 'WAPPL'],
-  KPHX: ['SOTIS', 'EAGUL', 'LOOP', 'LALUZ', 'Bhansn'],
-  KSLC: ['GOLDN', 'MCRIT', 'DBACK', 'LYNXX', 'ALDER'],
-  KSAN: ['CIEGA', 'LNKWV', 'MOUNT', 'POMAT', 'RUBID'],
-  KSFO: ['PORTE', 'OFFSH', 'TRUKN', 'SFBOW', 'BDEGA'],
-  KSEA: ['HAROB', 'SUMMA', 'MCKEY', 'NORNG', 'HUSKY'],
-  KDCA: ['TRUPS', 'SHRKS', 'RAVNN', 'SSAYS', 'WOOLY'],
-  KIAD: ['SENTR', 'FLRAY', 'DOCSS', 'TYSON', 'SWANN'],
-  KBWI: ['TERPZ', 'HORDS', 'SKATE', 'RAVNN', 'SOXXY'],
-  KLAS: ['SHEAD', 'COWBY', 'CLARR', 'BOACH', 'PRFUM'],
-  KMDW: ['BEARS', 'SOARS', 'BONZZ', 'WLDCT', 'HEYYY'],
-  KCLT: ['KILNS', 'MAPPS', 'BOBZY', 'CLAWD', 'PRSTR'],
-  KBNA: ['HAWKZ', 'BRAVE', 'ALCOA', 'TCUPS', 'BRWNZ'],
-  KHOU: ['BOONE', 'ALIZE', 'EPSLN', 'GALVS', 'ONION'],
-  KMEM: ['BLUES', 'ROCKS', 'ORRRS', 'BNDID', 'GREYS'],
-  KPIT: ['COATT', 'RENAY', 'CHAWW', 'RAMUS', 'TARIQ'],
-  KSTL: ['ARCHH', 'LUMPY', 'MCALR', 'RVRBD', 'DRAGO'],
-  KRDU: ['TARHL', 'TROJN', 'HUCKS', 'TROYN', 'LLAWN'],
-  KBUF: ['TOMBS', 'GIOTO', 'ELROI', 'DERBB', 'BUBBA'],
-  KTUL: ['VALER', 'ARBKL', 'CHERO', 'OILRS', 'WINDS'],
-  KOKC: ['WINGS', 'BRAVE', 'SOONE', 'BOMRS', 'CRUSE'],
-  KBHM: ['DIXIE', 'TRUSS', 'RECON', 'STEEL', 'STONS'],
-  KRIC: ['GORDO', 'WATTX', 'YANKS', 'TRUPS', 'DALES'],
-  KJAX: ['MARLN', 'GATOR', 'CRANE', 'PALMS', 'COAST'],
-  KAUS: ['SLTNS', 'STARR', 'PERCH', 'SSTEP', 'ALAMO'],
-  KIND: ['SMITY', 'PLATO', 'RACES', 'CARML', 'BRICKR'],
-  KCMH: ['HENDR', 'BUCKY', 'HERKY', 'FLANK', 'COLAN'],
-  KCLE: ['CAVLR', 'BNKRS', 'DAWGS', 'ROCKY', 'HEROE'],
-  KMKE: ['BRWNS', 'AARNN', 'CHEEZ', 'BRATS', 'LMBAU'],
-  KMSY: ['JAZZY', 'CAJUN', 'KREWW', 'BRDBN', 'BAYOU'],
-  KGRR: ['HIAWT', 'BLUWY', 'DUNNY', 'SPARS', 'GRRRR'],
-  KFAT: ['SNORA', 'RAISD', 'KINGZ', 'FOGGY', 'FRSNO'],
-  KOMA: ['CORNZ', 'HUSKY', 'HAWKY', 'PLNTS', 'PLDGE'],
-  KELP: ['ROPES', 'PASSES', 'ORGAN', 'SANDS', 'MTFRT'],
-  KPVD: ['BOSOX', 'ROGRS', 'NWPTS', 'MSSNS', 'BAYST'],
-  KGSO: ['PINES', 'TRIDR', 'GUILL', 'PILOT', 'AGGRO'],
-  KDAY: ['HUFFY', 'DYTON', 'WRGHT', 'ORBTS', 'HAWKS'],
-  KLEX: ['BLUGS', 'HORSE', 'DERBY', 'STTLR', 'BSEED'],
-  KTYS: ['VOLS', 'KRNEL', 'SMKYS', 'APPCH', 'TNNES'],
-  KMSN: ['BADGR', 'CHESE', 'DAIRY', 'PACKE', 'BUCKY'],
-  KTEB: ['KORRY', 'BUBLE', 'SMASS', 'RIGGI', 'WOOLY'],
-  KVNY: ['OSHNN', 'HOLTZ', 'POPPR', 'VNTRM', 'DARTS'],
-  KHWD: ['BDEGA', 'PORTE', 'SHOAL', 'FRELY', 'ALTAM'],
-  KPAO: ['BDEGA', 'PORTE', 'SHOAL', 'FRELY', 'ALTAM'],
-  KSAT: ['ALAMO', 'FIESTA', 'HEROE', 'PRNKS', 'VNDRB'],
-  KABQ: ['MESA', 'SANDD', 'VOLCA', 'GRNDX', 'CBASE'],
-  KTPA: ['SUNCS', 'BUCS', 'RAYSS', 'BEACN', 'FLRDA'],
-  KRSW: ['EVRGD', 'GLFSD', 'PALMS', 'SUNNY', 'MARLN'],
-  KPBI: ['BEACN', 'SUNSR', 'BBIKE', 'WESTR', 'PALMS'],
-  KBDL: ['CLONE', 'NWLND', 'DEVAL', 'ETHAN', 'YALIE'],
-  KMCI: ['CHIFS', 'ROYLS', 'PLAINS', 'WNDSR', 'GNADO'],
-  KDSM: ['HAWKY', 'HUSKY', 'HAWKI', 'CORNY', 'PLNTS'],
-  KLIT: ['RAZRB', 'DUCKS', 'PIGGY', 'BRDGE', 'ARKNS'],
-  KBOI: ['GEMS', 'SPUDS', 'TTONS', 'BOISE', 'HAWKZ'],
-  KCOS: ['PIKES', 'SPRNG', 'ALPIN', 'ROCKY', 'MTNER'],
-  KFSD: ['COORN', 'PRIRE', 'LAKTA', 'BLKHL', 'WNDSD'],
-}
-
-function pickSID(icao) {
-  const list = sids[icao]
-  if (!list || list.length === 0) return null
-  return pickRandom(list)
-}
-
-// Generic transition names — plausible 5-letter fix names used across US airspace
-const transitions = [
-  'BURLY', 'FINGR', 'HILEX', 'JAYMS', 'KARNS',
-  'LEENA', 'MARTZ', 'NOREX', 'OTTOS', 'PARKE',
-  'QUAIL', 'REDFN', 'SHIPP', 'TESSY', 'UPTON',
-  'VANCE', 'WAVEY', 'XENON', 'YUTES', 'ZORAX',
-  'BIGJN', 'COYOT', 'DUNNO', 'ELROI', 'FOXXY',
-  'GREKO', 'HARLD', 'INKOV', 'JURNY', 'KLEAN',
-  'LOVEE', 'MIKEY', 'NUDGE', 'OZZZY', 'PENNS',
-  'RABBT', 'SIEEX', 'TURBO', 'UMBRA', 'VENTI',
-]
-
-function buildRoutePhrase(sid) {
-  if (!sid) return 'via the filed route'
-  const sidNum = randomInt(1, 9)
-  const useTransition = Math.random() < 0.6
-  if (useTransition) {
-    const transition = pickRandom(transitions)
-    return `via the ${sid} ${sidNum} departure, ${transition} transition, then as filed`
-  }
-  return `via the ${sid} ${sidNum} departure, then as filed`
 }
 
 const airports = [
@@ -388,7 +288,7 @@ Return raw JSON only, no markdown:
         ? flightLevelToWords(Math.floor(expectAlt / 100))
         : altitudeToWords(expectAlt)
 
-      const sid = pickSID(departure.icao)
+      const sid = pickRealSID(sidData, departure.icao)
       const routePhrase = buildRoutePhrase(sid)
 
       const prompt = `Generate a realistic IFR clearance delivery from ${departure.icao} (${departure.city}) to ${destination.icao} (${destination.city}).
