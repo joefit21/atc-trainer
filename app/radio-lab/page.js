@@ -37,7 +37,7 @@ const DEMO_SCENARIOS = {
   },
   classd: {
     scenario_type: 'classd', airport_id: 'KRDM', airport_name: 'Redmond', state: 'OR',
-    tower_freq: '124.5', ground_freq: '121.8', runway: '5', pattern: 'left',
+    tower_freq: '124.5', ground_freq: '121.8', runway: '5', pattern: 'left', hold_short_candidates: ['11', '29'], hold_short_runway: '11',
     aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
     callsign_spoken: 'November four five two one Hotel',
     position: 'the general aviation ramp',

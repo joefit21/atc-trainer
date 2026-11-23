@@ -23,6 +23,20 @@ export async function POST(request) {
     const rwySpoken = runwaySpoken(scenario.runway)
     let prompt
 
+    // A hold short or crossing may only name a real runway at this airport (never the
+    // active runway's own strip). Scenarios without the list keep the older wording.
+    const candidates = scenario.hold_short_candidates
+    const holdShort = scenario.hold_short_runway // a runway number, null for none, or undefined (older scenario)
+    const crossingRule = holdShort !== undefined
+      ? holdShort
+        ? `- Add a hold short instruction for runway ${runwaySpoken(holdShort)}, written as spoken digits: "hold short runway ${runwaySpoken(holdShort)}". Do not mention any other runway except the departure runway.`
+        : '- Issue a simple taxi clearance with NO hold short and NO crossing instruction. Do not mention any runway except the departure runway.'
+      : Array.isArray(candidates)
+      ? candidates.length > 0
+        ? `- About 1 out of 3 times (roughly 33%) add a hold short instruction for a runway crossing, naming ONLY one of these real runways at this airport, as spoken digits: ${candidates.map((c) => `"runway ${runwaySpoken(c)}"`).join(' or ')}. The other 2 out of 3 times issue a simple taxi clearance with no hold short or crossing instruction.`
+        : '- This airport has only one runway, so never mention a hold short or a crossing for any other runway. Issue a simple taxi clearance.'
+      : '- About 1 out of 3 times (roughly 33%) add a hold short instruction for a runway crossing (use a different runway number, also as spoken digits). The other 2 out of 3 times issue a simple taxi clearance with no hold short or crossing instruction.'
+
     if (phase === 'ground') {
       prompt = `You are ${scenario.airport_name} Ground Control (${scenario.airport_id}).
 Aircraft: ${scenario.callsign_spoken} (${scenario.aircraft_type})
@@ -35,7 +49,7 @@ Respond with a realistic ground taxi clearance. Rules:
 - Start with the aircraft callsign in spoken form: ${scenario.callsign_spoken}
 - Assign runway ${scenario.runway} — write it as spoken digits: "runway ${rwySpoken}"
 - Include a taxiway route using a single letter (Alpha, Bravo, or Charlie)
-- About 1 out of 3 times (roughly 33%) add a hold short instruction for a runway crossing (use a different runway number, also as spoken digits). The other 2 out of 3 times issue a simple taxi clearance with no hold short or crossing instruction.
+${crossingRule}
 - Keep response under 25 words
 - Professional controller cadence — no pleasantries
 

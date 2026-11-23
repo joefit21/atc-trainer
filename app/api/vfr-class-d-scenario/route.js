@@ -1,4 +1,5 @@
 import { requireSubscribed } from '@/lib/require-auth'
+import { pickRunwayForWind, holdShortCandidates, pickHoldShort } from '@/lib/classd.mjs'
 
 // Verified Class D airports — tower/ground/departure freqs and runway patterns from airnav.com
 const CLASS_D_AIRPORTS = [
@@ -125,11 +126,14 @@ export async function GET(request) {
   if (authError) return authError
 
   const airport            = pickRandom(CLASS_D_AIRPORTS)
-  const rwyObj             = pickRandom(airport.runways)
+  const wind               = randomWind()
+  // The runway in use follows the announced wind (it used to be picked at random, so about
+  // one departure in five had a tailwind of 5 knots or more).
+  const rwyObj             = pickRunwayForWind(airport.runways, parseInt(wind.dir, 10), wind.speed)
+  const holdCandidates     = holdShortCandidates(airport.runways, rwyObj.rwy)
   const aircraft           = pickRandom(AIRCRAFT)
   const tail               = generateTailNumber()
   const atis               = pickRandom(ATIS_LETTERS)
-  const wind               = randomWind()
   const sky                = pickRandom(SKY_CONDITIONS)
   const altimeter          = randomAltimeter()
   const position           = pickRandom(POSITIONS)
@@ -144,6 +148,10 @@ export async function GET(request) {
     ground_freq:      airport.ground,
     departure_freq:   airport.departure,
     runway:           rwyObj.rwy,
+    // Real runways ground may mention for a hold short or crossing (not the active runway's own strip).
+    hold_short_candidates: holdCandidates,
+    // About a third of departures get a hold short or crossing, for one of those real runways.
+    hold_short_runway: pickHoldShort(holdCandidates),
     pattern:          rwyObj.pattern,
     aircraft_type:    aircraft.type,
     callsign_display: tail.display,
