@@ -5,8 +5,8 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 const DEMO_SCENARIOS = {
   ground: {
     callsign: 'N4521H',
-    airport: 'KPHX – Phoenix Sky Harbor',
-    clearance_text: 'November four five two one Hotel, Phoenix Ground, runway eight, taxi via Bravo, Delta, hold short of runway eight.',
+    airport: 'KSLE – Salem',
+    clearance_text: 'November four five two one Hotel, Salem Ground, runway tree one, taxi via Alpha, hold short of runway tree one.',
   },
   ifr: {
     callsign: 'N7823K',

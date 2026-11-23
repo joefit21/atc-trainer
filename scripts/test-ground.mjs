@@ -49,9 +49,11 @@ check('PHX can depart on every runway end', ['07L', '07R', '08', '25L', '25R', '
 check('PAO (one strip) uses both ends and never a crossing instruction',
   seen.KPAO.has('13') && seen.KPAO.has('31') && Array.from({ length: 500 }, () => pickInstruction(rw.KPAO, '13')).every((x) => x.startsWith('hold short')))
 
-// The fixed demo uses a runway that exists at Phoenix.
-const dm = demo.match(/Phoenix Ground, runway ([a-z ]+), taxi via [^,]+, [^,]+, (?:hold short of|cross) runway ([a-z ]+)\./)
-check('fixed ground demo names real Phoenix runways', !!dm && rw.KPHX.some((id) => runwaySpoken(id) === dm[1]) && rw.KPHX.some((id) => runwaySpoken(id) === dm[2]), dm ? dm.slice(1).join(' / ') : 'no match')
-check('fixed ground demo does not hold short of the reciprocal end of its own runway', !!dm && !(sameStrip(rw.KPHX.find((id) => runwaySpoken(id) === dm[1]), rw.KPHX.find((id) => runwaySpoken(id) === dm[2])) && dm[1] !== dm[2]))
+// The fixed ground demo (the home-page sample) is at Salem, a Class D airport, and uses real Salem runways.
+const dm = demo.match(/Salem Ground, runway ([a-z ]+), taxi via [^,]+, hold short of runway ([a-z ]+)\./)
+const salemRunway = (spoken) => rw.KSLE.find((id) => runwaySpoken(id) === spoken)
+check('fixed ground demo names real Salem runways', !!dm && !!salemRunway(dm[1]) && !!salemRunway(dm[2]), dm ? dm.slice(1).join(' / ') : 'no match')
+check('fixed ground demo holds short of its own departure runway', !!dm && dm[1] === dm[2])
+check('fixed ground demo is not at Redmond (the Departure tab demo)', !/Redmond/.test(demo.slice(demo.indexOf('ground: {'), demo.indexOf('ifr: {'))))
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')
 process.exit(failed ? 1 : 0)
