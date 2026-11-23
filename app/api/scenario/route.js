@@ -3,6 +3,8 @@ import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
 import sidData from '@/lib/sids.json'
+import coordData from '@/lib/airport-coords.json'
+import { pickAirlineFlightLevel } from '@/lib/altitudes.mjs'
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -204,10 +206,11 @@ function generateCallsign(forceAirline = null) {
   }
 }
 
+// Spoken as radio phraseology, with every digit as a word: "eight thousand",
+// "one two thousand". (It used to return numerals, "1 2 thousand", leaving the voice to guess.)
 function altitudeToWords(alt) {
-  const t = alt / 1000
-  const tStr = t >= 10 ? t.toString().split('').join(' ') : t.toString()
-  return `${tStr} thousand`
+  const t = Math.round(alt / 1000)
+  return `${t.toString().split('').map(d => digitWords[parseInt(d)]).join(' ')} thousand`
 }
 
 function flightLevelToWords(fl) {
@@ -274,8 +277,10 @@ Return raw JSON only, no markdown:
       const [departure, destination] = pickTwoDifferent(airports)
       const callsign = generateCallsign()
       const initialAlt = randomInt(8, 12) * 1000
+      // Airlines expect a flight level that follows the hemispheric rule for the direction of
+      // flight (odd eastbound, even westbound, FL300-FL410); see lib/altitudes.mjs.
       const expectAlt = callsign.isAirline
-        ? randomInt(18, 39) * 1000
+        ? pickAirlineFlightLevel(coordData.airports[departure.icao], coordData.airports[destination.icao]) * 100
         : (initialAlt + randomInt(3, 8) * 1000)
       const freq = generateFrequency()
       const squawk = generateSquawk()
@@ -291,30 +296,11 @@ Return raw JSON only, no markdown:
       const sid = pickRealSID(sidData, departure.icao)
       const routePhrase = buildRoutePhrase(sid)
 
-      const prompt = `Generate a realistic IFR clearance delivery from ${departure.icao} (${departure.city}) to ${destination.icao} (${destination.city}).
-
-Use this exact callsign in spoken form: "${callsign.spoken}"
-
-Use these exact values — do not change any of them:
-- Route: ${routePhrase}
-- Initial altitude: ${initialAltWords}
-- Expect altitude: ${expectAltWords} one zero minutes after departure
-- Departure frequency: ${freqWords}
-- Squawk: ${squawkWords}
-
-CLEARANCE FORMAT (follow exactly): "${callsign.spoken}, cleared to ${destination.city} ${routePhrase}, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}"
-
-Return raw JSON only, no markdown:
-{"clearance_text":"the full spoken clearance here"}`
-
-      const message = await anthropic.messages.create({
-        model: 'claude-haiku-4-5',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }]
-      })
-
-      const rawText = message.content[0].text
-      const parsed = parseAIJson(rawText)
+      // The clearance is a fixed script, so it is assembled here rather than by a model:
+      // every number is spoken as words, and no model call is needed.
+      const parsed = {
+        clearance_text: `${callsign.spoken}, cleared to ${destination.city} ${routePhrase}, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}`,
+      }
 
       const ttsResponse = await openai.audio.speech.create({
         model: 'tts-1', voice: 'onyx', input: parsed.clearance_text, speed: 1.1
@@ -323,7 +309,6 @@ Return raw JSON only, no markdown:
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer())
       const audioUrl = `data:audio/mp3;base64,${audioBuffer.toString('base64')}`
 
-      logUsage({ model: message.model, usage: message.usage, duration_ms: Date.now() - t0, route: 'scenario/ifr' })
 
       return Response.json({
         callsign: callsign.display,

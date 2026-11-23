@@ -28,9 +28,29 @@ const out = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'sids.jso
 
 const ENROUTE = new Set(['3', '6', 'S', 'V'])
 const byAirport = new Map() // icao -> Map(procId -> { name, number, transitions:Set })
+const coords = {} // icao -> [latitude, longitude, magnetic variation (east positive)]
+
+// ARINC 424 airport reference point: lat 'N33381212' (N DD MM SS ss), lon 'W084254031'
+// (W DDD MM SS ss), magnetic variation 'W0050' (W/E + degrees to tenths).
+function dms(field, degDigits) {
+  const sign = field[0] === 'S' || field[0] === 'W' ? -1 : 1
+  const d = Number(field.slice(1, 1 + degDigits))
+  const m = Number(field.slice(1 + degDigits, 3 + degDigits))
+  const sec = Number(field.slice(3 + degDigits, 7 + degDigits)) / 100
+  return sign * (d + m / 60 + sec / 3600)
+}
 
 const rl = createInterface({ input: createReadStream(src, { encoding: 'latin1' }), crlfDelay: Infinity })
 for await (const line of rl) {
+  if (line.length > 56 && line[4] === 'P' && line[5] === ' ' && line[12] === 'A' && /^K[A-Z0-9]{3}$/.test(line.slice(6, 10).trim())) {
+    const icao = line.slice(6, 10).trim()
+    const var_ = Number(line.slice(52, 56)) / 10
+    const lat = dms(line.slice(32, 41), 2)
+    const lon = dms(line.slice(41, 51), 3)
+    if (Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(var_)) {
+      coords[icao] = [Number(lat.toFixed(4)), Number(lon.toFixed(4)), line[51] === 'W' ? -var_ : var_]
+    }
+  }
   if (line.length < 30 || line[4] !== 'P' || line[12] !== 'D') continue
   const icao = line.slice(6, 10).trim()
   if (!/^K[A-Z0-9]{3}$/.test(icao)) continue // the continental US, which is all the trainer uses
@@ -64,5 +84,13 @@ const data = {
   airports,
 }
 writeFileSync(out, JSON.stringify(data))
+// Airports the FAA file does not include. Positions entered by hand (approximate: only
+// the east/west direction of a flight is used, so a small error is harmless).
+const MANUAL_COORDS = { KPBI: [26.6832, -80.0956, -6] }
+for (const [icao, c] of Object.entries(MANUAL_COORDS)) if (!coords[icao]) coords[icao] = c
+
+const coordsOut = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'airport-coords.json')
+writeFileSync(coordsOut, JSON.stringify({ source: data.source, cycle, generated: data.generated, airports: coords }))
+console.log(`wrote ${coordsOut}: ${Object.keys(coords).length} airports`)
 const n = Object.values(airports).reduce((s, a) => s + a.length, 0)
 console.log(`wrote ${out}: ${Object.keys(airports).length} airports, ${n} departure procedures`)

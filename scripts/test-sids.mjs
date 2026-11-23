@@ -1,6 +1,6 @@
 // Tests the departure-procedure data and phrasing. Run: node scripts/test-sids.mjs
 import { readFileSync } from 'node:fs'
-import { pickSID, buildRoutePhrase, DIGIT_WORDS } from '../lib/sid-phrase.mjs'
+import { pickSID, buildRoutePhrase, DIGIT_WORDS, NO_SID_PHRASES } from '../lib/sid-phrase.mjs'
 
 const data = JSON.parse(readFileSync(new URL('../lib/sids.json', import.meta.url), 'utf8'))
 const route = readFileSync(new URL('../app/api/scenario/route.js', import.meta.url), 'utf8')
@@ -29,8 +29,8 @@ check('KATL no longer has the invented TANKS', !(data.airports.KATL || []).some(
 const icaos = [...route.matchAll(/\{ icao: '(K[A-Z0-9]{3})'/g)].map((m) => m[1])
 check('found the trainer airport list', icaos.length > 50, String(icaos.length))
 const none = icaos.filter((i) => !data.airports[i])
-console.log(`     ${icaos.length - none.length} airports use real SIDs; ${none.length} have none published and say "via the filed route": ${none.join(' ')}`)
-for (const i of none) { if (buildRoutePhrase(pickSID(data, i)) !== 'via the filed route') { check('no-SID airport falls back: ' + i, false) } }
+console.log(`     ${icaos.length - none.length} airports use real SIDs; ${none.length} have none published and get one of the three no-SID phrases: ${none.join(' ')}`)
+for (const i of none) { if (!NO_SID_PHRASES.includes(buildRoutePhrase(pickSID(data, i)))) { check('no-SID airport uses an approved phrase: ' + i, false) } }
 
 // 4. Phrasing.
 const seq = (...v) => { let i = 0; return () => v[i++ % v.length] }
@@ -38,7 +38,10 @@ const sid = { name: 'BAYLR', number: 6, transitions: ['TEHRU'] }
 check('phrase with transition', buildRoutePhrase(sid, seq(0.1, 0)) === 'via the BAYLR six departure, TEHRU transition, then as filed', buildRoutePhrase(sid, seq(0.1, 0)))
 check('phrase without transition', buildRoutePhrase(sid, seq(0.9)) === 'via the BAYLR six departure, then as filed')
 check('a SID with no transitions never invents one', buildRoutePhrase({ name: 'PADGT', number: 3, transitions: [] }, seq(0)) === 'via the PADGT tree departure, then as filed')
-check('no SID -> filed route', buildRoutePhrase(null) === 'via the filed route')
+check('the three no-SID phrases are the approved ones', JSON.stringify(NO_SID_PHRASES) === JSON.stringify(['via radar vectors', 'as filed', 'via fly runway heading, expect radar vectors on course']))
+check('no SID -> every approved phrase can come up', NO_SID_PHRASES.every((ph, i) => buildRoutePhrase(null, () => i / 3 + 0.01) === ph))
+const seen = new Set(); for (let n = 0; n < 300; n++) seen.add(buildRoutePhrase(null))
+check('no SID -> only approved phrases over 300 draws', seen.size === 3 && [...seen].every((x) => NO_SID_PHRASES.includes(x)))
 check('digit 9 is niner, 3 is tree', DIGIT_WORDS[9] === 'niner' && DIGIT_WORDS[3] === 'tree')
 
 // 5. Many random draws only ever produce procedures that exist.
