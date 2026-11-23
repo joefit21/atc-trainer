@@ -28,6 +28,7 @@ const out = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'sids.jso
 
 const ENROUTE = new Set(['3', '6', 'S', 'V'])
 const byAirport = new Map() // icao -> Map(procId -> { name, number, transitions:Set })
+const runways = {} // icao -> ['07L', '07R', '08', ...] (real runway identifiers)
 const coords = {} // icao -> [latitude, longitude, magnetic variation (east positive)]
 
 // ARINC 424 airport reference point: lat 'N33381212' (N DD MM SS ss), lon 'W084254031'
@@ -50,6 +51,12 @@ for await (const line of rl) {
     if (Number.isFinite(lat) && Number.isFinite(lon) && Number.isFinite(var_)) {
       coords[icao] = [Number(lat.toFixed(4)), Number(lon.toFixed(4)), line[51] === 'W' ? -var_ : var_]
     }
+  }
+  // Runway record: section P, subsection G, identifier like 'RW07L' in columns 14-18.
+  if (line.length > 40 && line[4] === 'P' && line[12] === 'G') {
+    const rIcao = line.slice(6, 10).trim()
+    const rm = line.slice(13, 18).trim().match(/^RW(\d{2}[LRC]?)$/)
+    if (rm && /^K[A-Z0-9]{3}$/.test(rIcao)) (runways[rIcao] ??= new Set()).add(rm[1])
   }
   if (line.length < 30 || line[4] !== 'P' || line[12] !== 'D') continue
   const icao = line.slice(6, 10).trim()
@@ -84,6 +91,11 @@ const data = {
   airports,
 }
 writeFileSync(out, JSON.stringify(data))
+const runwaysOut = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'runways.json')
+const runwayList = Object.fromEntries(Object.entries(runways).sort().map(([k, v]) => [k, [...v].sort()]))
+writeFileSync(runwaysOut, JSON.stringify({ source: data.source, cycle, generated: data.generated, airports: runwayList }))
+console.log(`wrote ${runwaysOut}: ${Object.keys(runwayList).length} airports`)
+
 const coordsOut = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'airport-coords.json')
 writeFileSync(coordsOut, JSON.stringify({ source: data.source, cycle, generated: data.generated, airports: coords }))
 console.log(`wrote ${coordsOut}: ${Object.keys(coords).length} airports`)

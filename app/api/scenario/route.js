@@ -4,6 +4,8 @@ import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
 import sidData from '@/lib/sids.json'
 import coordData from '@/lib/airport-coords.json'
+import runwayData from '@/lib/runways.json'
+import { buildGroundClearance } from '@/lib/ground.mjs'
 import { pickAirlineFlightLevel } from '@/lib/altitudes.mjs'
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
 
@@ -231,30 +233,40 @@ export async function GET(request) {
       const airport = pickRandom(airports)
       const callsign = generateCallsign()
 
-      const prompt = `Generate a realistic US ground control taxi clearance for ${airport.icao} (${airport.city}).
+      // Departure clearance from the airport's real runways (lib/ground.mjs): the runway
+      // is picked from a wind, spoken correctly, and any hold-short or crossing instruction
+      // only names a runway that exists. Taxiway names are invented. An airport with no
+      // runway data falls back to the old model-written clearance.
+      const runwayIds = runwayData.airports[airport.icao]
+      let parsed
+      let message = null
+      if (runwayIds && runwayIds.length > 0) {
+        parsed = { clearance_text: buildGroundClearance({ callsignSpoken: callsign.spoken, city: airport.city, runways: runwayIds }).text }
+      } else {
+        const prompt = `Generate a realistic US ground control taxi clearance for ${airport.icao} (${airport.city}).
 
-Use this exact callsign in spoken form: "${callsign.spoken}"
+  Use this exact callsign in spoken form: "${callsign.spoken}"
 
-RUNWAY RULES:
-- Speak each digit individually: 16L = "one six left", 27R = "two seven right", 9 = "niner"
-- No leading zeros: 04L = "four left"
-- L = "left", R = "right", C = "center"
-- Only use L/R/C designators about 1 in 6 scenarios
-- If a secondary runway is mentioned always say "cross runway" or "hold short of runway" before it
+  RUNWAY RULES:
+  - Speak each digit individually: 16L = "one six left", 27R = "two seven right", 9 = "niner"
+  - No leading zeros: 04L = "four left"
+  - L = "left", R = "right", C = "center"
+  - Only use L/R/C designators about 1 in 6 scenarios
+  - If a secondary runway is mentioned always say "cross runway" or "hold short of runway" before it
 
-CLEARANCE FORMAT: "${callsign.spoken}, ${airport.city} ground, runway [digits], taxi via [taxiways], [hold short or cross instruction if needed]"
+  CLEARANCE FORMAT: "${callsign.spoken}, ${airport.city} ground, runway [digits], taxi via [taxiways], [hold short or cross instruction if needed]"
 
-Return raw JSON only, no markdown:
-{"clearance_text":"the full spoken clearance here"}`
+  Return raw JSON only, no markdown:
+  {"clearance_text":"the full spoken clearance here"}`
 
-      const message = await anthropic.messages.create({
-        model: 'claude-haiku-4-5',
-        max_tokens: 300,
-        messages: [{ role: 'user', content: prompt }]
-      })
+        message = await anthropic.messages.create({
+          model: 'claude-haiku-4-5',
+          max_tokens: 300,
+          messages: [{ role: 'user', content: prompt }]
+        })
 
-      const rawText = message.content[0].text
-      const parsed = parseAIJson(rawText)
+        parsed = parseAIJson(message.content[0].text)
+      }
 
       const ttsResponse = await openai.audio.speech.create({
         model: 'tts-1', voice: 'onyx', input: parsed.clearance_text, speed: 1.1
@@ -263,7 +275,7 @@ Return raw JSON only, no markdown:
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer())
       const audioUrl = `data:audio/mp3;base64,${audioBuffer.toString('base64')}`
 
-      logUsage({ model: message.model, usage: message.usage, duration_ms: Date.now() - t0, route: 'scenario/ground' })
+      if (message) logUsage({ model: message.model, usage: message.usage, duration_ms: Date.now() - t0, route: 'scenario/ground' })
 
       return Response.json({
         callsign: callsign.display,

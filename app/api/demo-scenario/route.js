@@ -6,7 +6,7 @@ const DEMO_SCENARIOS = {
   ground: {
     callsign: 'N4521H',
     airport: 'KPHX – Phoenix Sky Harbor',
-    clearance_text: 'November four five two one Hotel, Phoenix Ground, runway eight right, taxi via Bravo, Delta, hold short of runway two six.',
+    clearance_text: 'November four five two one Hotel, Phoenix Ground, runway eight, taxi via Bravo, Delta, hold short of runway eight.',
   },
   ifr: {
     callsign: 'N7823K',
