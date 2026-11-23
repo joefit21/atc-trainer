@@ -12,7 +12,7 @@ const DEMO_SCENARIOS = {
     callsign: 'N7823K',
     airport: 'KDFW – Dallas Fort Worth',
     destination: 'KIAH – Houston Intercontinental',
-    clearance_text: 'November seven eight two three Kilo is cleared to the Houston Intercontinental Airport via the PODDE Two departure, then as filed. Climb and maintain one one thousand, expect one five thousand one zero minutes after departure. Departure frequency one two four point three, squawk four five three two.',
+    clearance_text: 'November seven eight two tree Kilo is cleared to the Houston Intercontinental Airport via the DARTZ Niner departure, then as filed. Climb and maintain one one thousand, expect one five thousand one zero minutes after departure. Departure frequency one two four point tree, squawk four five tree two.',
   }
 }
 
