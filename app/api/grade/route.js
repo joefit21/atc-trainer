@@ -13,9 +13,21 @@ export async function POST(request) {
       if (authError) return authError
     }
 
-    const message = await anthropic.messages.create({
+    // For a clearance that includes a departure procedure, say exactly which words are
+    // lenient (the names, which voice-to-text cannot spell) and which are exact (the
+    // number), instead of leaving the model to work it out.
+    const sidMatch = clearance_text.match(/via the ([A-Z]{2,5}) (\w+) departure(?:, ([A-Z]{5}) transition)?/)
+    const sidHint = sidMatch
+      ? `\nDEPARTURE PROCEDURE IN THIS CLEARANCE (already identified for you):
+- Procedure name: ${sidMatch[1]}. Voice-to-text cannot spell it. ANY phonetic attempt at the name is fully correct. Never comment on its spelling or tell the pilot to check a chart.
+- Procedure number: "${sidMatch[2]}". This must match exactly; a different number is a real error.
+${sidMatch[3] ? `- Transition: ${sidMatch[3]}. ANY phonetic attempt at the name is fully correct, but some transition must be read back.` : '- There is no transition in this clearance.'}\n`
+      : ''
+
+    const makeRequest = () => anthropic.messages.create({
       model: 'claude-haiku-4-5',
-      max_tokens: 500,
+      max_tokens: 1000,
+      temperature: 0,
       messages: [{
         role: 'user',
         content: `You are an expert FAA flight instructor and air traffic controller grading a pilot's ATC readback.
@@ -41,6 +53,7 @@ When you see numbers that appear to run together in the readback, always try to 
 - "flight level 2 5 0 1 0" = flight level 250 AND 10 minutes
 - Always split sequential numbers into the most logical combination of clearance elements.
 
+${sidHint}
 GRADING RULES:
 1. CALLSIGN IS MANDATORY. The pilot must include their callsign EITHER at the beginning OR at the end of the readback. Both positions are equally acceptable and receive full credit. Only deduct points if the callsign is completely absent.
 2. Do NOT penalize for omitting the ATC facility name. Not required.
@@ -49,6 +62,8 @@ GRADING RULES:
 5. Do NOT penalize for "taxi to" vs "taxi via" — this distinction is not required for a correct readback.
 6. For IFR destination, the city name alone is ALWAYS full credit. "atlanta", "dallas", "phoenix" are all acceptable regardless of the full airport name. Never penalize for not saying the full airport name.
 7. For 5-character waypoint fix names, accept any phonetic attempt. Voice-to-text cannot accurately spell fixes like ZELMO or BOARS. If the pilot attempted to say something in that position, give full credit.
+7b. Departure procedure (SID) names and their transitions, like "BAYLR six departure, TEHRU transition", are fix-style names that voice-to-text cannot spell. Accept ANY phonetic attempt at the procedure name and at the transition name ("Baylor", "bailer", "Teheru"), and also a 3-letter procedure name said as a word or as letters ("Dayton" or "day" for DAY, "A T L" for ATL). The NUMBER after the procedure name is NOT lenient: it must match the clearance exactly ("six" vs "seven" is a real error). A transition is optional in the readback only if the clearance did not include one; if the clearance included a transition, the pilot must say something in that position.
+7c. Routing can also be "via radar vectors", "as filed", or "via fly runway heading, expect radar vectors on course". The readback must include the same routing, in the same meaning. Saying a different one is a routing error.
 8. Never mention which rule you applied. Never reference rule numbers or guidelines.
 9. Never explain interpretations. Grade naturally as a flight instructor would.
 10. Never compliment correct items. Only give feedback on genuine errors.
@@ -56,13 +71,30 @@ GRADING RULES:
 12. For ground control, required elements: callsign, runway, taxiway route, hold short or crossing instructions.
 13. For IFR, required elements: callsign, destination, routing, initial altitude, expect altitude and time, departure frequency, squawk code.
 
-Return raw JSON only, no markdown:
-{"score":85,"feedback":"Your feedback here."}`
+Return raw JSON only, no markdown, with exactly these three fields in this order:
+{"check":"...","score":85,"feedback":"..."}
+
+"check" is your private scratch work and is never shown to the pilot. In it, go through each required element in order (callsign, destination, routing, initial altitude, expect altitude and time, departure frequency, squawk) and write what the clearance said, what the pilot said, and whether they match. Spoken digits are the same as numerals ("four tree two one" is 4321, "one two five point tree" is 125.3). Do all of your reasoning here, once.
+
+"score" comes from your check. If every element matches, the score is 100.
+
+"feedback" is shown to the pilot. It contains only genuine errors, stated once and plainly. Never reconsider, correct yourself, or say "wait" or "actually" in it. If every element matches, it is one short sentence saying the readback was correct.`
       }]
     })
 
-    const rawText = message.content[0].text
-    const result = parseAIJson(rawText)
+    // One retry if the model's reply cannot be read as the expected JSON.
+    let result
+    for (let attempt = 1; attempt <= 2 && !result; attempt++) {
+      const message = await makeRequest()
+      try {
+        const parsed = parseAIJson(message.content[0].text)
+        if (typeof parsed.score === 'number' && typeof parsed.feedback === 'string') result = { score: parsed.score, feedback: parsed.feedback }
+        else console.error('Grade reply had the wrong shape:', message.content[0].text.slice(0, 300))
+      } catch (e) {
+        console.error('Grade reply was not valid JSON:', message.content[0].text.slice(0, 400))
+      }
+    }
+    if (!result) throw new Error('Grader reply could not be read')
     return Response.json(result)
 
   } catch (error) {
