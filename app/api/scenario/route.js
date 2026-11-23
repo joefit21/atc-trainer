@@ -93,7 +93,7 @@ const airports = [
   { icao: 'KABQ', city: 'albuquerque' },
   { icao: 'KTPA', city: 'tampa' },
   { icao: 'KRSW', city: 'fort myers' },
-  { icao: 'KPBI', city: 'west palm beach' },
+  { icao: 'KDJT', city: 'west palm beach' },
   { icao: 'KBDL', city: 'hartford' },
   { icao: 'KMCI', city: 'kansas city' },
   { icao: 'KDSM', city: 'des moines' },

@@ -84,11 +84,6 @@ const data = {
   airports,
 }
 writeFileSync(out, JSON.stringify(data))
-// Airports the FAA file does not include. Positions entered by hand (approximate: only
-// the east/west direction of a flight is used, so a small error is harmless).
-const MANUAL_COORDS = { KPBI: [26.6832, -80.0956, -6] }
-for (const [icao, c] of Object.entries(MANUAL_COORDS)) if (!coords[icao]) coords[icao] = c
-
 const coordsOut = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'airport-coords.json')
 writeFileSync(coordsOut, JSON.stringify({ source: data.source, cycle, generated: data.generated, airports: coords }))
 console.log(`wrote ${coordsOut}: ${Object.keys(coords).length} airports`)
