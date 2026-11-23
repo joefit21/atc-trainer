@@ -68,7 +68,7 @@ GRADING RULES:
 9. Never explain interpretations. Grade naturally as a flight instructor would.
 10. Never compliment correct items. Only give feedback on genuine errors.
 11. Keep feedback concise and direct, as a flight instructor speaking to a student.
-12. For ground control, required elements: callsign, runway, taxiway route, hold short or crossing instructions.
+12. For ground control, required elements: callsign, runway, taxiway route, and any hold short or crossing instruction that the clearance includes (if the clearance has none, none is required).
 13. For IFR, required elements: callsign, destination, routing, initial altitude, expect altitude and time, departure frequency, squawk code.
 
 Return raw JSON only, no markdown, with exactly these three fields in this order:

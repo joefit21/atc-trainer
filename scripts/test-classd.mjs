@@ -37,6 +37,14 @@ for (const [id, rws] of Object.entries(airports)) for (const r of rws) {
   const c = holdShortCandidates(rws, r.rwy)
   check(`${id} rwy ${r.rwy}: candidates are real and never the active strip`, c.every((x) => rws.some((q) => q.rwy === x) && !sameStripNumber(r.rwy, x)), c.join(','))
 }
+// RULE: the hold short is never the assigned runway (the clearance limit) or its other end.
+let ruleBroken = 0
+for (const [id, rws] of Object.entries(airports)) for (const r of rws) for (let i = 0; i < 500; i++) {
+  const h = pickHoldShort(holdShortCandidates(rws, r.rwy), Math.random, 1)
+  if (h !== null && sameStripNumber(r.rwy, h)) ruleBroken++
+}
+check('RULE: a hold short never names the assigned runway or its other end', ruleBroken === 0, String(ruleBroken))
+check('Redmond demo: hold short 11 is a different strip than runway 5', !sameStripNumber(5, 11))
 check('Palo Alto (one runway) has no crossing candidates', holdShortCandidates(airports.KPAO, '13').length === 0 && holdShortCandidates(airports.KPAO, '31').length === 0)
 check('Redmond 5 can cross 11 or 29', JSON.stringify(holdShortCandidates(airports.KRDM, '5')) === JSON.stringify(['11', '29']))
 

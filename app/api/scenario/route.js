@@ -253,6 +253,7 @@ export async function GET(request) {
   - L = "left", R = "right", C = "center"
   - Only use L/R/C designators about 1 in 6 scenarios
   - If a secondary runway is mentioned always say "cross runway" or "hold short of runway" before it
+  - Never say "hold short of runway" for the assigned departure runway itself. A hold short or crossing instruction may only name a different runway.
 
   CLEARANCE FORMAT: "${callsign.spoken}, ${airport.city} ground, runway [digits], taxi via [taxiways], [hold short or cross instruction if needed]"
 

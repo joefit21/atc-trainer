@@ -6,7 +6,7 @@ const DEMO_SCENARIOS = {
   ground: {
     callsign: 'N4521H',
     airport: 'KSLE – Salem',
-    clearance_text: 'November four five two one Hotel, Salem Ground, runway tree one, taxi via Alpha, hold short of runway tree one.',
+    clearance_text: 'November four five two one Hotel, Salem Ground, runway tree one, taxi via Alpha, hold short of runway one six.',
   },
   ifr: {
     callsign: 'N7823K',
