@@ -1,25 +1,16 @@
 import OpenAI from 'openai'
+import { GROUND, IFR_DEMO, IFR_LANDING } from '@/lib/demo-clearances.mjs'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
-const DEMO_SCENARIOS = {
-  ground: {
-    callsign: 'N4521H',
-    airport: 'KSLE – Salem',
-    clearance_text: 'November four five two one Hotel, Salem Ground, runway tree one, taxi via Alpha, hold short of runway one six.',
-  },
-  ifr: {
-    callsign: 'N7823K',
-    airport: 'KDFW – Dallas Fort Worth',
-    destination: 'KIAH – Houston Intercontinental',
-    clearance_text: 'November seven eight two tree Kilo is cleared to the Houston Intercontinental Airport via the DARTZ Niner departure, then as filed. Climb and maintain one one thousand, expect one five thousand one zero minutes after departure. Departure frequency one two four point tree, squawk four five tree two.',
-  }
-}
+// The sample clearances live in lib/demo-clearances.mjs. The practice lab's IFR demo and
+// the home page's IFR sample are different clearances: the home page asks with for=landing.
+const DEMO_SCENARIOS = { ground: GROUND, ifr: IFR_DEMO }
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type') || 'ground'
-  const scenario = DEMO_SCENARIOS[type] || DEMO_SCENARIOS.ground
+  const scenario = type === 'ifr' && searchParams.get('for') === 'landing' ? IFR_LANDING : DEMO_SCENARIOS[type] || DEMO_SCENARIOS.ground
 
   try {
     const mp3 = await openai.audio.speech.create({

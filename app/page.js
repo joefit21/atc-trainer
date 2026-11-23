@@ -139,14 +139,15 @@ function HomeContent() {
     guard.current = true
     setter(p => ({ ...p, status: 'loading' }))
     try {
-      const res  = await fetch(`/api/demo-scenario?type=${type}`)
+      // The home page's IFR sample is its own clearance, separate from the lab's IFR demo.
+      const res  = await fetch(`/api/demo-scenario?type=${type}${type === 'ifr' ? '&for=landing' : ''}`)
       const data = await res.json()
       if (audioRef.current) {
         audioRef.current.src = data.audio_url
         audioRef.current.load()
         if (andPlay) audioRef.current.play().catch(() => {})
       }
-      setter({ status: andPlay ? 'played' : 'ready', text: data.clearance_text })
+      setter({ status: andPlay ? 'played' : 'ready', text: data.clearance_text, craft: data.craft })
     } catch {
       guard.current = false
       setter(p => ({ ...p, status: 'idle' }))
@@ -309,11 +310,11 @@ function HomeContent() {
                 <div className="pt-3 border-t border-white/10">
                   <p className="text-xs text-gray-500 mb-2">CRAFT breakdown:</p>
                   <div className="space-y-1 text-xs">
-                    <div><span className="text-blue-400 font-bold">C</span> <span className="text-gray-500">Clearance limit:</span> <span className="text-gray-300">Houston Intercontinental</span></div>
-                    <div><span className="text-blue-400 font-bold">R</span> <span className="text-gray-500">Route:</span> <span className="text-gray-300">PODDE Two departure, as filed</span></div>
-                    <div><span className="text-blue-400 font-bold">A</span> <span className="text-gray-500">Altitude:</span> <span className="text-gray-300">Climb/maintain 11,000 · Expect 15,000 (10 min out)</span></div>
-                    <div><span className="text-blue-400 font-bold">F</span> <span className="text-gray-500">Frequency:</span> <span className="text-gray-300">124.3</span></div>
-                    <div><span className="text-blue-400 font-bold">T</span> <span className="text-gray-500">Transponder:</span> <span className="text-gray-300">4532</span></div>
+                    <div><span className="text-blue-400 font-bold">C</span> <span className="text-gray-500">Clearance limit:</span> <span className="text-gray-300">{ifrPreview.craft?.limit}</span></div>
+                    <div><span className="text-blue-400 font-bold">R</span> <span className="text-gray-500">Route:</span> <span className="text-gray-300">{ifrPreview.craft?.route}</span></div>
+                    <div><span className="text-blue-400 font-bold">A</span> <span className="text-gray-500">Altitude:</span> <span className="text-gray-300">{ifrPreview.craft?.altitude}</span></div>
+                    <div><span className="text-blue-400 font-bold">F</span> <span className="text-gray-500">Frequency:</span> <span className="text-gray-300">{ifrPreview.craft?.frequency}</span></div>
+                    <div><span className="text-blue-400 font-bold">T</span> <span className="text-gray-500">Transponder:</span> <span className="text-gray-300">{ifrPreview.craft?.transponder}</span></div>
                   </div>
                 </div>
               </div>
