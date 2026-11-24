@@ -1,5 +1,6 @@
 import { requireSubscribed } from '@/lib/require-auth'
 import classDData from '@/lib/class-d-airports.json'
+import { pickRunwayForWind } from '@/lib/classd.mjs'
 
 // Class D airports with a control tower, ground control and a published tower frequency, built from
 // the FAA's NASR data by scripts/build-class-d.mjs (frequencies, facility names, runways and
@@ -80,11 +81,12 @@ export async function GET(request) {
   if (authError) return authError
 
   const airport            = pickRandom(CLASS_D_AIRPORTS)
-  const rwyObj             = pickRandom(airport.runways)
+  const wind               = randomWind()
+  // The runway in use follows the announced wind, so an arrival never lands with a tailwind.
+  const rwyObj             = pickRunwayForWind(airport.runways, parseInt(wind.dir, 10), wind.speed)
   const aircraft           = pickRandom(AIRCRAFT)
   const tail               = generateTailNumber()
   const atis               = pickRandom(ATIS_LETTERS)
-  const wind               = randomWind()
   const sky                = pickRandom(SKY_CONDITIONS)
   const altimeter          = randomAltimeter()
   const approachDir        = pickRandom(APPROACH_DIRECTIONS)

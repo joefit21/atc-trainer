@@ -35,7 +35,7 @@ const get = async (path) => (await fetch(BASE + path, { headers: { 'X-Demo-Reque
 const draws = []
 for (let i = 0; i < 120; i++) draws.push(['/api/vfr-class-d-scenario', get('/api/vfr-class-d-scenario')], ['/api/vfr-class-d-arrival-scenario', get('/api/vfr-class-d-arrival-scenario')])
 const states = new Set(), ids = new Set()
-let bad = 0
+let bad = 0, tailwinds = 0, arrivals = 0
 for (const [path, p] of draws) {
   const s = await p
   const a = find(s.airport_id)
@@ -43,9 +43,15 @@ for (const [path, p] of draws) {
     && a.runways.some((r) => r.rwy === s.runway && r.pattern === s.pattern) && s.atis?.active_runway === s.runway
     && (path.includes('arrival') || (s.hold_short_candidates.every((c) => a.runways.some((r) => r.rwy === c) && Number(c) !== Number(s.runway) && Number(c) !== ((Number(s.runway) + 17) % 36) + 1)))
   if (!ok) { bad++; if (bad < 4) console.log('     bad scenario', path, JSON.stringify(s).slice(0, 300)) }
+  if (path.includes('arrival')) {
+    arrivals++
+    const comp = Math.cos(((Number(s.atis.wind_dir) - Number(s.runway) * 10) * Math.PI) / 180) * Number(s.atis.wind_speed)
+    if (Number(s.atis.wind_speed) >= 4 && comp < -0.5) tailwinds++
+  }
   states.add(s.state); ids.add(s.airport_id)
 }
 check('240 generated scenarios are all consistent with the airport list', bad === 0, `${bad} bad`)
+check(`arrivals with a real wind (4+ kt) never get a tailwind (${arrivals} arrivals)`, tailwinds === 0, String(tailwinds))
 check('the scenarios spread across many airports and states', ids.size >= 60 && states.size >= 20, `${ids.size} airports, ${states.size} states`)
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')
 process.exit(failed ? 1 : 0)
