@@ -4,7 +4,8 @@ import { runwaySpoken, reciprocal, sameStrip, pickActiveRunway, pickInstruction,
 
 const rw = JSON.parse(readFileSync(new URL('../lib/runways.json', import.meta.url), 'utf8')).airports
 const route = readFileSync(new URL('../app/api/scenario/route.js', import.meta.url), 'utf8')
-const demo = readFileSync(new URL('../app/api/demo-scenario/route.js', import.meta.url), 'utf8')
+import { GROUND } from '../lib/demo-clearances.mjs'
+const demo = GROUND.clearance_text
 let failed = 0
 const check = (name, cond, extra = '') => { console.log(cond ? 'ok  ' : 'FAIL', name, cond ? '' : extra); if (!cond) failed++ }
 const icaos = [...route.matchAll(/\{ icao: '(K[A-Z0-9]{3})'/g)].map((m) => m[1])
