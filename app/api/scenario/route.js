@@ -9,6 +9,7 @@ import { buildGroundClearance } from '@/lib/ground.mjs'
 import { pickAirlineFlightLevel, isEastboundFlight, pickExpectAltitude } from '@/lib/altitudes.mjs'
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
 import { forSpeech } from '@/lib/speech'
+import { generateSquawk } from '@/lib/squawk.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -160,15 +161,6 @@ function pickTwoDifferent(arr) {
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
-function generateSquawk() {
-  const reserved = ['7500','7600','7700','1200','7000','2000','1202','1255','1277','4000','0000']
-  let squawk
-  do {
-    squawk = Array.from({length: 4}, () => randomInt(0, 7)).join('')
-  } while (reserved.includes(squawk))
-  return squawk
-}
-
 function generateFrequency() {
   const reserved = [
     '121.5','122.0','122.1','122.2','122.3','122.4','122.5',

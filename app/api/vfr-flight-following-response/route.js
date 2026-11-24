@@ -1,17 +1,8 @@
 import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
+import { generateSquawk as randomSquawk } from '@/lib/squawk.mjs'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-
-// Squawk codes use ONLY octal digits 0–7
-function randomSquawk() {
-  const reserved = new Set(['0000', '7500', '7600', '7700'])
-  let code
-  do {
-    code = Array.from({ length: 4 }, () => Math.floor(Math.random() * 8)).join('')
-  } while (reserved.has(code))
-  return code
-}
 
 function digitSpoken(d) {
   return ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'niner'][parseInt(d)]
