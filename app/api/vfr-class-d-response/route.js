@@ -2,6 +2,7 @@ import { parseAIJson } from '@/lib/parse-json'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
+import { stripWindReport } from '@/lib/controller-text.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai    = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -52,6 +53,7 @@ Respond with a realistic ground taxi clearance. Rules:
 ${crossingRule}
 - Keep response under 25 words
 - Professional controller cadence — no pleasantries
+- NEVER include a wind report, altimeter, or any weather: Ground Control does not issue those (the pilot already has the ATIS)
 
 CRITICAL: Write ALL runway numbers as individual spoken digits. Examples:
 - Runway 13 → "runway one three"
@@ -102,6 +104,8 @@ Return raw JSON only, no markdown:
 
     const rawText = message.content[0].text
     const parsed  = parseAIJson(rawText)
+    // Ground never gives a wind report; only Tower does, with the takeoff clearance.
+    if (phase === 'ground') parsed.controller_text = stripWindReport(parsed.controller_text)
 
     const ttsResponse = await openai.audio.speech.create({
       model: 'tts-1',

@@ -2,6 +2,7 @@ import { parseAIJson } from '@/lib/parse-json'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { requireSubscribed } from '@/lib/require-auth'
+import { stripWindReport } from '@/lib/controller-text.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai    = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -68,6 +69,7 @@ Respond with a taxi-to-parking clearance:
 - Direct them to ${scenario.parking_destination}
 - Keep response under 20 words
 - Professional ground controller cadence — no pleasantries
+- NEVER include a wind report, altimeter, or any weather: Ground Control does not issue those
 
 Return raw JSON only, no markdown:
 {"controller_text": "the full clearance exactly as spoken"}`
@@ -107,6 +109,8 @@ Return raw JSON only, no markdown:
 
     const rawText = message.content[0].text
     const parsed  = parseAIJson(rawText)
+    // Ground never gives a wind report; only Tower does with a landing clearance.
+    if (phase === 'taxi_to_parking') parsed.controller_text = stripWindReport(parsed.controller_text)
 
     const ttsResponse = await openai.audio.speech.create({
       model: 'tts-1',
