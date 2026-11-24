@@ -3,16 +3,11 @@ import { readFileSync } from 'node:fs'
 import { pickRunwayForWind, holdShortCandidates, pickHoldShort, reciprocalNumber, sameStripNumber } from '../lib/classd.mjs'
 
 const real = JSON.parse(readFileSync(new URL('../lib/runways.json', import.meta.url), 'utf8')).airports
-const src = readFileSync(new URL('../app/api/vfr-class-d-scenario/route.js', import.meta.url), 'utf8')
-const block = src.slice(src.indexOf('const CLASS_D_AIRPORTS'), src.indexOf('const AIRCRAFT'))
-const airports = {}
-for (const m of block.matchAll(/id: '(K[A-Z0-9]{3})'[\s\S]*?runways: \[([\s\S]*?)\],\n  \}/g)) {
-  airports[m[1]] = [...m[2].matchAll(/rwy: '(\d+)',\s*pattern: '(\w+)'/g)].map((x) => ({ rwy: x[1], pattern: x[2] }))
-}
+const airports = Object.fromEntries(JSON.parse(readFileSync(new URL('../lib/class-d-airports.json', import.meta.url), 'utf8')).airports.map((a) => [a.id, a.runways]))
 let failed = 0
 const check = (name, cond, extra = '') => { console.log(cond ? 'ok  ' : 'FAIL', name, cond ? '' : extra); if (!cond) failed++ }
 
-check('found the four Class D airports', Object.keys(airports).length === 4, Object.keys(airports).join(' '))
+check('found the Class D airports', Object.keys(airports).length >= 250 && ['KRDM', 'KPAO', 'KSLE', 'KOTH'].every((i) => airports[i]), String(Object.keys(airports).length))
 check('opposite ends', reciprocalNumber(5) === 23 && reciprocalNumber(23) === 5 && reciprocalNumber(36) === 18 && reciprocalNumber(18) === 36 && reciprocalNumber(31) === 13)
 check('same strip', sameStripNumber(5, 23) && sameStripNumber('13', '31') && !sameStripNumber(5, 11))
 for (const [id, rws] of Object.entries(airports)) check(`${id}: every runway the scenario can use is real`, rws.every((r) => (real[id] || []).some((x) => parseInt(x, 10) === Number(r.rwy))), id)
