@@ -24,11 +24,11 @@ const scoreBorder = (s) => s >= 90 ? 'border-green-400/20' : s >= 70 ? 'border-y
 const DEMO_SCENARIOS = {
   ctaf: {
     scenario_type: 'ctaf', airport_id: 'KAUN', airport_name: 'Auburn', airport_state: 'CA',
-    ctaf: '122.8', runway: '7', pattern: 'left',
+    ctaf: '122.7', runway: '7', pattern: 'left',
     aircraft_type: 'Cessna 172', callsign_display: 'N4521H',
     callsign_spoken: 'November four five two one Hotel', approach_direction: 'south',
     steps: [
-      { index: 0, phase: 'inbound_10',  situation: 'You are 10 miles south of Auburn at 3,400 ft MSL, inbound for landing. Runway in use is 7, left traffic. CTAF is 122.8.', hint: 'Say: "Auburn traffic", callsign, distance and direction, intentions, runway.' },
+      { index: 0, phase: 'inbound_10',  situation: 'You are 10 miles south of Auburn at 3,400 ft MSL, inbound for landing. Runway in use is 7, left traffic. Wind is 070 at 8 knots. CTAF is 122.7.', hint: 'Say: "Auburn traffic", callsign, distance and direction, intentions, runway.' },
       { index: 1, phase: 'entering_45', situation: 'You are entering the 45° to the left downwind for Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", callsign, "entering 45 left downwind", runway, "Auburn".' },
       { index: 2, phase: 'base',        situation: 'You are turning left base for Runway 7 at Auburn.', hint: 'Say: "Auburn traffic", callsign, "left base runway 7", "Auburn".' },
       { index: 3, phase: 'final',       situation: 'You are turning final for Runway 7 at Auburn, full stop.', hint: 'Say: "Auburn traffic", callsign, "final runway 7", full stop, "Auburn".' },

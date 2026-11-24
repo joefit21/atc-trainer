@@ -1,18 +1,11 @@
 import { requireSubscribed } from '@/lib/require-auth'
+import ctafData from '@/lib/ctaf-airports.json'
+import { pickRunwayForWind } from '@/lib/classd.mjs'
 
-// runways: array of { rwy, pattern } — verified against airnav.com FAA data
-const UNCONTROLLED_AIRPORTS = [
-  { id: 'KAUN', name: 'Auburn',        state: 'CA', ctaf: '122.8', runways: [{ rwy: '7',  pattern: 'left'  }, { rwy: '25', pattern: 'left'  }] },
-  { id: 'KUKI', name: 'Ukiah',         state: 'CA', ctaf: '123.0', runways: [{ rwy: '15', pattern: 'left'  }, { rwy: '33', pattern: 'right' }] },
-  { id: 'KFOT', name: 'Rohnerville',   state: 'CA', ctaf: '122.8', runways: [{ rwy: '11', pattern: 'right' }, { rwy: '29', pattern: 'left'  }] },
-  { id: 'KBKE', name: 'Baker City',    state: 'OR', ctaf: '122.8', runways: [{ rwy: '13', pattern: 'left'  }, { rwy: '31', pattern: 'left'  }, { rwy: '17', pattern: 'left' }, { rwy: '35', pattern: 'left' }] },
-  { id: 'KORS', name: 'Orcas Island',  state: 'WA', ctaf: '122.8', runways: [{ rwy: '16', pattern: 'left'  }, { rwy: '34', pattern: 'right' }] },
-  { id: 'KFHR', name: 'Friday Harbor', state: 'WA', ctaf: '122.8', runways: [{ rwy: '16', pattern: 'right' }, { rwy: '34', pattern: 'right' }] },
-  { id: 'KTMK', name: 'Tillamook',     state: 'OR', ctaf: '122.8', runways: [{ rwy: '13', pattern: 'left'  }, { rwy: '31', pattern: 'left'  }, { rwy: '1',  pattern: 'left' }, { rwy: '19', pattern: 'right' }] },
-  { id: 'KSVH', name: 'Statesville',   state: 'NC', ctaf: '122.8', runways: [{ rwy: '10', pattern: 'left'  }, { rwy: '28', pattern: 'left'  }] },
-  { id: 'KRUQ', name: 'Rowan County',  state: 'NC', ctaf: '122.8', runways: [{ rwy: '2',  pattern: 'left'  }, { rwy: '20', pattern: 'left'  }] },
-  { id: 'KDLZ', name: 'Delaware',      state: 'OH', ctaf: '122.8', runways: [{ rwy: '10', pattern: 'left'  }, { rwy: '28', pattern: 'left'  }] },
-]
+// Public, non-towered airports with one published CTAF frequency and plain-numbered paved runways,
+// built from the FAA's NASR data by scripts/build-ctaf-airports.mjs (CTAF frequency, runways and
+// traffic-pattern direction all come from there).
+const UNCONTROLLED_AIRPORTS = ctafData.airports
 
 const AIRCRAFT = [
   { type: 'Cessna 172',         spoken: 'Cessna one seven two' },
@@ -56,7 +49,12 @@ export async function GET(request) {
   if (authError) return authError
 
   const airport     = pickRandom(UNCONTROLLED_AIRPORTS)
-  const rwyObj      = pickRandom(airport.runways)
+  // The runway in use follows the wind, so nobody is sent to land with a tailwind. At a non-towered
+  // airport the pilot gets the wind from the AWOS or the windsock, so it is stated in the first step.
+  const windDir     = randomInt(0, 35) * 10
+  const windSpeed   = randomInt(0, 14)
+  const rwyObj      = pickRunwayForWind(airport.runways, windDir, windSpeed)
+  const windText    = windSpeed < 3 ? 'Wind is calm.' : `Wind is ${String(windDir).padStart(3, '0')} at ${windSpeed} knots.`
   const runway      = rwyObj.rwy
   const pattern     = rwyObj.pattern
   const aircraft    = pickRandom(AIRCRAFT)
@@ -68,7 +66,7 @@ export async function GET(request) {
     {
       index: 0,
       phase: 'inbound_10',
-      situation: `You are 10 miles ${approachDir} of ${airport.name} at ${approachAlt.toLocaleString()} ft MSL, inbound for landing. Runway in use is ${runway}, ${pattern} traffic. CTAF is ${airport.ctaf}.`,
+      situation: `You are 10 miles ${approachDir} of ${airport.name} at ${approachAlt.toLocaleString()} ft MSL, inbound for landing. Runway in use is ${runway}, ${pattern} traffic. ${windText} CTAF is ${airport.ctaf}.`,
       hint: `Say: "${airport.name} traffic", callsign, distance and direction from field, intentions, and runway number.`,
     },
     {
@@ -103,6 +101,8 @@ export async function GET(request) {
     airport_name:     airport.name,
     airport_state:    airport.state,
     ctaf:             airport.ctaf,
+    wind_dir:         String(windDir).padStart(3, '0'),
+    wind_speed:       windSpeed,
     runway,
     pattern,
     aircraft_type:    aircraft.type,

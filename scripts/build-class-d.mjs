@@ -16,25 +16,12 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { parseCsv, hardSurface } from './nasr.mjs'
 
 const dir = process.argv[2]
 if (!dir) { console.error('usage: node scripts/build-class-d.mjs /path/to/csv/folder [cycle date]'); process.exit(1) }
 const cycle = process.argv[3] || null
 
-function parseCsv(text) {
-  const rows = []; let row = [], cur = '', q = false
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i]
-    if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++ } else q = false } else cur += c }
-    else if (c === '"') q = true
-    else if (c === ',') { row.push(cur); cur = '' }
-    else if (c === '\n') { row.push(cur.replace(/\r$/, '')); rows.push(row); row = []; cur = '' }
-    else cur += c
-  }
-  if (cur || row.length) { row.push(cur); rows.push(row) }
-  const head = rows.shift()
-  return rows.filter((r) => r.length === head.length).map((r) => Object.fromEntries(head.map((h, i) => [h, r[i]])))
-}
 const read = (f) => parseCsv(readFileSync(join(dir, f), 'latin1'))
 
 const classD = new Set(read('CLS_ARSP.csv').filter((r) => r.SITE_TYPE_CODE === 'A' && r.CLASS_D_AIRSPACE === 'Y' && !r.CLASS_B_AIRSPACE && !r.CLASS_C_AIRSPACE).map((r) => r.ARPT_ID))
@@ -44,8 +31,6 @@ const rwys = read('APT_RWY.csv')
 const ends = read('APT_RWY_END.csv')
 
 const vhf = (f) => { const n = Number(f); return n >= 118 && n <= 136.975 }
-const HARD = new Set(['ASPH', 'CONC', 'PEM', 'TRTD'])
-const isHard = (s) => s.split('-').every((p) => HARD.has(p))
 const title = (s) => s.toLowerCase().replace(/\b[a-z]/g, (m) => m.toUpperCase())
 // The FAA's call sign text needs tidying before it is spoken: "ELLIS TOWER" would become "Ellis Tower
 // Tower", "MC ALLEN" is McAllen, "ST CLOUD" is Saint Cloud, "DOUBLE EAGLE II" ends in "two".
@@ -75,7 +60,7 @@ for (const b of bases) {
   if (!lcl || lcl !== gnd) { reject(id, 'tower and ground facility names differ'); continue }
   if (!/^[A-Z][A-Z ]+$/.test(lcl)) { reject(id, 'facility name has digits or punctuation'); continue }
   if (GENERIC.test(lcl.replace(/\s+(TOWER|TWR)$/, ''))) { reject(id, `generic or unclear facility name, held for review (${lcl})`); continue }
-  const hard = rwys.filter((r) => r.ARPT_ID === id && !/^H\d|W/.test(r.RWY_ID) && isHard(r.SURFACE_TYPE_CODE) && Number(r.RWY_LEN) >= 2000)
+  const hard = rwys.filter((r) => r.ARPT_ID === id && !/^H\d|W/.test(r.RWY_ID) && hardSurface(r.SURFACE_TYPE_CODE) && Number(r.RWY_LEN) >= 2000)
   if (hard.length === 0) { reject(id, 'no hard-surface runway of 2,000 ft or more'); continue }
   const hardIds = new Set(hard.map((r) => r.RWY_ID))
   const e = ends.filter((r) => r.ARPT_ID === id && hardIds.has(r.RWY_ID))

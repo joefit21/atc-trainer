@@ -90,7 +90,7 @@ let failed = 0
 
 // ---------- CTAF ----------
 {
-  const scenario = { airport_name: 'Auburn', airport_id: 'KAUN', ctaf: '122.8', aircraft_type: 'Cessna 172', runway: '7', pattern: 'left', ...CS }
+  const scenario = { airport_name: 'Auburn', airport_id: 'KAUN', ctaf: '122.7', aircraft_type: 'Cessna 172', runway: '7', pattern: 'left', ...CS }
   const base = [
     { step: 0, phase: 'inbound_10', situation: 'inbound', transcription: 'Auburn traffic, Cessna 4521 Hotel, 10 miles south, inbound for landing runway 7, Auburn.' },
     { step: 1, phase: 'entering_45', situation: '45', transcription: 'Auburn traffic, Cessna 4521 Hotel, entering the 45 for the left downwind runway 7, Auburn.' },
