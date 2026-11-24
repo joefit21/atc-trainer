@@ -6,6 +6,9 @@ const ifr = 'november one two tree alpha bravo, cleared to denver via the BAYLR 
 const rb = 'cleared to Denver via the Baylor six departure then as filed climb and maintain 10,000 expect flight level 350 ten minutes after departure departure frequency 125.3 squawk 4321'
 const ifrCv = ifr.replace('climb and maintain one zero thousand', 'climb via the SID')
 const rbCv = rb.replace('climb and maintain 10,000', 'climb via the SID')
+// An airline clearance with a flight level; voice-to-text wrote "flight level three zero zero" as "3-0".
+const air = 'hawaiian fifteen, cleared to houston hobby via fly runway heading, expect radar vectors on course, climb and maintain one one thousand, expect flight level tree zero zero one zero minutes after departure, departure frequency one two seven point two, squawk four seven zero two'
+const airRb = 'Hawaiian 15, cleared to the Houston airport via fly runway heading, expect radar vectors on course, climb and maintain 1-1000, expect flight level 3-0, 1-0 minutes after departure, frequency 127.2, squawk 4-7-0-2.'
 const ground = 'november one two tree alpha bravo, salem ground, runway tree one, taxi via alpha, hold short of runway one six'
 const gb = 'runway 31 taxi via Alpha hold short of runway 16'
 const cs = 'November 123 Alpha Bravo '
@@ -19,6 +22,8 @@ const cases = [
   ['climb via, not read back', ifrCv, cs + rbCv.replace('climb via the SID', ''), 'ifr', 75],
   ['climb via, an altitude instead of climb via', ifrCv, cs + rbCv.replace('climb via the SID', 'climb and maintain 10,000'), 'ifr', 75],
   ['climb via, wrong expect altitude', ifrCv, cs + rbCv.replace('flight level 350', 'flight level 330'), 'ifr', 75],
+  ['airline FL300 with a zero lost in transcription', air, airRb, 'ifr', 100],
+  ['airline FL300 with the wrong flight level', air, airRb.replace('flight level 3-0', 'flight level 3-3-0'), 'ifr', 75],
   ['ground, correct with callsign', ground, cs + gb, 'ground', 100],
   ['ground, no callsign', ground, gb, 'ground', 82],
   ['ground, wrong runway', ground, cs + 'runway 13 taxi via Alpha hold short of runway 16', 'ground', 70],

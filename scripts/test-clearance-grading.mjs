@@ -38,5 +38,13 @@ const cv = parseClearance('november one two tree alpha bravo, cleared to denver 
 check('climb via: parsed as climb via, no initial altitude', cv.climbVia === true && cv.initialAltitude === null, JSON.stringify(cv))
 check('climb via: routing, transition and expect altitude still parse', cv.routeKind === 'sid' && cv.sidName === 'BAYLR' && cv.transition === 'TEHRU' && cv.expectAltitude === 35000 && cv.frequency === '1253' && cv.squawk === '4321', JSON.stringify(cv))
 check('a climb and maintain clearance is not climb via', p.climbVia === false)
+
+// A flight level with a zero dropped by voice-to-text still counts, but only after "flight level".
+check('expect: "flight level 3-0, 1-0 minutes" counts for FL300 (a zero lost in transcription)', altitudeSaid('expect flight level 3-0, 1-0 minutes after departure', 30000, { minutes: true }))
+check('expect: "flight level 35, ten minutes" counts for FL350', altitudeSaid('expect flight level 35 ten minutes after departure', 35000, { minutes: true }))
+check('expect: FL300 still counts when read in full', altitudeSaid('expect flight level 300 ten minutes after departure', 30000, { minutes: true }) && altitudeSaid('expect flight level three zero zero one zero minutes', 30000, { minutes: true }))
+check('expect: a wrong flight level is still wrong', !altitudeSaid('expect flight level 3-1, 1-0 minutes after departure', 30000, { minutes: true }) && !altitudeSaid('expect flight level 3-3-0 ten minutes after departure', 30000, { minutes: true }) && !altitudeSaid('expect flight level 2-5-0 ten minutes after departure', 30000, { minutes: true }))
+check('a bare "3-0" with no "flight level" does not count', !altitudeSaid('expect 3-0, 1-0 minutes after departure', 30000, { minutes: true }))
+check('a lost zero is not forgiven for ordinary altitudes', !altitudeSaid('expect 1-5 ten minutes after departure', 15000, { minutes: true }) && !altitudeSaid('climb and maintain 1-1', 11000))
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')
 process.exit(failed ? 1 : 0)
