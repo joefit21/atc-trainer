@@ -52,7 +52,7 @@ for (const [label, c] of [['lab IFR demo', IFR_DEMO], ['home-page IFR sample', I
   check(`${label}: breakdown altitude matches`, cr.altitude.startsWith(`${climbText} · Expect ${expectText}`), `${cr.altitude} vs ${p.climb}/${p.expect}`)
   // RULE: "climb via the SID" exactly when the procedure has the altitude restrictions for it, and the expect altitude is above its top altitude.
   check(`${label}: climb via the SID is used exactly when the procedure is eligible`, !!p.climbVia === !!real?.climbVia, `clearance climbVia=${!!p.climbVia}, data climbVia=${!!real?.climbVia}`)
-  if (p.climbVia) check(`${label}: expect altitude is above the procedure's top altitude`, p.expect * (p.expectIsFL ? 1 : 1) > (real?.topAlt || 0), `${p.expect} vs ${real?.topAlt}`)
+  if (p.climbVia) check(`${label}: expect altitude is above the procedure's top altitude`, p.expect * (p.expectIsFL ? 100 : 1) > (real?.topAlt || 0), `${p.expect} vs ${real?.topAlt}`)
   check(`${label}: breakdown clearance limit appears in the clearance`, c.clearance_text.includes(cr.limit), cr.limit)
 }
 
