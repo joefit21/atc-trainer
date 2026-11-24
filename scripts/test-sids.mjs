@@ -36,8 +36,10 @@ for (const i of none) { if (!NO_SID_PHRASES.includes(buildRoutePhrase(pickSID(da
 const seq = (...v) => { let i = 0; return () => v[i++ % v.length] }
 const sid = { name: 'BAYLR', number: 6, transitions: ['TEHRU'] }
 check('phrase with transition', buildRoutePhrase(sid, seq(0.1, 0)) === 'via the BAYLR six departure, TEHRU transition, then as filed', buildRoutePhrase(sid, seq(0.1, 0)))
-check('phrase without transition', buildRoutePhrase(sid, seq(0.9)) === 'via the BAYLR six departure, then as filed')
-check('a SID with no transitions never invents one', buildRoutePhrase({ name: 'PADGT', number: 3, transitions: [] }, seq(0)) === 'via the PADGT tree departure, then as filed')
+check('a departure procedure always names a transition before "then as filed"', [0, 0.3, 0.6, 0.9, 0.99].every((r) => buildRoutePhrase(sid, seq(r)) === 'via the BAYLR six departure, TEHRU transition, then as filed'))
+check('a SID with no transitions is never cleared without one (uses a no-SID phrase)', NO_SID_PHRASES.includes(buildRoutePhrase({ name: 'PADGT', number: 3, transitions: [] }, seq(0))))
+check('pickSID skips procedures with no transition', pickSID({ airports: { KXXX: [{ name: 'PADGT', number: 3, transitions: [] }, { name: 'BAYLR', number: 6, transitions: ['TEHRU'] }] } }, 'KXXX', () => 0).name === 'BAYLR')
+check('an airport whose procedures all lack transitions gets no SID', pickSID({ airports: { KXXX: [{ name: 'PADGT', number: 3, transitions: [] }] } }, 'KXXX') === null)
 check('the three no-SID phrases are the approved ones', JSON.stringify(NO_SID_PHRASES) === JSON.stringify(['via radar vectors', 'as filed', 'via fly runway heading, expect radar vectors on course']))
 check('no SID -> every approved phrase can come up', NO_SID_PHRASES.every((ph, i) => buildRoutePhrase(null, () => i / 3 + 0.01) === ph))
 const seen = new Set(); for (let n = 0; n < 300; n++) seen.add(buildRoutePhrase(null))
@@ -51,8 +53,8 @@ for (let n = 0; n < 5000; n++) {
   const s = pickSID(data, icao)
   const phrase = buildRoutePhrase(s)
   if (s && !has(icao, s.name, s.number)) wrong++
-  const t = phrase.match(/, ([A-Z]{5}) transition/)
-  if (t && !s.transitions.includes(t[1])) wrong++
+  const t = phrase.match(/, ([A-Z]{5}) transition, then as filed/)
+  if (s && (!t || !s.transitions.includes(t[1]))) wrong++
 }
 check('5000 random clearances use only real procedures and real transitions', wrong === 0, String(wrong))
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')

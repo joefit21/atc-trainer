@@ -32,6 +32,7 @@ for (const [label, c] of [['lab IFR demo', IFR_DEMO], ['home-page IFR sample', I
   check(`${label}: clearance text parses`, p.sid && p.climb && p.expect && p.freq && p.squawk, JSON.stringify(p))
   const real = (sids[dep(c)] || []).find((x) => x.name === p.sid?.name && x.number === p.sid?.number)
   check(`${label}: SID ${p.sid?.name} ${p.sid?.number} is a real departure from ${dep(c)}`, !!real)
+  check(`${label}: the departure names a transition before "then as filed"`, !!p.sid?.transition)
   if (p.sid?.transition) check(`${label}: transition ${p.sid.transition} is real for that SID`, real?.transitions.includes(p.sid.transition))
   // The breakdown must say exactly what the clearance says.
   const cr = c.craft
