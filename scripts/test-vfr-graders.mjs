@@ -106,7 +106,7 @@ let failed = 0
       ['no closing airport name', 2, 'Auburn traffic, 4521 Hotel, left base runway 7.', { 2: 95 }],
       ['no callsign at all', 2, 'Auburn traffic, left base runway 7, Auburn.', { 2: 55 }],
       ['base without a runway number', 2, 'Auburn traffic, 4521 Hotel, left base, Auburn.', { 2: 70 }],
-      ['final without stating the intention', 3, 'Auburn traffic, 4521 Hotel, final runway 7, Auburn.', { 3: 80 }],
+      ['final without stating the intention is fine', 3, 'Auburn traffic, 4521 Hotel, final runway 7, Auburn.', { 3: 100 }],
       ['"clear of the active" with no number', 4, 'Auburn traffic, 4521 Hotel, clear of the active, Auburn.', { 4: 60 }],
       ['inbound without a distance and direction', 0, 'Auburn traffic, Cessna 4521 Hotel, inbound for landing runway 7, Auburn.', { 0: 70 }],
       ['inbound for the full stop counts as landing intent', 0, 'Auburn traffic, Cessna 4521 Hotel, 10 miles south, inbound for the full stop runway 7, Auburn.', { 0: 100 }],
