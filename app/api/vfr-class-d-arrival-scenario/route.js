@@ -1,45 +1,10 @@
 import { requireSubscribed } from '@/lib/require-auth'
+import classDData from '@/lib/class-d-airports.json'
 
-const CLASS_D_AIRPORTS = [
-  {
-    id: 'KRDM', name: 'Redmond', state: 'OR',
-    tower: '124.5', ground: '121.8',
-    runways: [
-      { rwy: '5',  pattern: 'left' },
-      { rwy: '23', pattern: 'left' },
-      { rwy: '11', pattern: 'left' },
-      { rwy: '29', pattern: 'left' },
-    ],
-  },
-  {
-    id: 'KPAO', name: 'Palo Alto', state: 'CA',
-    tower: '118.6', ground: '125.0',
-    runways: [
-      { rwy: '13', pattern: 'left'  },
-      { rwy: '31', pattern: 'right' },
-    ],
-  },
-  {
-    id: 'KSLE', name: 'Salem', state: 'OR',
-    tower: '119.1', ground: '121.9',
-    runways: [
-      { rwy: '13', pattern: 'left' },
-      { rwy: '31', pattern: 'left' },
-      { rwy: '16', pattern: 'left' },
-      { rwy: '34', pattern: 'left' },
-    ],
-  },
-  {
-    id: 'KOTH', name: 'North Bend', state: 'OR',
-    tower: '118.45', ground: '127.1',
-    runways: [
-      { rwy: '5',  pattern: 'left'  },
-      { rwy: '23', pattern: 'left'  },
-      { rwy: '13', pattern: 'left'  },
-      { rwy: '31', pattern: 'right' },
-    ],
-  },
-]
+// Class D airports with a control tower, ground control and a published tower frequency, built from
+// the FAA's NASR data by scripts/build-class-d.mjs (frequencies, facility names, runways and
+// traffic-pattern direction all come from there).
+const CLASS_D_AIRPORTS = classDData.airports
 
 const AIRCRAFT = [
   { type: 'Cessna 172',         spoken: 'Cessna one seven two' },
