@@ -289,11 +289,19 @@ export async function GET(request) {
     } else {
       const [departure, destination] = pickTwoDifferent(airports)
       const callsign = generateCallsign()
+      // A departure procedure with real altitude restrictions is cleared "climb via the SID";
+      // any other clearance gets a specific initial altitude. Both then get an expect altitude.
+      const sid = pickRealSID(sidData, departure.icao)
+      const routePhrase = buildRoutePhrase(sid)
+      const climbVia = Boolean(sid?.climbVia)
       const initialAlt = randomInt(8, 12) * 1000
+      // Above the highest altitude the procedure itself names, and never below 8,000.
+      const climbViaBase = climbVia ? Math.max(Math.ceil(sid.topAlt / 1000) * 1000, 8000) : 0
       // Airlines expect a flight level that follows the hemispheric rule for the direction of
       // flight (odd eastbound, even westbound, FL300-FL410); see lib/altitudes.mjs.
       const expectAlt = callsign.isAirline
         ? pickAirlineFlightLevel(coordData.airports[departure.icao], coordData.airports[destination.icao]) * 100
+        : climbVia ? climbViaBase + randomInt(2, 6) * 1000
         : (initialAlt + randomInt(3, 8) * 1000)
       const freq = generateFrequency()
       const squawk = generateSquawk()
@@ -301,18 +309,15 @@ export async function GET(request) {
       const squawkWords = squawk.split('').map(d => digitWords[parseInt(d)]).join(' ')
       const [freqWhole, freqDec] = freq.split('.')
       const freqWords = `${freqWhole.split('').map(d => digitWords[parseInt(d)]).join(' ')} point ${freqDec.split('').map(d => digitWords[parseInt(d)]).join(' ')}`
-      const initialAltWords = altitudeToWords(initialAlt)
+      const initialAltWords = climbVia ? 'via the SID' : `and maintain ${altitudeToWords(initialAlt)}`
       const expectAltWords = (callsign.isAirline || expectAlt >= 18000)
         ? flightLevelToWords(Math.floor(expectAlt / 100))
         : altitudeToWords(expectAlt)
 
-      const sid = pickRealSID(sidData, departure.icao)
-      const routePhrase = buildRoutePhrase(sid)
-
       // The clearance is a fixed script, so it is assembled here rather than by a model:
       // every number is spoken as words, and no model call is needed.
       const parsed = {
-        clearance_text: `${callsign.spoken}, cleared to ${destination.city} ${routePhrase}, climb and maintain ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}`,
+        clearance_text: `${callsign.spoken}, cleared to ${destination.city} ${routePhrase}, climb ${initialAltWords}, expect ${expectAltWords} one zero minutes after departure, departure frequency ${freqWords}, squawk ${squawkWords}`,
       }
 
       const ttsResponse = await openai.audio.speech.create({

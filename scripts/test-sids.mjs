@@ -57,5 +57,16 @@ for (let n = 0; n < 5000; n++) {
   if (s && (!t || !s.transitions.includes(t[1]))) wrong++
 }
 check('5000 random clearances use only real procedures and real transitions', wrong === 0, String(wrong))
+
+// 6. "Climb via the SID" eligibility (built from the procedure's altitude restrictions).
+const all = entries.flatMap(([icao, list]) => list.map((p) => ({ icao, ...p })))
+const cvList = all.filter((p) => p.climbVia)
+check('some procedures are climb via eligible, most are not', cvList.length > 150 && cvList.length < all.length / 2, String(cvList.length))
+check('every eligible procedure has a top altitude', cvList.every((p) => Number.isFinite(p.topAlt) && p.topAlt >= 1000 && p.topAlt <= 30000))
+const find = (icao, name) => (data.airports[icao] || []).find((p) => p.name === name)
+check('KDEN BAYLR is eligible (several restrictions)', find('KDEN', 'BAYLR')?.climbVia === true)
+check('KDFW DARTZ is not eligible (restrictions on some runways only)', !find('KDFW', 'DARTZ')?.climbVia)
+check('KDEN PLAIN is not eligible (vector departure, no restrictions)', !find('KDEN', 'PLAIN')?.climbVia)
+check('pickSID passes the climb via flag through', pickSID({ airports: { KXXX: [{ name: 'BAYLR', number: 6, transitions: ['TEHRU'], climbVia: true, topAlt: 11000 }] } }, 'KXXX').climbVia === true)
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')
 process.exit(failed ? 1 : 0)

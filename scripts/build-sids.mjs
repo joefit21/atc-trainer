@@ -27,6 +27,15 @@ const cycle = process.argv[3] || null
 const out = join(dirname(fileURLToPath(import.meta.url)), '..', 'lib', 'sids.json')
 
 const ENROUTE = new Set(['3', '6', 'S', 'V'])
+const RUNWAY_TRANSITION = new Set(['1', '4', 'F', 'T'])
+const COMMON = new Set(['2', '5', 'M'])
+// Leg types that end at an altitude ("climb on heading to X", "course to an altitude") rather
+// than at a named fix; they are not crossing restrictions at a fix.
+const ALTITUDE_LEGS = new Set(['VA', 'CA', 'FA', 'VI', 'VM', 'VR', 'VD', 'CI', 'CD', 'CR', 'FC', 'FD', 'FM', 'HA', 'HF', 'HM'])
+// Altitude descriptions that are real crossing restrictions (at, at or above, at or below,
+// between); the glide-slope ones (G, H, I, J) are not.
+const RESTRICTION_CODES = new Set(['+', '-', ' ', '@', 'B', 'C', 'V', 'X', 'Y'])
+const altFeet = (f) => (/^FL\d+$/.test(f) ? Number(f.slice(2)) * 100 : /^\d+$/.test(f) ? Number(f) : null)
 const byAirport = new Map() // icao -> Map(procId -> { name, number, transitions:Set })
 const runways = {} // icao -> ['07L', '07R', '08', ...] (real runway identifiers)
 const coords = {} // icao -> [latitude, longitude, magnetic variation (east positive)]
@@ -68,7 +77,16 @@ for await (const line of rl) {
   if (!m) continue
   if (routeType === '0') continue // engine-out only, never part of a normal clearance
   const procs = byAirport.get(icao) ?? new Map()
-  const proc = procs.get(id) ?? { name: m[1], number: Number(m[2]), transitions: new Set() }
+  const proc = procs.get(id) ?? { name: m[1], number: Number(m[2]), transitions: new Set(), legs: [] }
+  if ('01'.includes(line[38])) {
+    const a1 = line.slice(84, 89).trim()
+    const a2 = line.slice(89, 94).trim()
+    const fix = line.slice(29, 34).trim()
+    const path = line.slice(47, 49)
+    if (a1 && fix && !ALTITUDE_LEGS.has(path) && RESTRICTION_CODES.has(line[82])) {
+      proc.legs.push({ routeType, transition, fix, key: `${fix}|${line[82]}|${a1}|${a2}`, alts: [altFeet(a1), altFeet(a2)].filter((x) => x != null) })
+    }
+  }
   // Only named fixes (5 letters) are used as transitions; the 3-letter VOR transitions
   // are left out because their spoken form on a clearance varies.
   if (ENROUTE.has(routeType) && /^[A-Z]{5}$/.test(transition)) proc.transitions.add(transition)
@@ -76,10 +94,26 @@ for await (const line of rl) {
   byAirport.set(icao, procs)
 }
 
+// "Climb via the SID" is only used when the procedure has real altitude restrictions to climb via:
+// at least two crossing restrictions at named fixes on the initial climb (the runway transition
+// plus the common route), whichever runway is used. The clearance doesn't name a runway, so the
+// runway with the fewest restrictions decides. topAlt is the highest altitude the procedure
+// itself names on that initial climb, so an "expect" altitude can be set above it.
+function climbVia(p) {
+  const distinct = (legs) => new Set(legs.map((l) => l.key)).size
+  const common = p.legs.filter((l) => COMMON.has(l.routeType))
+  const byRunway = new Map()
+  for (const l of p.legs) if (RUNWAY_TRANSITION.has(l.routeType)) byRunway.set(l.transition, [...(byRunway.get(l.transition) ?? []), l])
+  const paths = byRunway.size ? [...byRunway.values()].map((r) => distinct([...r, ...common])) : [distinct(common)]
+  if (Math.min(...paths) < 2) return null
+  const topAlt = Math.max(...p.legs.filter((l) => !ENROUTE.has(l.routeType)).flatMap((l) => l.alts))
+  return Number.isFinite(topAlt) ? { climbVia: true, topAlt } : null
+}
+
 const airports = {}
 for (const icao of [...byAirport.keys()].sort()) {
   airports[icao] = [...byAirport.get(icao).values()]
-    .map((p) => ({ name: p.name, number: p.number, transitions: [...p.transitions].sort() }))
+    .map((p) => ({ name: p.name, number: p.number, transitions: [...p.transitions].sort(), ...climbVia(p) }))
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 

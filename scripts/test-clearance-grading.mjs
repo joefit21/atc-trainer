@@ -31,5 +31,12 @@ check('expect: missing time or wrong level fails', !altitudeSaid('expect flight 
 check('expect: run-together digits are split correctly', altitudeSaid('expect two five zero one zero minutes after departure', 25000, { minutes: true }))
 check('altitudeFromWords', altitudeFromWords('one one thousand') === 11000 && altitudeFromWords('flight level tree five zero') === 35000 && altitudeFromWords('niner thousand') === 9000)
 check('numberGroups merges spoken digits only', JSON.stringify(numberGroups('climb and maintain one zero thousand expect flight level tree five zero')) === JSON.stringify(['10T', '350']))
+
+// "Climb via the SID" clearances.
+const cvTail = ', climb via the SID, expect flight level tree five zero one zero minutes after departure, departure frequency one two five point tree, squawk four tree two one'
+const cv = parseClearance('november one two tree alpha bravo, cleared to denver via the BAYLR six departure, TEHRU transition, then as filed' + cvTail, 'ifr')
+check('climb via: parsed as climb via, no initial altitude', cv.climbVia === true && cv.initialAltitude === null, JSON.stringify(cv))
+check('climb via: routing, transition and expect altitude still parse', cv.routeKind === 'sid' && cv.sidName === 'BAYLR' && cv.transition === 'TEHRU' && cv.expectAltitude === 35000 && cv.frequency === '1253' && cv.squawk === '4321', JSON.stringify(cv))
+check('a climb and maintain clearance is not climb via', p.climbVia === false)
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')
 process.exit(failed ? 1 : 0)
