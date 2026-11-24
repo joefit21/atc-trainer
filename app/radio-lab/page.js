@@ -296,7 +296,7 @@ export default function RadioLab() {
       const res = await authedFetch('/api/grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clearance_text: ifrScenario.clearance_text, readback_text: text, scenario_type: 'ifr', is_demo: isDemo }),
+        body: JSON.stringify({ clearance_text: ifrScenario.clearance_text, readback_text: text, scenario_type: 'ifr', is_demo: isDemo, callsign: ifrScenario.callsign }),
       })
       const result = await res.json()
       setIFRScore(result.score)
