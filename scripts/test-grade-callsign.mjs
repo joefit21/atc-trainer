@@ -9,6 +9,9 @@ const rbCv = rb.replace('climb and maintain 10,000', 'climb via the SID')
 // An airline clearance with a flight level; voice-to-text wrote "flight level three zero zero" as "3-0".
 const air = 'hawaiian fifteen, cleared to houston hobby via fly runway heading, expect radar vectors on course, climb and maintain one one thousand, expect flight level tree zero zero one zero minutes after departure, departure frequency one two seven point two, squawk four seven zero two'
 const airRb = 'Hawaiian 15, cleared to the Houston airport via fly runway heading, expect radar vectors on course, climb and maintain 1-1000, expect flight level 3-0, 1-0 minutes after departure, frequency 127.2, squawk 4-7-0-2.'
+// Feedback names exactly what was missing: the expected altitude, the time after departure, or both.
+const pal = 'november zero zero one xray juliet, cleared to palo alto via radar vectors, climb and maintain one two thousand, expect flight level one niner zero one zero minutes after departure, departure frequency one tree tree point two, squawk four seven zero zero'
+const palRb = 'N-001XJ, cleared the Palo Alto airport via radar vectors, climb and maintain 1-2000, expect flight level 1-9-0, 1-0 minutes after departure, frequency 133.2, squawk 4-7-0-0.'
 const ground = 'november one two tree alpha bravo, salem ground, runway tree one, taxi via alpha, hold short of runway one six'
 const gb = 'runway 31 taxi via Alpha hold short of runway 16'
 const cs = 'November 123 Alpha Bravo '
@@ -32,6 +35,17 @@ const cases = [
   ['IFR, wrong SID number', ifr, cs + rb.replace('six', 'seven'), 'ifr', 70],
 ]
 let failed = 0
+const feedbackCases = [
+  ['expect altitude wrong, time said: asks for the altitude only', palRb.replace('1-9-0', '1-0-0'), 75, /altitude to expect: flight level one niner zero/i, /time after departure/i],
+  ['expect altitude right, time not said: asks for the time only', palRb.replace(', 1-0 minutes after departure', ' after departure'), 90, /time after departure/i, /altitude to expect/i],
+  ['expect altitude and time both missing', palRb.replace('expect flight level 1-9-0, 1-0 minutes after departure,', ''), 65, /altitude to expect[\s\S]*time after departure/i, null],
+  ['everything right', palRb, 100, /clean call/i, null],
+]
+for (const [name, r, want, must, mustNot] of feedbackCases) {
+  const g = await (await fetch(BASE + '/api/grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clearance_text: pal, readback_text: r, scenario_type: 'ifr', is_demo: true, callsign: 'N001XJ' }) })).json()
+  const ok = g.score === want && must.test(g.feedback) && (!mustNot || !mustNot.test(g.feedback))
+  console.log(ok ? 'ok  ' : 'FAIL', name.padEnd(56), g.score, JSON.stringify(g.feedback)); if (!ok) failed++
+}
 for (const [name, c, r, t, want] of cases) {
   const got = []
   for (let i = 0; i < 4; i++) got.push((await grade(c, r, t)).score)

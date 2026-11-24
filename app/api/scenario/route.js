@@ -6,7 +6,7 @@ import sidData from '@/lib/sids.json'
 import coordData from '@/lib/airport-coords.json'
 import runwayData from '@/lib/runways.json'
 import { buildGroundClearance } from '@/lib/ground.mjs'
-import { pickAirlineFlightLevel } from '@/lib/altitudes.mjs'
+import { pickAirlineFlightLevel, isEastboundFlight, pickExpectAltitude } from '@/lib/altitudes.mjs'
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
 import { forSpeech } from '@/lib/speech'
 
@@ -300,10 +300,12 @@ export async function GET(request) {
       const climbViaBase = climbVia ? Math.max(Math.ceil(sid.topAlt / 1000) * 1000, 8000) : 0
       // Airlines expect a flight level that follows the hemispheric rule for the direction of
       // flight (odd eastbound, even westbound, FL300-FL410); see lib/altitudes.mjs.
+      // Everyone else follows the same rule below FL290: odd thousands eastbound, even westbound.
+      const eastbound = isEastboundFlight(coordData.airports[departure.icao], coordData.airports[destination.icao])
       const expectAlt = callsign.isAirline
         ? pickAirlineFlightLevel(coordData.airports[departure.icao], coordData.airports[destination.icao]) * 100
-        : climbVia ? climbViaBase + randomInt(2, 6) * 1000
-        : (initialAlt + randomInt(3, 8) * 1000)
+        : climbVia ? pickExpectAltitude(climbViaBase + 2000, climbViaBase + 6000, eastbound)
+        : pickExpectAltitude(initialAlt + 3000, initialAlt + 8000, eastbound)
       const freq = generateFrequency()
       const squawk = generateSquawk()
 

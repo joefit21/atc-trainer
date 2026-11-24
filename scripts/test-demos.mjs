@@ -54,6 +54,9 @@ for (const [label, c] of [['lab IFR demo', IFR_DEMO], ['home-page IFR sample', I
   check(`${label}: climb via the SID is used exactly when the procedure is eligible`, !!p.climbVia === !!real?.climbVia, `clearance climbVia=${!!p.climbVia}, data climbVia=${!!real?.climbVia}`)
   if (p.climbVia) check(`${label}: expect altitude is above the procedure's top altitude`, p.expect * (p.expectIsFL ? 100 : 1) > (real?.topAlt || 0), `${p.expect} vs ${real?.topAlt}`)
   check(`${label}: breakdown clearance limit appears in the clearance`, c.clearance_text.includes(cr.limit), cr.limit)
+  // RULE: the expect altitude follows the direction of flight (odd thousands eastbound, even westbound).
+  const eastbound = isEastbound(magneticCourse(coords[dep(c)], coords[dest(c)]))
+  check(`${label}: the expect altitude follows the odd-east / even-west rule`, (Math.round((p.expectIsFL ? p.expect * 100 : p.expect) / 1000) % 2 === 1) === eastbound, `${p.expect} ${eastbound ? 'eastbound' : 'westbound'}`)
 }
 
 // The home-page sample is an airline flight: its flight level follows the hemispheric rule.
