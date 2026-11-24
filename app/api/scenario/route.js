@@ -8,6 +8,7 @@ import runwayData from '@/lib/runways.json'
 import { buildGroundClearance } from '@/lib/ground.mjs'
 import { pickAirlineFlightLevel } from '@/lib/altitudes.mjs'
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
+import { forSpeech } from '@/lib/speech-text.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -270,7 +271,7 @@ export async function GET(request) {
       }
 
       const ttsResponse = await openai.audio.speech.create({
-        model: 'tts-1', voice: 'onyx', input: parsed.clearance_text, speed: 1.1
+        model: 'tts-1', voice: 'onyx', input: forSpeech(parsed.clearance_text), speed: 1.1
       })
 
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer())
@@ -321,7 +322,7 @@ export async function GET(request) {
       }
 
       const ttsResponse = await openai.audio.speech.create({
-        model: 'tts-1', voice: 'onyx', input: parsed.clearance_text, speed: 1.1
+        model: 'tts-1', voice: 'onyx', input: forSpeech(parsed.clearance_text), speed: 1.1
       })
 
       const audioBuffer = Buffer.from(await ttsResponse.arrayBuffer())

@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import { GROUND, IFR_DEMO, IFR_LANDING } from '@/lib/demo-clearances.mjs'
+import { forSpeech } from '@/lib/speech-text.mjs'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
@@ -16,7 +17,7 @@ export async function GET(request) {
     const mp3 = await openai.audio.speech.create({
       model: 'tts-1',
       voice: 'onyx',
-      input: scenario.clearance_text,
+      input: forSpeech(scenario.clearance_text),
       speed: 1.1,
     })
 
