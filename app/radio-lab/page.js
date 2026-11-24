@@ -53,12 +53,12 @@ const DEMO_SCENARIOS = {
     approach_direction: 'southeast', approach_distance: 10, approach_altitude: 3200, parking_destination: 'GA ramp',
   },
   flightfollowing: {
-    scenario_type: 'flight_following', facility_name: 'NorCal Approach', facility_freq: '132.45',
+    scenario_type: 'flight_following', facility_name: 'NorCal Approach', facility_freq: '125.4',
     altimeter_station: 'Sacramento', aircraft_type: 'Cessna 172',
     callsign_display: 'N4521H', callsign_spoken: 'November four five two one Hotel',
     destination_name: 'Sacramento Executive', destination_id: 'KSAC',
     position_reference: 'Auburn', position_direction: 'south', position_distance: 12,
-    altitude: 5500, altimeter: '30.04',
+    altitude: 6500, altimeter: '30.04',
   },
 }
 

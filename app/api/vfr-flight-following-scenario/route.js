@@ -1,115 +1,29 @@
 import { requireSubscribed } from '@/lib/require-auth'
+import ffData from '@/lib/flight-following.json'
+import { magneticCourse, isEastbound, trueCourse } from '@/lib/altitudes.mjs'
 
-// Geographic regions — facility, position references, and destinations are
-// all within ~200 nm of each other so scenarios make geographic sense.
-// altimeter_station: the city/airport name the controller identifies when issuing the altimeter
-//   e.g. "Sacramento altimeter, two niner niner five"
-const REGIONS = [
-  {
-    facility: { name: 'NorCal Approach', freq: '132.45' },
-    altimeter_station: 'Sacramento',
-    references: ['Auburn', 'Stockton', 'Modesto', 'Fresno', 'Chico', 'Redding', 'Marysville'],
-    destinations: [
-      { name: 'Sacramento Executive',        id: 'KSAC' },
-      { name: 'Fresno Yosemite International', id: 'KFAT' },
-      { name: 'Redding Municipal',           id: 'KRDD' },
-      { name: 'Chico Municipal',             id: 'KCIC' },
-      { name: 'Stockton Metropolitan',       id: 'KSCK' },
-      { name: 'Beale Air Force Base',        id: 'KBAB' },
-    ],
-  },
-  {
-    facility: { name: 'Seattle Approach', freq: '120.1' },
-    altimeter_station: 'Seattle',
-    references: ['Olympia', 'Tacoma', 'Everett', 'Bellingham', 'Bremerton', 'Monroe'],
-    destinations: [
-      { name: 'Seattle Boeing Field',        id: 'KBFI' },
-      { name: 'Paine Field',                 id: 'KPAE' },
-      { name: 'Olympia Regional',            id: 'KOLM' },
-      { name: 'Bellingham International',    id: 'KBLI' },
-      { name: 'Harvey Field',                id: 'S43'  },
-    ],
-  },
-  {
-    facility: { name: 'Portland Approach', freq: '124.0' },
-    altimeter_station: 'Portland',
-    references: ['Salem', 'Eugene', 'Pendleton', 'Astoria', 'McMinnville', 'The Dalles'],
-    destinations: [
-      { name: 'Salem Airport',               id: 'KSLE' },
-      { name: 'Eugene Airport',              id: 'KEUG' },
-      { name: 'Medford Airport',             id: 'KMFR' },
-      { name: 'Pendleton Regional',          id: 'KPDT' },
-      { name: 'McMinnville Municipal',       id: 'KMMV' },
-    ],
-  },
-  {
-    facility: { name: 'Salt Lake Approach', freq: '124.3' },
-    altimeter_station: 'Salt Lake',
-    references: ['Provo', 'Logan', 'Ogden', 'Price', 'Vernal', 'Heber City'],
-    destinations: [
-      { name: 'Provo Municipal',             id: 'KPVU' },
-      { name: 'Logan-Cache Airport',         id: 'KLGU' },
-      { name: 'Ogden Hinckley',              id: 'KOGD' },
-      { name: 'Vernal Regional',             id: 'KVEL' },
-      { name: 'Spanish Fork Municipal',      id: 'U77'  },
-    ],
-  },
-  {
-    facility: { name: 'Denver Center', freq: '133.4' },
-    altimeter_station: 'Denver',
-    references: ['Grand Junction', 'Glenwood Springs', 'Steamboat Springs', 'Fort Collins', 'Pueblo'],
-    destinations: [
-      { name: 'Grand Junction Regional',     id: 'KGJT' },
-      { name: 'Colorado Springs Airport',    id: 'KCOS' },
-      { name: 'Fort Collins-Loveland',       id: 'KFNL' },
-      { name: 'Pueblo Memorial',             id: 'KPUB' },
-      { name: 'Leadville Lake County',       id: 'KLXV' },
-    ],
-  },
-  {
-    facility: { name: 'Albuquerque Center', freq: '135.3' },
-    altimeter_station: 'Albuquerque',
-    references: ['Santa Fe', 'Taos', 'Roswell', 'Gallup', 'Farmington', 'Ruidoso'],
-    destinations: [
-      { name: 'Albuquerque International Sunport', id: 'KABQ' },
-      { name: 'Santa Fe Regional',           id: 'KSAF' },
-      { name: 'Roswell International Air Center', id: 'KROW' },
-      { name: 'Farmington Four Corners',     id: 'KFMN' },
-    ],
-  },
-  {
-    facility: { name: 'SoCal Approach', freq: '124.5' },
-    altimeter_station: 'Los Angeles',
-    references: ['Oceanside', 'Riverside', 'Palm Springs', 'Victorville', 'El Cajon', 'Hemet'],
-    destinations: [
-      { name: 'Long Beach Airport',          id: 'KLGB' },
-      { name: 'John Wayne Airport',          id: 'KSNA' },
-      { name: 'Palm Springs International',  id: 'KPSP' },
-      { name: 'Ramona Airport',              id: 'KRNM' },
-      { name: 'Hemet-Ryan Airport',          id: 'KHMT' },
-    ],
-  },
-  {
-    facility: { name: 'Houston Approach', freq: '119.0' },
-    altimeter_station: 'Houston',
-    references: ['Galveston', 'Conroe', 'Beaumont', 'Victoria', 'Huntsville', 'Wharton'],
-    destinations: [
-      { name: 'Sugar Land Regional',         id: 'KSGR' },
-      { name: 'Galveston Scholes',           id: 'KGLS' },
-      { name: 'Beaumont Municipal',          id: 'KBMT' },
-      { name: 'Victoria Regional',           id: 'KVCT' },
-      { name: 'Conroe-North Houston Regional', id: 'KCXO' },
-    ],
-  },
-]
+// Real facilities and airports from the FAA's NASR data (scripts/build-flight-following.mjs). The pilot
+// starts a few miles from an airport, and the facility and frequency are the ones the FAA lists for
+// that airport (an approach control, or an ARTCC where there is none). The destination is another
+// airport served by the same facility, and the cruising altitude follows the direction of flight.
+const FF = ffData
+const START_AIRPORTS = FF.airports.filter((a) => a.freq)
+const BY_FACILITY = {}
+for (const a of FF.airports) (BY_FACILITY[a.fac] ??= []).push(a)
 
-// Odd+500 = eastbound (0–179°), even+500 = westbound (180–359°) per 14 CFR 91.159
-const VFR_ALTITUDES = [3500, 4500, 5500, 6500, 7500, 8500, 9500, 10500]
+const COMPASS = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest']
+// The compass point for a true bearing in degrees.
+const compassPoint = (deg) => COMPASS[Math.round((((deg % 360) + 360) % 360) / 45) % 8]
 
-const APPROACH_DIRECTIONS = [
-  'north', 'south', 'east', 'west',
-  'northeast', 'northwest', 'southeast', 'southwest',
-]
+const rad = (d) => (d * Math.PI) / 180
+function distanceNm(a, b) {
+  const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lon - a.lon) / 2) ** 2
+  return 2 * 3440.065 * Math.asin(Math.sqrt(h))
+}
+
+// 14 CFR 91.159: odd thousands plus 500 on a magnetic course of 0-179, even thousands plus 500 on 180-359.
+const EASTBOUND_ALTITUDES = [3500, 5500, 7500, 9500, 11500]
+const WESTBOUND_ALTITUDES = [4500, 6500, 8500, 10500, 12500]
 
 const AIRCRAFT = [
   { type: 'Cessna 172',         spoken: 'Cessna one seven two' },
@@ -149,27 +63,40 @@ export async function GET(request) {
   const { authError } = await requireSubscribed(request)
   if (authError) return authError
 
-  const region      = pickRandom(REGIONS)
+  // A starting airport needs somewhere to go: another airport on the same facility, 20-120 nm away.
+  let start, destination, distance
+  for (let i = 0; i < 50 && !destination; i++) {
+    start = pickRandom(START_AIRPORTS)
+    const options = (BY_FACILITY[start.fac] || []).filter((d) => d.id !== start.id && (distance = distanceNm(start, d)) >= 20 && distance <= 120)
+    if (options.length) destination = pickRandom(options)
+  }
   const aircraft    = pickRandom(AIRCRAFT)
   const tail        = generateTailNumber()
-  const destination = pickRandom(region.destinations)
-  const posRef      = pickRandom(region.references)
-  const posDir      = pickRandom(APPROACH_DIRECTIONS)
+  // The pilot is on the far side of the starting airport from the destination, flying toward it.
+  const bearing     = trueCourse([start.lat, start.lon], [destination.lat, destination.lon])
+  const posDir      = compassPoint(bearing + 180)
   const posDist     = randomInt(8, 18)
-  const altitude    = pickRandom(VFR_ALTITUDES)
+  const course      = magneticCourse([start.lat, start.lon, start.mv], [destination.lat, destination.lon])
+  const minAlt      = Math.max(start.elev, destination.elev) + 2000
+  // A typical cruise: at least 2,000 ft above the higher airport and no more than 5,000 ft above that.
+  const allLevels   = isEastbound(course) ? EASTBOUND_ALTITUDES : WESTBOUND_ALTITUDES
+  const levels      = allLevels.filter((a) => a >= minAlt && a <= minAlt + 5000)
+  const altitude    = pickRandom(levels.length ? levels : [allLevels.find((a) => a >= minAlt) ?? allLevels[allLevels.length - 1]])
   const altimeter   = randomAltimeter()
+  // The controller gives the altimeter of the nearest weather station (ASOS or AWOS).
+  const station     = FF.stations.reduce((best, st) => (distanceNm(start, st) < distanceNm(start, best) ? st : best), FF.stations[0])
 
   return Response.json({
     scenario_type:       'flight_following',
-    facility_name:       region.facility.name,
-    facility_freq:       region.facility.freq,
-    altimeter_station:   region.altimeter_station,
+    facility_name:       FF.facilities[start.fac],
+    facility_freq:       start.freq,
+    altimeter_station:   station.name,
     aircraft_type:       aircraft.type,
     callsign_display:    tail.display,
     callsign_spoken:     tail.spoken,
     destination_name:    destination.name,
     destination_id:      destination.id,
-    position_reference:  posRef,
+    position_reference:  start.name,
     position_direction:  posDir,
     position_distance:   posDist,
     altitude,
