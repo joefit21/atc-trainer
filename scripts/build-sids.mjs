@@ -96,8 +96,8 @@ for await (const line of rl) {
 
 // "Climb via the SID" is only used when the procedure has real altitude restrictions to climb via:
 // at least two crossing restrictions at named fixes on the initial climb (the runway transition
-// plus the common route), whichever runway is used. The clearance doesn't name a runway, so the
-// runway with the fewest restrictions decides. topAlt is the highest altitude the procedure
+// plus the common route) for at least one runway. The clearance doesn't name a runway, so one
+// runway with enough restrictions is enough. topAlt is the highest altitude the procedure
 // itself names on that initial climb, so an "expect" altitude can be set above it.
 function climbVia(p) {
   const distinct = (legs) => new Set(legs.map((l) => l.key)).size
@@ -105,7 +105,7 @@ function climbVia(p) {
   const byRunway = new Map()
   for (const l of p.legs) if (RUNWAY_TRANSITION.has(l.routeType)) byRunway.set(l.transition, [...(byRunway.get(l.transition) ?? []), l])
   const paths = byRunway.size ? [...byRunway.values()].map((r) => distinct([...r, ...common])) : [distinct(common)]
-  if (Math.min(...paths) < 2) return null
+  if (Math.max(...paths) < 2) return null
   const topAlt = Math.max(...p.legs.filter((l) => !ENROUTE.has(l.routeType)).flatMap((l) => l.alts))
   return Number.isFinite(topAlt) ? { climbVia: true, topAlt } : null
 }

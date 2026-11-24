@@ -65,7 +65,7 @@ check('some procedures are climb via eligible, most are not', cvList.length > 15
 check('every eligible procedure has a top altitude', cvList.every((p) => Number.isFinite(p.topAlt) && p.topAlt >= 1000 && p.topAlt <= 30000))
 const find = (icao, name) => (data.airports[icao] || []).find((p) => p.name === name)
 check('KDEN BAYLR is eligible (several restrictions)', find('KDEN', 'BAYLR')?.climbVia === true)
-check('KDFW DARTZ is not eligible (restrictions on some runways only)', !find('KDFW', 'DARTZ')?.climbVia)
+check('KDFW DARTZ is eligible (two or more restrictions on several runways)', find('KDFW', 'DARTZ')?.climbVia === true && find('KDFW', 'DARTZ').topAlt === 10000)
 check('KDEN PLAIN is not eligible (vector departure, no restrictions)', !find('KDEN', 'PLAIN')?.climbVia)
 check('pickSID passes the climb via flag through', pickSID({ airports: { KXXX: [{ name: 'BAYLR', number: 6, transitions: ['TEHRU'], climbVia: true, topAlt: 11000 }] } }, 'KXXX').climbVia === true)
 console.log(failed ? `\n${failed} FAILED` : '\nALL PASS')

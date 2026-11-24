@@ -16,6 +16,14 @@ function parse(c) {
   const t = c.clearance_text
   const sid = t.match(/via the ([A-Z]{3,5}) (\w+) departure(?:, ([A-Z]{5}) transition)?, then as filed/)
   const alt = t.match(/[Cc]limb and maintain ((?:\w+ )+?)thousand, expect (flight level )?((?:\w+ )+?)(?:thousand )?one zero minutes after departure/)
+  const via = t.match(/[Cc]limb via the SID, expect (flight level )?((?:\w+ )+?)(?:thousand )?one zero minutes after departure/)
+  if (via) return {
+    sid: sid && { name: sid[1], number: Number(digits(sid[2])), transition: sid[3] || null },
+    climbVia: true, climb: 'via the SID', expectIsFL: !!via[1],
+    expect: via[1] ? Number(digits(via[2])) : Number(digits(via[2])) * 1000,
+    freq: (() => { const f = t.match(/[Dd]eparture frequency ((?:\w+ )+?)point ((?:\w+ ?)+?),/); return f && `${digits(f[1])}.${digits(f[2])}` })(),
+    squawk: (() => { const q = t.match(/squawk ((?:\w+ ?)+?)\.$/); return q && digits(q[1]) })(),
+  }
   return {
     sid: sid && { name: sid[1], number: Number(digits(sid[2])), transition: sid[3] || null },
     climb: alt && Number(digits(alt[1])) * 1000,
@@ -40,7 +48,11 @@ for (const [label, c] of [['lab IFR demo', IFR_DEMO], ['home-page IFR sample', I
   check(`${label}: breakdown route matches (SID, number, transition)`, cr.route === `${p.sid.name} ${p.sid.number === 9 ? 'Niner' : ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight'][p.sid.number]} departure${p.sid.transition ? `, ${p.sid.transition} transition` : ''}, then as filed`, cr.route)
   check(`${label}: breakdown frequency and transponder match`, cr.frequency === p.freq && cr.transponder === p.squawk, `${cr.frequency}/${p.freq} ${cr.transponder}/${p.squawk}`)
   const expectText = p.expectIsFL ? `FL${p.expect}` : fmt(p.expect)
-  check(`${label}: breakdown altitude matches`, cr.altitude.startsWith(`Climb/maintain ${fmt(p.climb)} · Expect ${expectText}`), `${cr.altitude} vs ${p.climb}/${p.expect}`)
+  const climbText = p.climbVia ? 'Climb via the SID' : `Climb/maintain ${fmt(p.climb)}`
+  check(`${label}: breakdown altitude matches`, cr.altitude.startsWith(`${climbText} · Expect ${expectText}`), `${cr.altitude} vs ${p.climb}/${p.expect}`)
+  // RULE: "climb via the SID" exactly when the procedure has the altitude restrictions for it, and the expect altitude is above its top altitude.
+  check(`${label}: climb via the SID is used exactly when the procedure is eligible`, !!p.climbVia === !!real?.climbVia, `clearance climbVia=${!!p.climbVia}, data climbVia=${!!real?.climbVia}`)
+  if (p.climbVia) check(`${label}: expect altitude is above the procedure's top altitude`, p.expect * (p.expectIsFL ? 1 : 1) > (real?.topAlt || 0), `${p.expect} vs ${real?.topAlt}`)
   check(`${label}: breakdown clearance limit appears in the clearance`, c.clearance_text.includes(cr.limit), cr.limit)
 }
 

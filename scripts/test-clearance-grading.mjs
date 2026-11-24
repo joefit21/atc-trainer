@@ -12,7 +12,7 @@ const kinds = (r) => parseClearance(`november one two tree alpha bravo, cleared 
 check('route kinds', kinds('via radar vectors') === 'vectors' && kinds('as filed') === 'filed' && kinds('via fly runway heading, expect radar vectors on course') === 'heading' && kinds('via the DAY niner departure, then as filed') === 'sid')
 check('fly runway heading: the altitude expect is not the routing expect', (() => { const x = parseClearance('november one two tree alpha bravo, cleared to denver via fly runway heading, expect radar vectors on course' + tail, 'ifr'); return x.expectAltitude === 35000 && x.initialAltitude === 10000 })())
 const d = parseClearance(IFR_DEMO.clearance_text, 'ifr')
-check('IFR demo: destination, altitudes, frequency, squawk', /houston/i.test(d.destination) && d.initialAltitude === 11000 && d.expectAltitude === 15000 && d.frequency === '1243' && d.squawk === '4532' && /^november seven eight two tree kilo$/i.test(d.callsign_spoken), JSON.stringify(d))
+check('IFR demo: destination, climb via the SID, expect altitude, frequency, squawk', /houston/i.test(d.destination) && d.climbVia === true && d.initialAltitude === null && d.expectAltitude === 15000 && d.frequency === '1243' && d.squawk === '4532' && /^november seven eight two tree kilo$/i.test(d.callsign_spoken), JSON.stringify(d))
 const l = parseClearance(IFR_LANDING.clearance_text, 'ifr')
 check('landing-page IFR sample parses fully (airline flight level)', l.initialAltitude === 10000 && l.expectAltitude >= 31000 && l.expectAltitude % 1000 === 0 && !!l.frequency && !!l.squawk && /united/i.test(l.callsign_spoken), JSON.stringify(l))
 
