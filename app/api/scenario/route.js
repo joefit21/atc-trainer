@@ -8,7 +8,7 @@ import runwayData from '@/lib/runways.json'
 import { buildGroundClearance } from '@/lib/ground.mjs'
 import { pickAirlineFlightLevel } from '@/lib/altitudes.mjs'
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
-import { forSpeech } from '@/lib/speech-text.mjs'
+import { forSpeech } from '@/lib/speech'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })

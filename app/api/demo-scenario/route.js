@@ -1,6 +1,6 @@
 import OpenAI from 'openai'
 import { GROUND, IFR_DEMO, IFR_LANDING } from '@/lib/demo-clearances.mjs'
-import { forSpeech } from '@/lib/speech-text.mjs'
+import { forSpeech } from '@/lib/speech'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
