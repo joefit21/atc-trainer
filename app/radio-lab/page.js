@@ -63,6 +63,21 @@ const DEMO_SCENARIOS = {
 }
 
 function InputPanel({ onSubmit, inputText, setInputText, isRecording, isTranscribing, transcriptionFailed, setTranscriptionFailed, startRecording, stopRecording }) {
+  // Tapping the red button to stop recording also submits: once the recording has been transcribed, the text is
+  // sent (an empty or failed transcription is not sent, and nothing is left waiting).
+  const submitAfter = useRef(false)
+  useEffect(() => {
+    if (!submitAfter.current) return
+    if (isTranscribing) { submitAfter.current = 'transcribing'; return }
+    if (submitAfter.current !== 'transcribing') return
+    submitAfter.current = false
+    const text = inputText.trim()
+    if (!text) return
+    setInputText('')
+    setTranscriptionFailed(false)
+    onSubmit(text)
+  }, [isTranscribing, inputText]) // eslint-disable-line react-hooks/exhaustive-deps
+  const stopAndSubmit = () => { submitAfter.current = true; stopRecording() }
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!inputText.trim() || isRecording || isTranscribing) return
@@ -80,7 +95,7 @@ function InputPanel({ onSubmit, inputText, setInputText, isRecording, isTranscri
           onChange={e => setInputText(e.target.value)}
           disabled={isRecording || isTranscribing}
           placeholder={
-            isRecording    ? 'Listening...' :
+            isRecording    ? 'Listening... tap ⏹ when done to send' :
             isTranscribing ? 'Transcribing...' :
             'Type your readback, or tap 🎙️ to speak'
           }
@@ -88,9 +103,9 @@ function InputPanel({ onSubmit, inputText, setInputText, isRecording, isTranscri
         />
         <button
           type="button"
-          onClick={isRecording ? stopRecording : startRecording}
+          onClick={isRecording ? stopAndSubmit : startRecording}
           disabled={isTranscribing}
-          title={isRecording ? 'Stop recording' : 'Speak your readback'}
+          title={isRecording ? 'Stop recording and submit' : 'Speak your readback'}
           className={`px-4 py-3 rounded-xl font-semibold transition disabled:opacity-50 ${
             isRecording
               ? 'bg-red-500 hover:bg-red-600 text-white animate-pulse'
