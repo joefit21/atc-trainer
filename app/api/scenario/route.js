@@ -10,6 +10,7 @@ import { pickAirlineFlightLevel, isEastboundFlight, pickExpectAltitude } from '@
 import { pickSID as pickRealSID, buildRoutePhrase } from '@/lib/sid-phrase.mjs'
 import { forSpeech } from '@/lib/speech'
 import { generateSquawk } from '@/lib/squawk.mjs'
+import { pickAirportPair } from '@/lib/airline-airports.mjs'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -151,13 +152,6 @@ function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-function pickTwoDifferent(arr) {
-  const first = pickRandom(arr)
-  let second
-  do { second = pickRandom(arr) } while (second.icao === first.icao)
-  return [first, second]
-}
-
 function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
@@ -224,7 +218,8 @@ export async function GET(request) {
 
     if (type === 'ground') {
       const airport = pickRandom(airports)
-      const callsign = generateCallsign()
+      // Airline callsigns are only for the IFR clearance scenario.
+      const callsign = generateCallsign(false)
 
       // Departure clearance from the airport's real runways (lib/ground.mjs): the runway
       // is picked from a wind, spoken correctly, and any hold-short or crossing instruction
@@ -280,8 +275,9 @@ export async function GET(request) {
       })
 
     } else {
-      const [departure, destination] = pickTwoDifferent(airports)
+      // An airline flight is only cleared between Class B and Class C airports (lib/airline-airports.mjs).
       const callsign = generateCallsign()
+      const [departure, destination] = pickAirportPair(airports, callsign.isAirline, pickRandom)
       // A departure procedure with real altitude restrictions is cleared "climb via the SID";
       // any other clearance gets a specific initial altitude. Both then get an expect altitude.
       const sid = pickRealSID(sidData, departure.icao)
