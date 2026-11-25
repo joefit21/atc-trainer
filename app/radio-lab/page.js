@@ -236,7 +236,8 @@ export default function RadioLab() {
     if (!audio) return
     audio.load()
     audio.playbackRate = playbackSpeed
-    audio.play().catch(() => {})
+    // A reply that arrives while the pilot is already recording is not played over them (Play Again plays it).
+    if (!isRecording) audio.play().catch(() => {})
   }, [controllerAudioUrl])
 
   // ── load scenario ─────────────────────────────────────────────────────────────
@@ -331,7 +332,19 @@ export default function RadioLab() {
   }
 
   // ── recording helpers ─────────────────────────────────────────────────────────
+  // Stops any clearance or controller audio, so it is not playing into the microphone. It is rewound, so Play starts
+  // it from the beginning.
+  const stopSpokenAudio = () => {
+    for (const ref of [ifrAudioRef, controllerAudioRef]) {
+      const audio = ref.current
+      if (!audio) continue
+      audio.pause()
+      audio.currentTime = 0
+    }
+  }
+
   const startRecording = async () => {
+    stopSpokenAudio()
     setTranscriptionFailed(false)
     setInputText('')
     try {
@@ -354,6 +367,7 @@ export default function RadioLab() {
           setTranscriptionFailed(true)
         }
       }
+      stopSpokenAudio() // again: it may have been started while the browser was asking for the microphone
       mediaRecorderRef.current.start()
       setIsRecording(true)
     } catch { alert('Microphone access required.') }
