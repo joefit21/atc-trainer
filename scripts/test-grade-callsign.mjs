@@ -36,11 +36,48 @@ const cases = [
 ]
 let failed = 0
 const feedbackCases = [
-  ['expect altitude wrong, time said: asks for the altitude only', palRb.replace('1-9-0', '1-0-0'), 75, /altitude to expect: flight level one niner zero/i, /time after departure/i],
+  ['expect altitude wrong, time said: asks for the altitude only', palRb.replace('1-9-0', '1-0-0'), 75, /expected altitude didn't match: the clearance said flight level one niner zero/i, /time after departure/i],
   ['expect altitude right, time not said: asks for the time only', palRb.replace(', 1-0 minutes after departure', ' after departure'), 90, /time after departure/i, /altitude to expect/i],
   ['expect altitude and time both missing', palRb.replace('expect flight level 1-9-0, 1-0 minutes after departure,', ''), 65, /altitude to expect[\s\S]*time after departure/i, null],
   ['everything right', palRb, 100, /clean call/i, null],
 ]
+
+// Wrong is told apart from missing, and the feedback says what the clearance had.
+const dal = 'delta twenty nine eighty nine, cleared to minneapolis as filed, climb and maintain one zero thousand, expect flight level tree eight zero one zero minutes after departure, departure frequency one two one point two, squawk seven five tree five'
+const dalRb = 'Delta 2989, cleared to the Minneapolis airport as filed, climb and maintain 10000, expect flight level 380, 10 minutes after departure, frequency 121.2, squawk 7535.'
+const wrongCases = [
+  ['frequency wrong', dalRb.replace('121.2', '121.1'), 80, /departure frequency didn't match: the clearance said one two one point two/],
+  ['frequency not read back', dalRb.replace(', frequency 121.2', ''), 80, /^Read back the departure frequency\.$/],
+  ['squawk wrong', dalRb.replace('7535', '7553'), 75, /squawk code didn't match: the clearance said seven five tree five/],
+  ['squawk not read back', dalRb.replace(', squawk 7535', ''), 75, /^Read back the squawk code\.$/],
+  ['initial altitude wrong', dalRb.replace('10000', '11000'), 75, /initial altitude didn't match: the clearance said one zero thousand/],
+  ['initial altitude not read back', dalRb.replace('climb and maintain 10000, ', ''), 75, /^Read back the altitude you were told to climb and maintain\.$/],
+  ['time wrong (the altitude is still right)', dalRb.replace('10 minutes', '15 minutes'), 90, /^Your time after departure didn't match/],
+  ['destination wrong', dalRb.replace('Minneapolis', 'Chicago'), 80, /^Your destination didn't match: the clearance was to Minneapolis\.$/],
+  ['routing wrong (vectors for as filed)', dalRb.replace('as filed', 'via radar vectors'), 70, /^Your routing didn't match/],
+  ['"minutes" does not stand in for the city "Minneapolis"', dalRb.replace('the Minneapolis airport', 'the airport'), 80, /^Read back where you are cleared to\.$/],
+]
+for (const [name, r, want, must] of wrongCases) {
+  const g = await (await fetch(BASE + '/api/grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clearance_text: dal, readback_text: r, scenario_type: 'ifr', is_demo: true, callsign: 'DAL2989' }) })).json()
+  const ok = g.score === want && must.test(g.feedback)
+  console.log(ok ? 'ok  ' : 'FAIL', name.padEnd(56), g.score, JSON.stringify(g.feedback)); if (!ok) failed++
+}
+
+// The same for ground: wrong versus missing, and a taxiway that is a different letter is wrong.
+const gcs = 'November 123 Alpha Bravo '
+const groundCases = [
+  ['ground: runway wrong', gcs + 'runway 13 taxi via Alpha hold short of runway 16', 70, /^Your runway didn't match: Ground assigned runway tree one\.$/],
+  ['ground: runway not read back', gcs + 'taxi via Alpha hold short of runway 16', 70, /^Read back your assigned runway\.$/],
+  ['ground: hold short runway wrong', gcs + 'runway 31 taxi via Alpha hold short of runway 34', 70, /^Your hold short or crossing instruction didn't match: Ground said hold short of runway one six\.$/],
+  ['ground: hold short not read back', gcs + 'runway 31 taxi via Alpha', 70, /^Read back the hold short or crossing instruction/],
+  ['ground: wrong taxiway (and the callsign letters do not count)', gcs + 'runway 31 taxi via Bravo hold short of runway 16', 70, /^Your taxi route didn't match: Ground said alpha\.$/],
+  ['ground: taxiway said as a bare letter', gcs + 'runway 31 taxi via taxiway A hold short of runway 16', 100, /^Clean call/],
+]
+for (const [name, r, want, must] of groundCases) {
+  const g = await (await fetch(BASE + '/api/grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clearance_text: ground, readback_text: r, scenario_type: 'ground', is_demo: true, callsign: 'N123AB' }) })).json()
+  const ok = g.score === want && must.test(g.feedback)
+  console.log(ok ? 'ok  ' : 'FAIL', name.padEnd(56), g.score, JSON.stringify(g.feedback)); if (!ok) failed++
+}
 for (const [name, r, want, must, mustNot] of feedbackCases) {
   const g = await (await fetch(BASE + '/api/grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ clearance_text: pal, readback_text: r, scenario_type: 'ifr', is_demo: true, callsign: 'N001XJ' }) })).json()
   const ok = g.score === want && must.test(g.feedback) && (!mustNot || !mustNot.test(g.feedback))
